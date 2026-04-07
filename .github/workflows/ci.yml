@@ -40,13 +40,14 @@ jobs:
           dotnet sonarscanner begin \
             /k:"acessaai" \
             /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}" \
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
 
       - name: Build
         run: dotnet build --no-restore
 
-      - name: Testes unitários
-        run: dotnet test --no-build --verbosity normal
+      - name: Testes unitários com cobertura
+        run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: SonarQube End
         run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
@@ -85,7 +86,7 @@ jobs:
 
       - name: Build Angular
         run: npm run build
-        
+
       - name: Upload to Nexus
         run: |
           tar czf acessaai-frontend.tar.gz -C dist .
