@@ -1,4 +1,4 @@
-@AcessaAi.API_HostAddress = http://localhost:5148
+@AcessaAi.API_HostAddress = http://localhost:5236
 
 GET {{AcessaAi.API_HostAddress}}/weatherforecast/
 Accept: application/json
