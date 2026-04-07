@@ -13,17 +13,34 @@ jobs:
     defaults:
       run:
         working-directory: ./backend/AcessaAi
-
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
+      - name: Setup Java (SonarScanner)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install SonarScanner for .NET
+        run: dotnet tool install --global dotnet-sonarscanner
+
       - name: Restaurar dependências
         run: dotnet restore
+
+      - name: SonarQube Begin
+        run: |
+          dotnet sonarscanner begin \
+            /k:"acessaai" \
+            /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}" \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
       - name: Build
         run: dotnet build --no-restore
@@ -31,15 +48,30 @@ jobs:
       - name: Testes unitários
         run: dotnet test --no-build --verbosity normal
 
+      - name: SonarQube End
+        run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+
+      - name: Publish
+        run: dotnet publish -c Release -o ./publish
+
+      - name: Upload to Nexus
+        run: |
+          cd ./publish
+          tar czf acessaai-backend.tar.gz .
+          curl -u "${{ secrets.NEXUS_USER }}:${{ secrets.NEXUS_PASSWORD }}" \
+            --upload-file acessaai-backend.tar.gz \
+            "${{ secrets.NEXUS_URL }}/repository/raw-hosted/acessaai/backend/${{ github.sha }}/acessaai-backend.tar.gz"
+
   frontend:
     name: Frontend (Angular)
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./frontend/acessa-ai-site
-
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -54,3 +86,11 @@ jobs:
 
       - name: Build Angular
         run: npm run build
+
+      - name: Upload to Nexus
+        run: |
+          cd dist
+          tar czf acessaai-frontend.tar.gz .
+          curl -u "${{ secrets.NEXUS_USER }}:${{ secrets.NEXUS_PASSWORD }}" \
+            --upload-file acessaai-frontend.tar.gz \
+            "${{ secrets.NEXUS_URL }}/repository/raw-hosted/acessaai/frontend/${{ github.sha }}/acessaai-frontend.tar.gz"
