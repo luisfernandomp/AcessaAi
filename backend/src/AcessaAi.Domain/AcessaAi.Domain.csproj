@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Avaliacoes\Interfaces\" />
-    <Folder Include="Categorias\Interfaces\" />
+    <Folder Include="GestaoAvaliacoes\Interfaces\" />
+    <Folder Include="GestaoCategorias\Interfaces\" />
     <Folder Include="GestaoEstabelecimentos\Interfaces\" />
   </ItemGroup>
 

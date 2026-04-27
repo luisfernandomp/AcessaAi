@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AcessaAi.Domain.Autenticacao.Entities
+namespace AcessaAi.Application.Avaliacoes.Services
 {
-    internal class Role
+    internal class AvaliacaoService
     {
     }
 }

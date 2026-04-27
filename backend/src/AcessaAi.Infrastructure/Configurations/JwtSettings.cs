@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AcessaAi.Infrastructure.Configurations
+﻿namespace AcessaAi.Infrastructure.Configurations
 {
     public class JwtSettings
     {

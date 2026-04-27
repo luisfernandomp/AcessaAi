@@ -12,6 +12,8 @@ namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
         public Endereco Endereco { get; set; }
         public List<Avaliacao> Avaliacoes { get; set; } = new List<Avaliacao>();
 
+        private Estabelecimento() { }
+
         protected Estabelecimento(string nome, Geocordenadas geolocalizacao)
         {
             Nome = nome;

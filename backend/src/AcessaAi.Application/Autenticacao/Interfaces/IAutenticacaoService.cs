@@ -1,7 +1,4 @@
 ﻿using AcessaAi.Application.Autenticacao.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AcessaAi.Application.Autenticacao.Interfaces
 {

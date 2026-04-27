@@ -1,7 +1,10 @@
+using AcessaAi.API.Extensions;
+using AcessaAi.Domain.Autenticacao.Entities;
 using AcessaAi.Infrastructure.Configurations;
 using AcessaAi.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -24,21 +27,27 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
+builder.Services.AddMappings();
+
 builder.Services
-    .AddIdentity<ApplicationUser, IdentityRole>(opt =>
+    .AddIdentity<Usuario, IdentityRole<int>>(opt =>
     {
         opt.Password.RequireDigit = true;
-        opt.Password.RequiredLength = 8;
+        opt.Password.RequiredLength = 6;
         opt.Password.RequireUppercase = true;
         opt.User.RequireUniqueEmail = true;
         opt.SignIn.RequireConfirmedEmail = true;
     })
     .AddEntityFrameworkStores<AcessaAiDbContext>()    
-    .AddDefaultTokenProviders();    
+    .AddDefaultTokenProviders();
+
 
 var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
 
 builder.Services.Configure<JwtSettings>(jwtSettingsSection);
+
+builder.Services.AddSingleton(sp =>
+    sp.GetRequiredService<IOptions<JwtSettings>>().Value);
 
 builder.Services
     .AddAuthentication(opt =>
@@ -61,6 +70,7 @@ builder.Services
         };
     });
 
+builder.Services.AddServicesExtensions(builder.Configuration);
 
 var app = builder.Build();
 
@@ -68,6 +78,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "v1");
+    });
 }
 
 app.UseRouting();

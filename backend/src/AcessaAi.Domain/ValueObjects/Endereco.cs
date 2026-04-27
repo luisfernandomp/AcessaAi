@@ -1,9 +1,4 @@
-﻿using AcessaAi.Domain.Avaliacoes.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AcessaAi.Domain.ValueObjects
+﻿namespace AcessaAi.Domain.ValueObjects
 {
     public class Endereco
     {
@@ -12,7 +7,20 @@ namespace AcessaAi.Domain.ValueObjects
         public string Cidade { get; set; } = string.Empty;
         public string Numero { get; set; } = string.Empty;
         public string CEP { get; set; } = string.Empty;
-        public List<Avaliacao> Avaliacoes { get; set; }
+        public string Bairro { get; set; } = string.Empty;  
+        public string Complemento { get; set; } = string.Empty; 
 
+        private Endereco() { }
+
+        public Endereco(string logradouro, string uf, string cidade, string numero, string cep, string bairro, string complemento)
+        {
+            Logradouro = logradouro;
+            UF = uf;
+            Cidade = cidade;
+            Numero = numero;
+            CEP = cep;
+            Bairro = bairro;
+            Complemento = complemento;
+        }
     }
 }
