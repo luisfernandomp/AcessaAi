@@ -4,7 +4,10 @@ using AcessaAi.Application.Mappings;
 using AcessaAi.Application.Usuarios.Interfaces;
 using AcessaAi.Application.Usuarios.Services;
 using AcessaAi.Domain.Autenticacao.Interfaces;
+using AcessaAi.Domain.Common;
+using AcessaAi.Infrastructure.Data;
 using AcessaAi.Infrastructure.Identity;
+using AcessaAi.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace AcessaAi.API.Extensions
@@ -19,6 +22,9 @@ namespace AcessaAi.API.Extensions
             services.AddScoped<IUsuarioService, UsuarioService>();
             services.AddScoped<IAutenticacaoService, AutenticacaoService>();
             services.AddScoped<ITokenService, TokenService>();
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         }
 
         public static IServiceCollection AddMappings(this IServiceCollection services)

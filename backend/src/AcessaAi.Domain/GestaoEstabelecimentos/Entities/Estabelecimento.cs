@@ -1,7 +1,6 @@
 ﻿using AcessaAi.Domain.Avaliacoes.Entities;
-using AcessaAi.Domain.Entities;
+using AcessaAi.Domain.Common;
 using AcessaAi.Domain.GestaoEstabelecimentos.ValueObjects;
-using AcessaAi.Domain.ValueObjects;
 
 namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
 {

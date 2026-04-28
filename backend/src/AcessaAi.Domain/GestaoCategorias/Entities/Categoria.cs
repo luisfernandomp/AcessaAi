@@ -1,4 +1,4 @@
-﻿using AcessaAi.Domain.Entities;
+﻿using AcessaAi.Domain.Common;
 
 namespace AcessaAi.Domain.Categorias.Entities
 {

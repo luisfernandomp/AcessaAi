@@ -1,4 +1,4 @@
-﻿namespace AcessaAi.Domain.Entities
+﻿namespace AcessaAi.Domain.Common
 {
     public abstract class EntityBase
     {

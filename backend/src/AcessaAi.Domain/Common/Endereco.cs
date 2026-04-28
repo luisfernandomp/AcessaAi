@@ -1,4 +1,4 @@
-﻿namespace AcessaAi.Domain.ValueObjects
+﻿namespace AcessaAi.Domain.Common
 {
     public class Endereco
     {

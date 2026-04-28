@@ -1,4 +1,4 @@
-﻿using AcessaAi.Domain.ValueObjects;
+﻿using AcessaAi.Domain.Common;
 using Microsoft.AspNetCore.Identity;
 
 namespace AcessaAi.Domain.Autenticacao.Entities

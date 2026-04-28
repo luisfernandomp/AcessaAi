@@ -2,7 +2,7 @@
 using AcessaAi.Application.Dtos;
 using AcessaAi.Application.Usuarios.Dtos.Responses;
 using AcessaAi.Domain.Autenticacao.Entities;
-using AcessaAi.Domain.ValueObjects;
+using AcessaAi.Domain.Common;
 using Nelibur.ObjectMapper;
 
 namespace AcessaAi.Application.Mappings

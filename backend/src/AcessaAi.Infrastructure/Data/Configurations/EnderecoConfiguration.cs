@@ -1,4 +1,4 @@
-﻿using AcessaAi.Domain.ValueObjects;
+﻿using AcessaAi.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
