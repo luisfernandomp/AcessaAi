@@ -16,23 +16,23 @@ namespace AcessaAi.Domain.Avaliacoes.Entities
         public Estabelecimento Estabelecimento { get; private set; }
 
         private Avaliacao() { }
-        private Avaliacao(string comentario, ushort estrelas, int usuarioId, int estabelecimentoId) 
+        private Avaliacao(string comentario, ushort estrelas, Usuario usuario, Estabelecimento estabelecimento) 
         {
             Comentario = comentario;
             Estrelas = estrelas;
-            UsuarioId = usuarioId;
-            EstabelecimentoId = estabelecimentoId;
+            Usuario = usuario;
+            Estabelecimento = estabelecimento;
         }
 
-        public static ErrorOr<Avaliacao> Criar(string comentario, ushort estrelas, int usuarioId, int estabelecimentoId)
+        public static ErrorOr<Avaliacao> Criar(string comentario, ushort estrelas, Usuario usuario, Estabelecimento estabelecimento)
         {
             var erros = new List<Error>();
 
-            if(usuarioId <= 0)
-                erros.Add(AvaliacaoErrors.UsuarioIdObrigatorio);
+            if(usuario == null)
+                erros.Add(AvaliacaoErrors.UsuarioObrigatorio);
 
-            if (estabelecimentoId <= 0)
-                erros.Add(AvaliacaoErrors.EstabelecimentoIdObrigatorio);
+            if (estabelecimento == null)
+                erros.Add(AvaliacaoErrors.EstabelecimentoObrigatorio);
 
             if (estrelas < 1 || estrelas > 5)
                 erros.Add(AvaliacaoErrors.NotaForaDoIntervalo);
@@ -45,7 +45,7 @@ namespace AcessaAi.Domain.Avaliacoes.Entities
             if (erros.Count > 0)
                 return erros;
 
-            return new Avaliacao(comentario, estrelas, usuarioId, estabelecimentoId);
+            return new Avaliacao(comentario, estrelas, usuario, estabelecimento);
         }
 
         public void Alterar(string comentario, ushort estrelas)

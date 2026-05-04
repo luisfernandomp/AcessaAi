@@ -9,8 +9,8 @@ namespace AcessaAi.API.Controllers
     [ApiController]
     public class UsuarioController : ControllerBase
     {
-        private readonly IUsuarioService _usuarioService;
-        public UsuarioController(IUsuarioService usuarioService)
+        private readonly IUsuarioApplicationService _usuarioService;
+        public UsuarioController(IUsuarioApplicationService usuarioService)
         {
             _usuarioService = usuarioService;
         }
@@ -24,7 +24,7 @@ namespace AcessaAi.API.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            var response = await _usuarioService.GetByIdAsync(id, cancellationToken);
+            var response = await _usuarioService.ObterPorIdAsync(id, cancellationToken);
 
             if (!response.Sucesso)
                 return NotFound(response);

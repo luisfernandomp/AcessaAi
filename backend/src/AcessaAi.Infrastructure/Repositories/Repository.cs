@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AcessaAi.Infrastructure.Repositories
 {
-    public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         protected readonly AcessaAiDbContext _context;
-        private readonly DbSet<TEntity> _dbSet;
+        protected readonly DbSet<TEntity> _dbSet;
 
         public Repository(AcessaAiDbContext context)
         {
@@ -15,7 +15,7 @@ namespace AcessaAi.Infrastructure.Repositories
             _dbSet = _context.Set<TEntity>();
         }
 
-        public async Task<TEntity?> GetByIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<TEntity?> ObterPorIdAsync(int id, CancellationToken cancellationToken)
         {
             return await _dbSet.FindAsync([id], cancellationToken);
         }

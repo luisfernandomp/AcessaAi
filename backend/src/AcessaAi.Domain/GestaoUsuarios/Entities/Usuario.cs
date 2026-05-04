@@ -1,4 +1,5 @@
-﻿using AcessaAi.Domain.Common;
+﻿using AcessaAi.Domain.Avaliacoes.Entities;
+using AcessaAi.Domain.Common;
 using Microsoft.AspNetCore.Identity;
 
 namespace AcessaAi.Domain.Autenticacao.Entities
@@ -11,10 +12,10 @@ namespace AcessaAi.Domain.Autenticacao.Entities
         public bool Ativo { get; set; } = true;
         public DateTimeOffset DataCadastro { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset? UltimoLogin { get; set; }
-
         public string? RefreshToken { get; set; }
         public DateTimeOffset? RefreshTokenExpiryTime { get; set; }
-
+        public ICollection<Avaliacao> Avaliacoes { get; set; }
+        
         private Usuario() { }
 
         public static Usuario CriarUsuario(string nomeCompleto, string email, DateTimeOffset dataNascimento)

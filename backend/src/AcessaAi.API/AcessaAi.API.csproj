@@ -8,6 +8,7 @@
     <ContainerBaseImage>mcr.microsoft.com/dotnet/aspnet:10.0</ContainerBaseImage>
     <UserSecretsId>6df9346a-175b-4f97-9049-95378bbb5f79</UserSecretsId>
     <DockerfileContext>..\..</DockerfileContext>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Middlewares\" />
+    <Folder Include="OpenApi\" />
   </ItemGroup>
 
 </Project>

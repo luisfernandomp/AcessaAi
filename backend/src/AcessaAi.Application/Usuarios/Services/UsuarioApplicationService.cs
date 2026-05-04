@@ -11,11 +11,11 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AcessaAi.Application.Usuarios.Services
 {
-    public class UsuarioService : IUsuarioService 
+    public class UsuarioApplicationService : IUsuarioApplicationService 
     {
         private readonly UserManager<Usuario> _userManager;
 
-        public UsuarioService(UserManager<Usuario> userManager)
+        public UsuarioApplicationService(UserManager<Usuario> userManager)
         {
             _userManager = userManager;
         }
@@ -52,7 +52,7 @@ namespace AcessaAi.Application.Usuarios.Services
             };
         }
 
-        public async Task<BaseResponse<UsuarioResponse>> GetByIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<BaseResponse<UsuarioResponse>> ObterPorIdAsync(int id, CancellationToken cancellationToken)
         {
             var usuario = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
 

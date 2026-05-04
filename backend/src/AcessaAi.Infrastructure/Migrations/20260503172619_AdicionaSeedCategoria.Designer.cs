@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using AcessaAi.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AcessaAi.Infrastructure.Migrations
 {
     [DbContext(typeof(AcessaAiDbContext))]
-    partial class AcessaAiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260503172619_AdicionaSeedCategoria")]
+    partial class AdicionaSeedCategoria
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -241,7 +244,7 @@ namespace AcessaAi.Infrastructure.Migrations
                         {
                             Id = 1,
                             Ativo = true,
-                            DataCadastro = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DataCadastro = new DateTimeOffset(new DateTime(2026, 5, 3, 17, 26, 18, 197, DateTimeKind.Unspecified).AddTicks(1768), new TimeSpan(0, 0, 0, 0, 0)),
                             Descricao = "Entrada principal nivelada ou com rampa.",
                             Icone = "fa-wheelchair-move",
                             Nome = "Rampa de Acesso"
@@ -250,7 +253,7 @@ namespace AcessaAi.Infrastructure.Migrations
                         {
                             Id = 2,
                             Ativo = true,
-                            DataCadastro = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DataCadastro = new DateTimeOffset(new DateTime(2026, 5, 3, 17, 26, 18, 197, DateTimeKind.Unspecified).AddTicks(3335), new TimeSpan(0, 0, 0, 0, 0)),
                             Descricao = "Banheiro com barras de apoio e espaço para manobra.",
                             Icone = "fa-restroom",
                             Nome = "Banheiro Adaptado"
@@ -259,7 +262,7 @@ namespace AcessaAi.Infrastructure.Migrations
                         {
                             Id = 3,
                             Ativo = true,
-                            DataCadastro = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DataCadastro = new DateTimeOffset(new DateTime(2026, 5, 3, 17, 26, 18, 197, DateTimeKind.Unspecified).AddTicks(3337), new TimeSpan(0, 0, 0, 0, 0)),
                             Descricao = "Elevador ou plataforma elevatória para acesso aos andares.",
                             Icone = "fa-elevator",
                             Nome = "Elevador"
@@ -268,7 +271,7 @@ namespace AcessaAi.Infrastructure.Migrations
                         {
                             Id = 4,
                             Ativo = true,
-                            DataCadastro = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DataCadastro = new DateTimeOffset(new DateTime(2026, 5, 3, 17, 26, 18, 197, DateTimeKind.Unspecified).AddTicks(3338), new TimeSpan(0, 0, 0, 0, 0)),
                             Descricao = "Vagas demarcadas e próximas à entrada.",
                             Icone = "fa-square-parking",
                             Nome = "Estacionamento Reservado"
@@ -277,7 +280,7 @@ namespace AcessaAi.Infrastructure.Migrations
                         {
                             Id = 5,
                             Ativo = true,
-                            DataCadastro = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DataCadastro = new DateTimeOffset(new DateTime(2026, 5, 3, 17, 26, 18, 197, DateTimeKind.Unspecified).AddTicks(3339), new TimeSpan(0, 0, 0, 0, 0)),
                             Descricao = "Piso de alerta e direcional para pessoas com deficiência visual.",
                             Icone = "fa-person-walking-with-cane",
                             Nome = "Piso Tátil"
@@ -286,7 +289,7 @@ namespace AcessaAi.Infrastructure.Migrations
                         {
                             Id = 6,
                             Ativo = true,
-                            DataCadastro = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DataCadastro = new DateTimeOffset(new DateTime(2026, 5, 3, 17, 26, 18, 197, DateTimeKind.Unspecified).AddTicks(3340), new TimeSpan(0, 0, 0, 0, 0)),
                             Descricao = "Cardápios ou sinalizações em Braille.",
                             Icone = "fa-braille",
                             Nome = "Braille"
@@ -295,7 +298,7 @@ namespace AcessaAi.Infrastructure.Migrations
                         {
                             Id = 7,
                             Ativo = true,
-                            DataCadastro = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DataCadastro = new DateTimeOffset(new DateTime(2026, 5, 3, 17, 26, 18, 197, DateTimeKind.Unspecified).AddTicks(3340), new TimeSpan(0, 0, 0, 0, 0)),
                             Descricao = "Equipe com conhecimento básico ou intérprete de Libras.",
                             Icone = "fa-hands",
                             Nome = "Libras"
@@ -304,7 +307,7 @@ namespace AcessaAi.Infrastructure.Migrations
                         {
                             Id = 8,
                             Ativo = true,
-                            DataCadastro = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DataCadastro = new DateTimeOffset(new DateTime(2026, 5, 3, 17, 26, 18, 197, DateTimeKind.Unspecified).AddTicks(3341), new TimeSpan(0, 0, 0, 0, 0)),
                             Descricao = "Local com baixo estímulo sonoro e visual (Amigável para TEA).",
                             Icone = "fa-volume-xmark",
                             Nome = "Ambiente Calmo"

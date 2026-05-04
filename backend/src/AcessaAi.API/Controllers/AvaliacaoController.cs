@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AcessaAi.API.Extensions;
+using AcessaAi.Application.Avaliacoes.Dtos.Requests;
+using AcessaAi.Application.Avaliacoes.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AcessaAi.API.Controllers
@@ -7,33 +9,71 @@ namespace AcessaAi.API.Controllers
     [ApiController]
     public class AvaliacaoController : ControllerBase
     {
+        private readonly IAvaliacaoApplicationService _avaliacaoService;
 
-
-        public AvaliacaoController() { }
-
-        [HttpGet]
-        public async Task<IActionResult> RecuperarAvaliacaoAsync(CancellationToken cancellationToken)
+        public AvaliacaoController(IAvaliacaoApplicationService avaliacaoService)
         {
-            return Ok("Avaliação realizada com sucesso!");
+            _avaliacaoService = avaliacaoService;
         }
 
+        /// <summary>
+        /// Cria uma nova avaliação. O endpoint espera um objeto do tipo AvaliacaoCreateRequest no corpo da requisição, contendo os detalhes da avaliação a ser criada. Se a criação for bem-sucedida, retorna um status 201 Created com os detalhes da avaliação criada. Caso contrário, retorna um status de erro apropriado.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> CriarAvaliacaoAsync(CancellationToken cancellationToken)
+        public async Task<IActionResult> CriarAsync([FromBody] AvaliacaoCreateRequest request, CancellationToken cancellationToken)
         {
-            return Ok("Avaliação realizada com sucesso!");
+            var result = await _avaliacaoService.CriarAsync(request, cancellationToken);
+            
+            return result.ToActionResult(avaliacao => 
+                CreatedAtAction(nameof(ObterPorIdAsync), new { id = avaliacao.Id }, avaliacao)
+            );
         }
 
-        [HttpPatch]
-        public async Task<IActionResult> AtualizarAvaliacaoAsync(CancellationToken cancellationToken)
+        /// <summary>
+        /// Altera uma avaliação existente. O endpoint espera um ID de avaliação como parâmetro de rota e um objeto do tipo AvaliacaoUpdateRequest no corpo da requisição, contendo os detalhes atualizados da avaliação. Se a atualização for bem-sucedida, retorna um status 200 OK com os detalhes da avaliação atualizada. Caso contrário, retorna um status de erro apropriado.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Atualizar(
+            int id, 
+            [FromBody] AvaliacaoUpdateRequest request, 
+            CancellationToken cancellationToken)
         {
-            return Ok("Avaliação realizada com sucesso!");
+            request.Id = id;
+            var result = await _avaliacaoService.AtualizarAsync(request, cancellationToken);
+            return result.ToActionResult(Ok);
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> ExcluirAvaliacaoAsync(CancellationToken cancellationToken)
+        /// <summary>
+        /// Exclui uma avaliação existente. O endpoint espera um ID de avaliação como parâmetro de rota. Se a exclusão for bem-sucedida, retorna um status 204 No Content. Caso contrário, retorna um status de erro apropriado.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> ExcluirAsync(int id, CancellationToken cancellationToken)
         {
-            return Ok("Avaliação realizada com sucesso!");
+            var result = await _avaliacaoService.ExcluirAsync(id, cancellationToken);
+            return result.ToActionResult(_ => NoContent());
         }
 
+        /// <summary>
+        /// Obtém uma avaliação por ID. O endpoint espera um ID de avaliação como parâmetro de rota. Se a avaliação for encontrada, retorna um status 200 OK com os detalhes da avaliação. Caso contrário, retorna um status de erro apropriado.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public async Task<IActionResult> ObterPorIdAsync(int id, CancellationToken cancellationToken)
+        {
+            var result = await _avaliacaoService.ObterPorIdAsync(id, cancellationToken);
+            return result.ToActionResult(Ok);
+        }
     }
 }

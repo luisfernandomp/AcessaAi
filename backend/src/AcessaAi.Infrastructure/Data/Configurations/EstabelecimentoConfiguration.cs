@@ -21,11 +21,6 @@ namespace AcessaAi.Infrastructure.Data.Mappings
             });
 
             builder.ComplexProperty(e => e.Endereco, EnderecoConfiguration.Configure());
-
-            builder.HasMany(e => e.Avaliacoes)
-                .WithOne()
-                .HasForeignKey("EstabelecimentoId")
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -13,7 +13,16 @@ namespace AcessaAi.Infrastructure.Data.Mappings
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Estrelas).IsRequired();
             builder.Property(x => x.Comentario).IsRequired().HasMaxLength(300);
-            builder.HasOne(x => x.Usuario).WithMany().HasForeignKey("UsuarioId").OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(x => x.Usuario)
+                .WithMany(x => x.Avaliacoes)
+                .HasForeignKey(x => x.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(x => x.Estabelecimento)
+                .WithMany(x => x.Avaliacoes)
+                .HasForeignKey(x => x.EstabelecimentoId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

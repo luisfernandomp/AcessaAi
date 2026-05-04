@@ -4,9 +4,9 @@ using AcessaAi.Application.Usuarios.Dtos.Responses;
 
 namespace AcessaAi.Application.Usuarios.Interfaces
 {
-    public interface IUsuarioService
+    public interface IUsuarioApplicationService
     {
-        Task<BaseResponse<UsuarioResponse>> GetByIdAsync(int id, CancellationToken cancellationToken);
+        Task<BaseResponse<UsuarioResponse>> ObterPorIdAsync(int id, CancellationToken cancellationToken);
         Task<BaseResponse<UsuarioResponse>> CadastrarAsync(UsuariosCadastrarRequest request, CancellationToken cancellationToken);
     }
 }

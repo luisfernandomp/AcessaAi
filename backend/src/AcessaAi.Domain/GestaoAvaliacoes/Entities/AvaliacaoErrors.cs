@@ -5,10 +5,10 @@ namespace AcessaAi.Domain.GestaoAvaliacoes.Entities
 {
     public static class AvaliacaoErrors
     {
-        public static Error UsuarioIdObrigatorio =>
+        public static Error UsuarioObrigatorio =>
             Error.Validation(code: "Avaliacao.UsuarioIdObrigatorio", description: "O ID do usuário é obrigatório.");
 
-        public static Error EstabelecimentoIdObrigatorio =>
+        public static Error EstabelecimentoObrigatorio =>
             Error.Validation(code: "Avaliacao.EstabelecimentoIdObrigatorio", description: "O ID do estabelecimento é obrigatório.");
 
         public static Error NotaForaDoIntervalo =>

@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Usuarios\Mappings\**" />
+    <EmbeddedResource Remove="Usuarios\Mappings\**" />
+    <None Remove="Usuarios\Mappings\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ErrorOr" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
     <PackageReference Include="TinyMapper" Version="3.0.3" />
@@ -19,7 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Usuarios\Mappings\" />
+    <Folder Include="Categorias\Dtos\" />
+    <Folder Include="Categorias\Dtos\Responses\" />
+    <Folder Include="Categorias\Interfaces\" />
   </ItemGroup>
 
 </Project>

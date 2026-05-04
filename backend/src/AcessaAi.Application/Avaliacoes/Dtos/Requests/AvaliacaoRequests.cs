@@ -5,6 +5,7 @@ namespace AcessaAi.Application.Avaliacoes.Dtos.Requests
         public string Comentario { get; set; }
         public ushort Estrelas { get; set; }
         public int UsuarioId { get; set; }
+        public int EstabelecimentoId { get; set; }  
     }
 
     public class AvaliacaoUpdateRequest

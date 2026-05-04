@@ -1,4 +1,5 @@
 using AcessaAi.API.Extensions;
+using AcessaAi.API.Middlewares;
 using AcessaAi.Domain.Autenticacao.Entities;
 using AcessaAi.Infrastructure.Configurations;
 using AcessaAi.Infrastructure.Identity;
@@ -9,6 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddServicesExtensions(builder.Configuration);
 
 // CORS
 builder.Services.AddCors(opt =>
@@ -25,7 +28,7 @@ builder.Services.AddCors(opt =>
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApiWithJwt();
 
 builder.Services.AddMappings();
 
@@ -36,11 +39,13 @@ builder.Services
         opt.Password.RequiredLength = 6;
         opt.Password.RequireUppercase = true;
         opt.User.RequireUniqueEmail = true;
-        opt.SignIn.RequireConfirmedEmail = true;
+        opt.SignIn.RequireConfirmedEmail = false;
     })
     .AddEntityFrameworkStores<AcessaAiDbContext>()    
     .AddDefaultTokenProviders();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
 
@@ -70,8 +75,6 @@ builder.Services
         };
     });
 
-builder.Services.AddServicesExtensions(builder.Configuration);
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -91,6 +94,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseExceptionHandler();
 
 app.MapControllers();
 

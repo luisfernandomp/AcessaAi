@@ -1,6 +1,7 @@
 ﻿using AcessaAi.Domain.Avaliacoes.Entities;
 using AcessaAi.Domain.Common;
 using AcessaAi.Domain.GestaoEstabelecimentos.ValueObjects;
+using ErrorOr;
 
 namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
 {
@@ -9,7 +10,7 @@ namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
         public string Nome { get; set; }    
         public Geocordenadas Geolocalizacao { get; set; }
         public Endereco Endereco { get; set; }
-        public List<Avaliacao> Avaliacoes { get; set; } = new List<Avaliacao>();
+        public ICollection<Avaliacao> Avaliacoes { get; set; }
 
         private Estabelecimento() { }
 
@@ -19,19 +20,31 @@ namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
             Geolocalizacao = geolocalizacao;
         }
 
-        public Estabelecimento CriarEstabelecimento(string nome, Geocordenadas geolocalizacao)
+        public static ErrorOr<Estabelecimento> Criar(string nome, Geocordenadas geocordenadas)
         {
-            return new Estabelecimento(nome, geolocalizacao);
+            var erros = new List<Error>();
+
+            if(string.IsNullOrEmpty(nome))
+                erros.Add(EstabelecimentoErros.NomeObrigatorio);
+
+            if(geocordenadas == null)
+                erros.Add(EstabelecimentoErros.GeocordenadasObrigatorio);
+
+
+            if(erros.Count > 0)
+                return erros;
+
+            return new Estabelecimento(nome, geocordenadas);
         }
 
-        public void AtualizarEstabelecimento(string nome, Geocordenadas geolocalizacao)
+        public void Alterar(string nome, Geocordenadas geolocalizacao)
         {
             Nome = nome;
             Geolocalizacao = geolocalizacao;
             DataAtualizacao = DateTime.Now;
         }
 
-        public void ExcluirEstabelecimento()
+        public void Desativar()
         {
             Ativo = false;
             DataAtualizacao = DateTime.Now;

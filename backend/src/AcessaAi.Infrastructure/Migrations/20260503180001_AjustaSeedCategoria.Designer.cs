@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using AcessaAi.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AcessaAi.Infrastructure.Migrations
 {
     [DbContext(typeof(AcessaAiDbContext))]
-    partial class AcessaAiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260503180001_AjustaSeedCategoria")]
+    partial class AjustaSeedCategoria
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
