@@ -3,11 +3,9 @@ using AcessaAi.Application.Usuarios.Dtos.Requests;
 using AcessaAi.Application.Usuarios.Dtos.Responses;
 using AcessaAi.Application.Usuarios.Interfaces;
 using AcessaAi.Domain.Autenticacao.Entities;
-using AcessaAi.Infrastructure.CrossCutting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Nelibur.ObjectMapper;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AcessaAi.Application.Usuarios.Services
 {
@@ -39,7 +37,6 @@ namespace AcessaAi.Application.Usuarios.Services
 
             var erros = result.Errors.Select(e => e.Description).ToArray();
 
-
             var usuarioResponse = result.Succeeded 
                 ? TinyMapper.Map<UsuarioResponse>(usuario)
                 : null;
@@ -58,9 +55,9 @@ namespace AcessaAi.Application.Usuarios.Services
 
             return new BaseResponse<UsuarioResponse>
             {
-                Sucesso = usuario.IsNotNull(),
-                Erros = usuario.IsNull() ? new string[] { "Usuário não encontrado" } : [],
-                Resultado = usuario.IsNull() ? null : TinyMapper.Map<UsuarioResponse>(usuario)
+                Sucesso = usuario is not null,
+                Erros = usuario is null ? ["Usuário não encontrado"] : [],
+                Resultado = usuario is null ? null : TinyMapper.Map<UsuarioResponse>(usuario)
             };
         }
     }

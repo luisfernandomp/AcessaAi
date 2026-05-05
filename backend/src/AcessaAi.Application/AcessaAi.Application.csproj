@@ -21,13 +21,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AcessaAi.Domain\AcessaAi.Domain.csproj" />
-    <ProjectReference Include="..\AcessaAi.Infrastructure\AcessaAi.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Categorias\Dtos\" />
     <Folder Include="Categorias\Dtos\Responses\" />
     <Folder Include="Categorias\Interfaces\" />
+    <Folder Include="Storage\" />
+    <Folder Include="Storage\Interfaces\" />
   </ItemGroup>
 
 </Project>
