@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AcessaAi.Application\AcessaAi.Application.csproj" />
+    <ProjectReference Include="..\AcessaAi.Infrastructure\AcessaAi.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

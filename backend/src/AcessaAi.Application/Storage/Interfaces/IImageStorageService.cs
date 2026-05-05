@@ -1,5 +1,3 @@
-using System;
-
 namespace AcessaAi.Application.Storage.Interfaces;
 
 public interface IImageStorageService

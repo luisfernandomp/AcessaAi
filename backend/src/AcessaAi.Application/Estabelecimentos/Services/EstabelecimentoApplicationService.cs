@@ -1,10 +1,12 @@
+using AcessaAi.Application.Estabelecimentos.Dtos.Requests;
 using AcessaAi.Application.Estabelecimentos.Dtos.Responses;
+using AcessaAi.Application.Estabelecimentos.Interfaces;
 using AcessaAi.Domain.Common;
 using AcessaAi.Domain.GestaoEstabelecimentos.Entities;
 using AcessaAi.Domain.GestaoEstabelecimentos.Repositories;
 using AcessaAi.Domain.GestaoEstabelecimentos.ValueObjects;
 using ErrorOr;
-using Nelibur.ObjectMapper;
+using Mapster;
 
 namespace AcessaAi.Application.Estabelecimentos.Services
 {
@@ -13,8 +15,8 @@ namespace AcessaAi.Application.Estabelecimentos.Services
         private readonly IEstabelecimentoRepository _estabelecimentoRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-            public EstabelecimentoApplicationService(
-                IEstabelecimentoRepository estabelecimentoRepository,
+        public EstabelecimentoApplicationService(
+            IEstabelecimentoRepository estabelecimentoRepository,
             IUnitOfWork unitOfWork)
         {
             _estabelecimentoRepository = estabelecimentoRepository;
@@ -25,8 +27,7 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             EstabelecimentoCriarRequest request,
             CancellationToken cancellationToken)
         {
-            
-            var geocordenadas = TinyMapper.Map<Geocordenadas>(request.Geocordenadas);
+            var geocordenadas = request.Geocordenadas.Adapt<Geocordenadas>();
 
             var estabelecimentoResult = Estabelecimento.Criar(request.Nome, geocordenadas);
 
@@ -38,7 +39,7 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             await _estabelecimentoRepository.AddAsync(estabelecimento, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
 
-            return TinyMapper.Map<EstabelecimentoResponse>(estabelecimento);
+            return estabelecimento.Adapt<EstabelecimentoResponse>();
         }
 
         public async Task<ErrorOr<EstabelecimentoResponse>> AtualizarAsync(
@@ -49,14 +50,14 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             if (estabelecimento is null)
                 return Error.NotFound("Estabelecimento.NaoEncontrado", "Estabelecimento não encontrado.");
 
-            var geocordenadas = TinyMapper.Map<Geocordenadas>(request.Geocordenadas);
+            var geocordenadas = request.Geocordenadas.Adapt<Geocordenadas>();
 
             estabelecimento.Alterar(request.Nome, geocordenadas);
 
             await _estabelecimentoRepository.UpdateAsync(estabelecimento, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
 
-            return TinyMapper.Map<EstabelecimentoResponse>(estabelecimento);
+            return estabelecimento.Adapt<EstabelecimentoResponse>();
         }
 
         public async Task<ErrorOr<Success>> ExcluirAsync(
@@ -82,8 +83,7 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             if (estabelecimento is null)
                 return Error.NotFound("Estabelecimento.NaoEncontrado", "Estabelecimento não encontrado.");
 
-            return TinyMapper.Map<EstabelecimentoResponse>(estabelecimento);
+            return estabelecimento.Adapt<EstabelecimentoResponse>();
         }
-
     }
 }

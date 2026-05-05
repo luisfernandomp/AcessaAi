@@ -1,4 +1,4 @@
-﻿namespace AcessaAi.Infrastructure.Configurations
+namespace AcessaAi.Infrastructure.Configurations
 {
     public class JwtSettings
     {

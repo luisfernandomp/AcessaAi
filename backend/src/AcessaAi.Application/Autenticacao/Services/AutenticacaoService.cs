@@ -1,80 +1,56 @@
-﻿using AcessaAi.Application.Autenticacao.Dtos;
+using AcessaAi.Application.Autenticacao.Dtos;
 using AcessaAi.Application.Autenticacao.Interfaces;
-using AcessaAi.Domain.Autenticacao.Entities;
-using AcessaAi.Domain.Autenticacao.Interfaces;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using System.IdentityModel.Tokens.Jwt;
+using AcessaAi.Domain.GestaoUsuarios.Repositories;
+using ErrorOr;
 using System.Security.Claims;
 
 namespace AcessaAi.Application.Autenticacao.Services
 {
     public class AutenticacaoService : IAutenticacaoService
     {
-        private readonly UserManager<Usuario> _userManager;
-        private readonly SignInManager<Usuario> _signInManager;
-        private readonly ILogger<AutenticacaoService> _logger;
+        private readonly IUsuarioRepository _usuarioRepository;
         private readonly ITokenService _tokenService;
 
-        public AutenticacaoService(UserManager<Usuario> userManager, 
-            SignInManager<Usuario> signInManager,
-            ITokenService tokenService,
-            ILogger<AutenticacaoService> logger)
+        public AutenticacaoService(IUsuarioRepository usuarioRepository, ITokenService tokenService)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _logger = logger;
+            _usuarioRepository = usuarioRepository;
             _tokenService = tokenService;
-        }   
+        }
 
-        public async Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken)
+        public async Task<ErrorOr<LoginResponse>> LoginAsync(LoginRequest request, CancellationToken cancellationToken)
         {
-			try
-			{
-                var user = await _userManager.FindByEmailAsync(request.Email);
+            var usuario = await _usuarioRepository.ObterPorEmailAsync(request.Email, cancellationToken);
 
-                if(user == null)
-                {
+            if (usuario is null)
+                return Error.Unauthorized("Auth.CredenciaisInvalidas", "Email ou senha inválidos.");
 
-                }
+            var senhaValida = await _usuarioRepository.ValidarSenhaAsync(usuario, request.Senha, cancellationToken);
 
-                var senhaValida = await _signInManager.CheckPasswordSignInAsync(user, request.Senha, false);
+            if (!senhaValida)
+                return Error.Unauthorized("Auth.CredenciaisInvalidas", "Email ou senha inválidos.");
 
-                if (!senhaValida.Succeeded)
-                {
+            var roles = await _usuarioRepository.ObterRolesAsync(usuario, cancellationToken);
 
-                }
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+                new(ClaimTypes.Name, usuario.UserName!),
+                new(ClaimTypes.Email, usuario.Email!),
+                new("jti", Guid.NewGuid().ToString()),
+            };
 
-                var userRoles = await _userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+                claims.Add(new Claim(ClaimTypes.Role, role));
 
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
+            var token = _tokenService.GenerateAccessToken(claims);
 
-                foreach (var role in userRoles)
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, role));
-                }
-
-                var token = _tokenService.GenerateAccessToken(claims);
-
-                return new LoginResponse
-                {
-                    Token = token,
-                    IdUsuario = user.Id,
-                    NomeUsuario = user.UserName,
-                    ExpiraEm = _tokenService.GetExpirationInMinutes()
-                };
-
-            }
-			catch (Exception ex)
-			{
-				throw;
-			}
+            return new LoginResponse
+            {
+                Token = token,
+                IdUsuario = usuario.Id,
+                NomeUsuario = usuario.UserName!,
+                ExpiraEm = _tokenService.GetExpirationInMinutes()
+            };
         }
     }
 }

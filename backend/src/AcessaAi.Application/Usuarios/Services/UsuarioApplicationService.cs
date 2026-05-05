@@ -1,26 +1,24 @@
-﻿using AcessaAi.Application.Dtos;
 using AcessaAi.Application.Usuarios.Dtos.Requests;
 using AcessaAi.Application.Usuarios.Dtos.Responses;
 using AcessaAi.Application.Usuarios.Interfaces;
 using AcessaAi.Domain.Autenticacao.Entities;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Nelibur.ObjectMapper;
+using AcessaAi.Domain.GestaoUsuarios.Repositories;
+using ErrorOr;
+using Mapster;
 
 namespace AcessaAi.Application.Usuarios.Services
 {
-    public class UsuarioApplicationService : IUsuarioApplicationService 
+    public class UsuarioApplicationService : IUsuarioApplicationService
     {
-        private readonly UserManager<Usuario> _userManager;
+        private readonly IUsuarioRepository _usuarioRepository;
 
-        public UsuarioApplicationService(UserManager<Usuario> userManager)
+        public UsuarioApplicationService(IUsuarioRepository usuarioRepository)
         {
-            _userManager = userManager;
+            _usuarioRepository = usuarioRepository;
         }
 
-        public async Task<BaseResponse<UsuarioResponse>> CadastrarAsync(UsuariosCadastrarRequest request, CancellationToken cancellationToken)
+        public async Task<ErrorOr<UsuarioResponse>> CadastrarAsync(UsuariosCadastrarRequest request, CancellationToken cancellationToken)
         {
-
             var usuario = Usuario.CriarUsuario(request.Nome, request.Email, request.DataNascimento);
 
             usuario.AdicionarEndereco(
@@ -30,35 +28,24 @@ namespace AcessaAi.Application.Usuarios.Services
                 request.Endereco.Numero,
                 request.Endereco.CEP,
                 request.Endereco.Bairro,
-                request.Endereco.Complemento
-            );
+                request.Endereco.Complemento);
 
-            var result = await _userManager.CreateAsync(usuario, request.Senha);
+            var result = await _usuarioRepository.CriarAsync(usuario, request.Senha, cancellationToken);
 
-            var erros = result.Errors.Select(e => e.Description).ToArray();
+            if (result.IsError)
+                return result.Errors;
 
-            var usuarioResponse = result.Succeeded 
-                ? TinyMapper.Map<UsuarioResponse>(usuario)
-                : null;
-
-            return new BaseResponse<UsuarioResponse>
-            {
-                Sucesso = result.Succeeded,
-                Erros = erros,
-                Resultado = usuarioResponse
-            };
+            return result.Value.Adapt<UsuarioResponse>();
         }
 
-        public async Task<BaseResponse<UsuarioResponse>> ObterPorIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<ErrorOr<UsuarioResponse>> ObterPorIdAsync(int id, CancellationToken cancellationToken)
         {
-            var usuario = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+            var usuario = await _usuarioRepository.ObterPorIdAsync(id, cancellationToken);
 
-            return new BaseResponse<UsuarioResponse>
-            {
-                Sucesso = usuario is not null,
-                Erros = usuario is null ? ["Usuário não encontrado"] : [],
-                Resultado = usuario is null ? null : TinyMapper.Map<UsuarioResponse>(usuario)
-            };
+            if (usuario is null)
+                return Error.NotFound("Usuario.NaoEncontrado", "Usuário não encontrado.");
+
+            return usuario.Adapt<UsuarioResponse>();
         }
     }
 }

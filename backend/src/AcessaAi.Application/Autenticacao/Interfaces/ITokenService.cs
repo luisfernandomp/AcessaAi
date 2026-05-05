@@ -1,6 +1,6 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 
-namespace AcessaAi.Domain.Autenticacao.Interfaces
+namespace AcessaAi.Application.Autenticacao.Interfaces
 {
     public interface ITokenService
     {

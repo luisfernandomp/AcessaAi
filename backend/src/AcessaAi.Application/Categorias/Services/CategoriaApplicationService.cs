@@ -2,6 +2,7 @@ using AcessaAi.Application.Categorias.Dtos.Responses;
 using AcessaAi.Application.Categorias.Interfaces;
 using AcessaAi.Domain.GestaoCategorias.Repositories;
 using ErrorOr;
+using Mapster;
 
 namespace AcessaAi.Application.Categorias.Services
 {
@@ -16,17 +17,8 @@ namespace AcessaAi.Application.Categorias.Services
 
         public async Task<ErrorOr<List<CategoriaResponse>>> ListarCategoriasAtivasAsync(CancellationToken cancellationToken)
         {
-            var consulta = await _categoriaRepository.ListarAtivasAsync(cancellationToken);
-
-            return consulta
-                .Select(c => new CategoriaResponse
-                {
-                    Id = c.Id,
-                    Nome = c.Nome,
-                    Descricao = c.Descricao,
-                    Icone = c.Icone
-                })
-                .ToList();
+            var categorias = await _categoriaRepository.ListarAtivasAsync(cancellationToken);
+            return categorias.Adapt<List<CategoriaResponse>>();
         }
     }
 }

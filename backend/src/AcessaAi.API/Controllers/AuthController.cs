@@ -1,4 +1,5 @@
-﻿using AcessaAi.Application.Autenticacao.Dtos;
+using AcessaAi.API.Extensions;
+using AcessaAi.Application.Autenticacao.Dtos;
 using AcessaAi.Application.Autenticacao.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,17 +19,13 @@ namespace AcessaAi.API.Controllers
         }
 
         /// <summary>
-        /// Rota para realizar o login na aplicação. Recebe as credenciais do usuário e retorna um token de autenticação válido por um período determinado.
+        /// Realiza o login e retorna um token JWT válido.
         /// </summary>
-        /// <param name="dto"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginRequest dto, CancellationToken cancellationToken)
         {
-            var response = await _autenticacaoService.LoginAsync(dto, cancellationToken);
-            return Ok(response);
+            var result = await _autenticacaoService.LoginAsync(dto, cancellationToken);
+            return result.ToActionResult(Ok);
         }
-
     }
 }

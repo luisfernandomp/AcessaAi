@@ -1,19 +1,20 @@
 using AcessaAi.API.Extensions;
 using AcessaAi.API.Middlewares;
 using AcessaAi.Domain.Autenticacao.Entities;
-using AcessaAi.Infrastructure.Configurations;
 using AcessaAi.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using AcessaAi.Infrastructure.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddServicesExtensions(builder.Configuration);
 
-// CORS
 builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(policy =>
@@ -24,13 +25,12 @@ builder.Services.AddCors(opt =>
     });
 });
 
-// Add services to the container.
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddControllers(opt =>
+{
+    opt.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+});
 
 builder.Services.AddOpenApiWithJwt();
-
-builder.Services.AddMappings();
 
 builder.Services
     .AddIdentity<Usuario, IdentityRole<int>>(opt =>
@@ -41,7 +41,7 @@ builder.Services
         opt.User.RequireUniqueEmail = true;
         opt.SignIn.RequireConfirmedEmail = false;
     })
-    .AddEntityFrameworkStores<AcessaAiDbContext>()    
+    .AddEntityFrameworkStores<AcessaAiDbContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -77,7 +77,6 @@ builder.Services
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

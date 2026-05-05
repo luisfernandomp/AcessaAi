@@ -1,56 +1,48 @@
-﻿using AcessaAi.Application.Avaliacoes.Dtos.Requests;
+using AcessaAi.Application.Avaliacoes.Dtos.Requests;
 using AcessaAi.Application.Avaliacoes.Dtos.Responses;
 using AcessaAi.Application.Avaliacoes.Interfaces;
-using AcessaAi.Application.Estabelecimentos.Services;
-using AcessaAi.Domain.Autenticacao.Entities;
 using AcessaAi.Domain.Avaliacoes.Entities;
 using AcessaAi.Domain.Common;
-using AcessaAi.Domain.GestaoAvaliacoes.Comandos;
 using AcessaAi.Domain.GestaoAvaliacoes.Repositories;
+using AcessaAi.Domain.GestaoEstabelecimentos.Repositories;
+using AcessaAi.Domain.GestaoUsuarios.Repositories;
 using ErrorOr;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Nelibur.ObjectMapper;
+using Mapster;
 
 namespace AcessaAi.Application.Avaliacoes.Services
 {
     public class AvaliacaoApplicationService : IAvaliacaoApplicationService
     {
         private readonly IAvaliacaoRepository _avaliacaoRepository;
+        private readonly IEstabelecimentoRepository _estabelecimentoRepository;
+        private readonly IUsuarioRepository _usuarioRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<Usuario> _userManager;
-        private readonly IEstabelecimentoApplicationService _estabelecimentoApplicationService;
 
         public AvaliacaoApplicationService(
             IAvaliacaoRepository avaliacaoRepository,
-            IUnitOfWork unitOfWork,
-            UserManager<Usuario> userManager,
-            IEstabelecimentoApplicationService estabelecimentoApplicationService)
+            IEstabelecimentoRepository estabelecimentoRepository,
+            IUsuarioRepository usuarioRepository,
+            IUnitOfWork unitOfWork)
         {
             _avaliacaoRepository = avaliacaoRepository;
+            _estabelecimentoRepository = estabelecimentoRepository;
+            _usuarioRepository = usuarioRepository;
             _unitOfWork = unitOfWork;
-            _userManager = userManager;
-            _estabelecimentoApplicationService = estabelecimentoApplicationService;
         }
 
         public async Task<ErrorOr<AvaliacaoResponse>> CriarAsync(
             AvaliacaoCreateRequest request,
             CancellationToken cancellationToken)
         {
+            var usuario = await _usuarioRepository.ObterPorIdAsync(request.UsuarioId, cancellationToken);
+            if (usuario is null)
+                return Error.NotFound("Usuario.NaoEncontrado", "Usuário não encontrado.");
 
-            var usuario = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == request.UsuarioId, cancellationToken);
-            var estabelecimento = await _estabelecimentoApplicationService.ObterPorIdAsync(request.EstabelecimentoId, cancellationToken);
+            var estabelecimento = await _estabelecimentoRepository.ObterPorIdAsync(request.EstabelecimentoId, cancellationToken);
+            if (estabelecimento is null)
+                return Error.NotFound("Estabelecimento.NaoEncontrado", "Estabelecimento não encontrado.");
 
-            var comando = TinyMapper.Map<AvaliacaoCriarComando>(request);
-
-            //comando.Estabelecimento = estabelecimento.Value;
-            comando.Usuario = usuario;
-
-            var avaliacaoResult = Avaliacao.Criar(
-                comando.Comentario,
-                comando.Estrelas,
-                comando.Usuario,
-                comando.Estabelecimento);
+            var avaliacaoResult = Avaliacao.Criar(request.Comentario, request.Estrelas, usuario, estabelecimento);
 
             if (avaliacaoResult.IsError)
                 return avaliacaoResult.Errors;
@@ -60,25 +52,23 @@ namespace AcessaAi.Application.Avaliacoes.Services
             await _avaliacaoRepository.AddAsync(avaliacao, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
 
-            return TinyMapper.Map<AvaliacaoResponse>(avaliacao);
+            return avaliacao.Adapt<AvaliacaoResponse>();
         }
 
         public async Task<ErrorOr<AvaliacaoResponse>> AtualizarAsync(
             AvaliacaoUpdateRequest request,
             CancellationToken cancellationToken)
         {
-            var comando = TinyMapper.Map<AvaliacaoAtualizarComando>(request);
-
-            var avaliacao = await _avaliacaoRepository.ObterPorIdAsync(comando.Id, cancellationToken);
+            var avaliacao = await _avaliacaoRepository.ObterPorIdAsync(request.Id, cancellationToken);
             if (avaliacao is null)
                 return Error.NotFound("Avaliacao.NaoEncontrada", "Avaliação não encontrada.");
 
-            avaliacao.Alterar(comando.Comentario, comando.Estrelas);
+            avaliacao.Alterar(request.Comentario, request.Estrelas);
 
             await _avaliacaoRepository.UpdateAsync(avaliacao, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
 
-            return TinyMapper.Map<AvaliacaoResponse>(avaliacao);
+            return avaliacao.Adapt<AvaliacaoResponse>();
         }
 
         public async Task<ErrorOr<Success>> ExcluirAsync(
@@ -104,7 +94,7 @@ namespace AcessaAi.Application.Avaliacoes.Services
             if (avaliacao is null)
                 return Error.NotFound("Avaliacao.NaoEncontrada", "Avaliação não encontrada.");
 
-            return TinyMapper.Map<AvaliacaoResponse>(avaliacao);
+            return avaliacao.Adapt<AvaliacaoResponse>();
         }
     }
 }

@@ -1,9 +1,10 @@
-﻿using AcessaAi.Application.Autenticacao.Dtos;
+using AcessaAi.Application.Autenticacao.Dtos;
+using ErrorOr;
 
 namespace AcessaAi.Application.Autenticacao.Interfaces
 {
     public interface IAutenticacaoService
     {
-        Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken);
+        Task<ErrorOr<LoginResponse>> LoginAsync(LoginRequest request, CancellationToken cancellationToken);
     }
 }

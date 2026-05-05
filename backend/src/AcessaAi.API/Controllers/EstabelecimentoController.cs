@@ -1,8 +1,7 @@
 using AcessaAi.API.Extensions;
-using AcessaAi.Application.Estabelecimentos.Dtos.Responses;
-using AcessaAi.Application.Avaliacoes.Services;
+using AcessaAi.Application.Estabelecimentos.Dtos.Requests;
+using AcessaAi.Application.Estabelecimentos.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using AcessaAi.Application.Estabelecimentos.Services;
 
 namespace AcessaAi.API.Controllers
 {
@@ -18,28 +17,19 @@ namespace AcessaAi.API.Controllers
         }
 
         /// <summary>
-        /// Cria um novo estabelecimento. O endpoint espera um objeto do tipo EstabelecimentoCriarRequest no corpo da requisição, contendo os detalhes do estabelecimento a ser criado. Se a criação for bem-sucedida, retorna um status 201 Created com os detalhes do estabelecimento criado. Caso contrário, retorna um status de erro apropriado.
+        /// Cria um novo estabelecimento.
         /// </summary>
-        /// <param name="request"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> CriarAsync([FromBody] EstabelecimentoCriarRequest request, CancellationToken cancellationToken)
         {
             var result = await _estabelecimentoService.CriarAsync(request, cancellationToken);
-
             return result.ToActionResult(estabelecimento =>
-                CreatedAtAction(nameof(ObterPorIdAsync), new { id = estabelecimento.Id }, estabelecimento)
-            );
+                CreatedAtAction(nameof(ObterPorIdAsync), new { id = estabelecimento.Id }, estabelecimento));
         }
 
         /// <summary>
-        /// Altera um estabelecimento existente. O endpoint espera um ID de estabelecimento como parâmetro de rota e um objeto do tipo EstabelecimentoAtualizarRequest no corpo da requisição, contendo os detalhes atualizados do estabelecimento. Se a atualização for bem-sucedida, retorna um status 200 OK com os detalhes do estabelecimento atualizado. Caso contrário, retorna um status de erro apropriado.
+        /// Atualiza um estabelecimento existente.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="request"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         [HttpPatch("{id}")]
         public async Task<IActionResult> AtualizarAsync(
             int id,
@@ -52,11 +42,8 @@ namespace AcessaAi.API.Controllers
         }
 
         /// <summary>
-        /// Exclui um estabelecimento existente. O endpoint espera um ID de estabelecimento como parâmetro de rota. Se a exclusão for bem-sucedida, retorna um status 204 No Content. Caso contrário, retorna um status de erro apropriado.
+        /// Remove um estabelecimento pelo ID.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> ExcluirAsync(int id, CancellationToken cancellationToken)
         {
@@ -65,11 +52,8 @@ namespace AcessaAi.API.Controllers
         }
 
         /// <summary>
-        /// Obtém um estabelecimento por ID. O endpoint espera um ID de estabelecimento como parâmetro de rota. Se o estabelecimento for encontrado, retorna um status 200 OK com os detalhes do estabelecimento. Caso contrário, retorna um status de erro apropriado.
+        /// Retorna um estabelecimento pelo ID.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> ObterPorIdAsync(int id, CancellationToken cancellationToken)
         {
