@@ -1,12 +1,12 @@
-﻿using AcessaAi.Domain.Categorias.Entities;
+﻿using AcessaAi.Domain.RecursosAcessibilidades.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AcessaAi.Infrastructure.Data.Mappings
 {
-    public class CategoriaConfiguration : IEntityTypeConfiguration<Categoria>
+    public class RecursoAcessibilidadeConfiguration : IEntityTypeConfiguration<RecursoAcessibilidade>
     {
-        public void Configure(EntityTypeBuilder<Categoria> builder)
+        public void Configure(EntityTypeBuilder<RecursoAcessibilidade> builder)
         {
             builder.ToTable("Categorias");
             builder.HasKey(c => c.Id);
@@ -22,7 +22,7 @@ namespace AcessaAi.Infrastructure.Data.Mappings
             var dataCadastro = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
             builder.HasData(
-                new Categoria
+                new RecursoAcessibilidade
                 {
                     Id = 1,
                     Nome = "Rampa de Acesso",
@@ -30,7 +30,7 @@ namespace AcessaAi.Infrastructure.Data.Mappings
                     Icone = "fa-wheelchair-move",
                     DataCadastro = dataCadastro
                 },
-                new Categoria
+                new RecursoAcessibilidade
                 {
                     Id = 2,
                     Nome = "Banheiro Adaptado",
@@ -38,7 +38,7 @@ namespace AcessaAi.Infrastructure.Data.Mappings
                     Icone = "fa-restroom",
                     DataCadastro = dataCadastro
                 },
-                new Categoria
+                new RecursoAcessibilidade
                 {
                     Id = 3,
                     Nome = "Elevador",
@@ -46,7 +46,7 @@ namespace AcessaAi.Infrastructure.Data.Mappings
                     Icone = "fa-elevator",
                     DataCadastro = dataCadastro
                 },
-                new Categoria
+                new RecursoAcessibilidade
                 {
                     Id = 4,
                     Nome = "Estacionamento Reservado",
@@ -54,7 +54,7 @@ namespace AcessaAi.Infrastructure.Data.Mappings
                     Icone = "fa-square-parking",
                     DataCadastro = dataCadastro
                 },
-                new Categoria
+                new RecursoAcessibilidade
                 {
                     Id = 5,
                     Nome = "Piso Tátil",
@@ -62,7 +62,7 @@ namespace AcessaAi.Infrastructure.Data.Mappings
                     Icone = "fa-person-walking-with-cane",
                     DataCadastro = dataCadastro
                 },
-                new Categoria
+                new RecursoAcessibilidade
                 {
                     Id = 6,
                     Nome = "Braille",
@@ -70,7 +70,7 @@ namespace AcessaAi.Infrastructure.Data.Mappings
                     Icone = "fa-braille",
                     DataCadastro = dataCadastro
                 },
-                new Categoria
+                new RecursoAcessibilidade
                 {
                     Id = 7,
                     Nome = "Libras",
@@ -78,7 +78,7 @@ namespace AcessaAi.Infrastructure.Data.Mappings
                     Icone = "fa-hands",
                     DataCadastro = dataCadastro
                 },
-                new Categoria
+                new RecursoAcessibilidade
                 {
                     Id = 8,
                     Nome = "Ambiente Calmo",

@@ -6,12 +6,12 @@ using System.Security.Claims;
 
 namespace AcessaAi.Application.Autenticacao.Services
 {
-    public class AutenticacaoService : IAutenticacaoService
+    public class AutenticacaoApplicationService : IAutenticacaoApplicationService
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly ITokenService _tokenService;
 
-        public AutenticacaoService(IUsuarioRepository usuarioRepository, ITokenService tokenService)
+        public AutenticacaoApplicationService(IUsuarioRepository usuarioRepository, ITokenService tokenService)
         {
             _usuarioRepository = usuarioRepository;
             _tokenService = tokenService;

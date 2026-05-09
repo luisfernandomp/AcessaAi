@@ -21,6 +21,14 @@ namespace AcessaAi.Infrastructure.Data.Mappings
             });
 
             builder.ComplexProperty(e => e.Endereco, EnderecoConfiguration.Configure());
+            builder.Property(e => e.MediaEstrelas).HasPrecision(3, 2);
+            builder.Property(e => e.CadastradoRecente).IsRequired();
+            builder.OwnsMany(e => e.UrlFotos, a =>
+            {
+                a.Property<string>("UrlFoto").HasColumnName("UrlFoto").IsRequired().HasMaxLength(500);
+                a.ToTable("EstabelecimentoFotos");
+                a.WithOwner().HasForeignKey("EstabelecimentoId");
+            });
         }
     }
 }

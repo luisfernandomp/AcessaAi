@@ -10,5 +10,6 @@ namespace AcessaAi.Application.Estabelecimentos.Interfaces
         Task<ErrorOr<EstabelecimentoResponse>> AtualizarAsync(EstabelecimentoAtualizarRequest request, CancellationToken cancellationToken);
         Task<ErrorOr<Success>> ExcluirAsync(int id, CancellationToken cancellationToken);
         Task<ErrorOr<EstabelecimentoResponse>> ObterPorIdAsync(int id, CancellationToken cancellationToken);
+        Task<ErrorOr<Success>> SubirImagemAsync(int id, EstabelecimentoImagemRequest request, CancellationToken cancellationToken);
     }
 }

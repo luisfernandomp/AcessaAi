@@ -24,9 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Categorias\Dtos\" />
-    <Folder Include="Categorias\Dtos\Responses\" />
-    <Folder Include="Categorias\Interfaces\" />
     <Folder Include="Storage\" />
     <Folder Include="Storage\Interfaces\" />
   </ItemGroup>

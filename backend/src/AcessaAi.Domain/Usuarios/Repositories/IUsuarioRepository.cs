@@ -1,4 +1,4 @@
-using AcessaAi.Domain.Autenticacao.Entities;
+using AcessaAi.Domain.Usuarios.Entities;
 using ErrorOr;
 
 namespace AcessaAi.Domain.GestaoUsuarios.Repositories

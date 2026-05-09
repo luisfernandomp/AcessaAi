@@ -1,8 +1,8 @@
 ﻿using AcessaAi.Domain.Common;
 
-namespace AcessaAi.Domain.Categorias.Entities
+namespace AcessaAi.Domain.RecursosAcessibilidades.Entities
 {
-    public class Categoria : EntityBase 
+    public class RecursoAcessibilidade : EntityBase 
     {
         public string Nome {get;set;}
         public string Descricao { get; set; }   

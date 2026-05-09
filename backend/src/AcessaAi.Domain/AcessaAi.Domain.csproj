@@ -7,11 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="GestaoCategorias\Consultas\" />
-    <Folder Include="GestaoCategorias\Interfaces\" />
-    <Folder Include="GestaoCategorias\Repositories\" />
-    <Folder Include="GestaoEstabelecimentos\Interfaces\" />
-    <Folder Include="GestaoEstabelecimentos\Services\" />
+    <Folder Include="RecursosAcessibilidades\Consultas\" />
+    <Folder Include="RecursosAcessibilidades\Interfaces\" />
+    <Folder Include="Estabelecimentos\Interfaces\" />
+    <Folder Include="Estabelecimentos\Services\" />
   </ItemGroup>
 
   <ItemGroup>

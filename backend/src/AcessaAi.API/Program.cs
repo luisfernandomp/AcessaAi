@@ -1,6 +1,6 @@
 using AcessaAi.API.Extensions;
 using AcessaAi.API.Middlewares;
-using AcessaAi.Domain.Autenticacao.Entities;
+using AcessaAi.Domain.Usuarios.Entities;
 using AcessaAi.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -31,6 +31,7 @@ builder.Services.AddControllers(opt =>
 });
 
 builder.Services.AddOpenApiWithJwt();
+builder.Services.AddS3(builder.Configuration);
 
 builder.Services
     .AddIdentity<Usuario, IdentityRole<int>>(opt =>

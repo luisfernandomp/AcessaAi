@@ -1,8 +1,8 @@
 using AcessaAi.Application.Usuarios.Dtos.Requests;
 using AcessaAi.Application.Usuarios.Dtos.Responses;
 using AcessaAi.Application.Usuarios.Interfaces;
-using AcessaAi.Domain.Autenticacao.Entities;
 using AcessaAi.Domain.GestaoUsuarios.Repositories;
+using AcessaAi.Domain.Usuarios.Entities;
 using ErrorOr;
 using Mapster;
 
@@ -21,7 +21,12 @@ namespace AcessaAi.Application.Usuarios.Services
         {
             var usuario = Usuario.CriarUsuario(request.Nome, request.Email, request.DataNascimento);
 
-            usuario.AdicionarEndereco(
+            if(usuario.IsError)
+                return usuario.Errors;
+
+            var usuarioResult = usuario.Value;
+
+            usuarioResult.AdicionarEndereco(
                 request.Endereco.Logradouro,
                 request.Endereco.UF,
                 request.Endereco.Cidade,
@@ -30,7 +35,7 @@ namespace AcessaAi.Application.Usuarios.Services
                 request.Endereco.Bairro,
                 request.Endereco.Complemento);
 
-            var result = await _usuarioRepository.CriarAsync(usuario, request.Senha, cancellationToken);
+            var result = await _usuarioRepository.CriarAsync(usuarioResult, request.Senha, cancellationToken);
 
             if (result.IsError)
                 return result.Errors;

@@ -1,7 +1,7 @@
-﻿using AcessaAi.Domain.Autenticacao.Entities;
-using AcessaAi.Domain.Avaliacoes.Entities;
-using AcessaAi.Domain.Categorias.Entities;
+﻿using AcessaAi.Domain.Avaliacoes.Entities;
 using AcessaAi.Domain.GestaoEstabelecimentos.Entities;
+using AcessaAi.Domain.RecursosAcessibilidades.Entities;
+using AcessaAi.Domain.Usuarios.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +15,7 @@ namespace AcessaAi.Infrastructure.Identity
 
         public DbSet<Usuario> Usuarios => Set<Usuario>();
         public DbSet<Avaliacao> Avaliacoes => Set<Avaliacao>();
-        public DbSet<Categoria> Categorias => Set<Categoria>();
+        public DbSet<RecursoAcessibilidade> Categorias => Set<RecursoAcessibilidade>();
         public DbSet<Estabelecimento> Estabelecimentos => Set<Estabelecimento>();
 
         protected override void OnModelCreating(ModelBuilder builder)

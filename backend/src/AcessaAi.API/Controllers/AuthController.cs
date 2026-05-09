@@ -11,9 +11,9 @@ namespace AcessaAi.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IAutenticacaoService _autenticacaoService;
+        private readonly IAutenticacaoApplicationService _autenticacaoService;
 
-        public AuthController(IAutenticacaoService autenticacaoService)
+        public AuthController(IAutenticacaoApplicationService autenticacaoService)
         {
             _autenticacaoService = autenticacaoService;
         }

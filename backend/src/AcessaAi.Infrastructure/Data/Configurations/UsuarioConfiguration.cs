@@ -1,4 +1,4 @@
-﻿using AcessaAi.Domain.Autenticacao.Entities;
+﻿using AcessaAi.Domain.Usuarios.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

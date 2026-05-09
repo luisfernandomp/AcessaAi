@@ -1,10 +1,12 @@
 using AcessaAi.API.Extensions;
 using AcessaAi.Application.Estabelecimentos.Dtos.Requests;
 using AcessaAi.Application.Estabelecimentos.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AcessaAi.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class EstabelecimentoController : ControllerBase
@@ -25,6 +27,22 @@ namespace AcessaAi.API.Controllers
             var result = await _estabelecimentoService.CriarAsync(request, cancellationToken);
             return result.ToActionResult(estabelecimento =>
                 CreatedAtAction(nameof(ObterPorIdAsync), new { id = estabelecimento.Id }, estabelecimento));
+        }
+
+
+        /// <summary>
+        /// Subir uma imagem para um estabelecimento existente. A imagem é enviada como um arquivo multipart/form-data e associada ao estabelecimento pelo ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="imagem"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpPost("{id:int}/imagem")]
+        public async Task<IActionResult> SubirImagemAsync(int id, IFormFile imagem, CancellationToken cancellationToken)
+        {
+            var request = imagem.ToEstabelecimentoImagemRequest();   
+            var result = await _estabelecimentoService.SubirImagemAsync(id, request, cancellationToken);
+            return result.ToActionResult(_ => NoContent());
         }
 
         /// <summary>

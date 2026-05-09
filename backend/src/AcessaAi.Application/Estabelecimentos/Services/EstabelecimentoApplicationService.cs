@@ -1,6 +1,7 @@
 using AcessaAi.Application.Estabelecimentos.Dtos.Requests;
 using AcessaAi.Application.Estabelecimentos.Dtos.Responses;
 using AcessaAi.Application.Estabelecimentos.Interfaces;
+using AcessaAi.Application.Storage.Interfaces;
 using AcessaAi.Domain.Common;
 using AcessaAi.Domain.GestaoEstabelecimentos.Entities;
 using AcessaAi.Domain.GestaoEstabelecimentos.Repositories;
@@ -13,13 +14,16 @@ namespace AcessaAi.Application.Estabelecimentos.Services
     public class EstabelecimentoApplicationService : IEstabelecimentoApplicationService
     {
         private readonly IEstabelecimentoRepository _estabelecimentoRepository;
+        private readonly IImageStorageService _imageStorageService;
         private readonly IUnitOfWork _unitOfWork;
 
         public EstabelecimentoApplicationService(
             IEstabelecimentoRepository estabelecimentoRepository,
+            IImageStorageService imageStorageService,
             IUnitOfWork unitOfWork)
         {
             _estabelecimentoRepository = estabelecimentoRepository;
+            _imageStorageService = imageStorageService; 
             _unitOfWork = unitOfWork;
         }
 
@@ -84,6 +88,30 @@ namespace AcessaAi.Application.Estabelecimentos.Services
                 return Error.NotFound("Estabelecimento.NaoEncontrado", "Estabelecimento não encontrado.");
 
             return estabelecimento.Adapt<EstabelecimentoResponse>();
+        }
+
+        public async Task<ErrorOr<Success>> SubirImagemAsync(
+            int id,
+            EstabelecimentoImagemRequest request,
+            CancellationToken cancellationToken)
+        {
+            var estabelecimento = await _estabelecimentoRepository.ObterPorIdAsync(id, cancellationToken);
+            if (estabelecimento is null)
+                return Error.NotFound("Estabelecimento.NaoEncontrado", "Estabelecimento não encontrado.");
+
+            var imageUrl = await _imageStorageService.UploadAsync(
+                request.Content,
+                request.FileName,
+                request.ContentType,
+                cancellationToken
+            );
+
+            estabelecimento.AdicionarImagem(imageUrl);
+
+            await _estabelecimentoRepository.UpdateAsync(estabelecimento, cancellationToken);
+            await _unitOfWork.CommitAsync(cancellationToken);
+
+            return Result.Success;
         }
     }
 }

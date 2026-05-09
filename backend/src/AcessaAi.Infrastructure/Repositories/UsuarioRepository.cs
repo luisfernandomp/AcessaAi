@@ -1,5 +1,5 @@
-using AcessaAi.Domain.Autenticacao.Entities;
 using AcessaAi.Domain.GestaoUsuarios.Repositories;
+using AcessaAi.Domain.Usuarios.Entities;
 using ErrorOr;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

@@ -11,7 +11,7 @@ namespace AcessaAi.Infrastructure.Data.Mappings
             builder.ToTable("Avaliacoes");
 
             builder.HasKey(x => x.Id);
-            builder.Property(x => x.Estrelas).IsRequired();
+            builder.Property(x => x.QuantidadeEstrelas).IsRequired();
             builder.Property(x => x.Comentario).IsRequired().HasMaxLength(300);
 
             builder.HasOne(x => x.Usuario)

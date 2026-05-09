@@ -1,8 +1,8 @@
 using System;
 
-namespace AcessaAi.Application.Categorias.Dtos.Responses;
+namespace AcessaAi.Application.RecursosAcessibilidades.Dtos.Responses;
 
-public class CategoriaResponse
+public class RecursoAcessibilidadeResponse
 {
     public int Id { get; set; }
     public string Nome { get; set; }
