@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcessaAi.API.Controllers
 {
+    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class RecursoAcessibilidadeController : ControllerBase
@@ -15,7 +16,6 @@ namespace AcessaAi.API.Controllers
             _recursoAcessibilidadeApplicationService = recursoAcessibilidadeApplicationService;
         }
 
-        [Authorize]
         [HttpGet("listar-ativas")]
         public async Task<IActionResult> ListarRecursosAcessibilidadesAtivasAsync(CancellationToken cancellationToken)
         {

@@ -1,6 +1,6 @@
-namespace AcessaAi.Application.Dtos.Requests
+namespace AcessaAi.Application.Dtos
 {
-    public record GeocordenadasRequest
+    public record class GeocordenadasResponse
     {
         public double Latitude { get; init; }
         public double Longitude { get; init; }

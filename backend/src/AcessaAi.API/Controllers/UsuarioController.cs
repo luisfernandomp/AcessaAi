@@ -20,6 +20,10 @@ namespace AcessaAi.API.Controllers
         /// <summary>
         /// Retorna os dados de um usuário pelo ID.
         /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [Authorize]
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
@@ -30,6 +34,9 @@ namespace AcessaAi.API.Controllers
         /// <summary>
         /// Cadastra um novo usuário no sistema.
         /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("cadastrar")]
         public async Task<IActionResult> CadastrarAsync([FromBody] UsuariosCadastrarRequest dto, CancellationToken cancellationToken)

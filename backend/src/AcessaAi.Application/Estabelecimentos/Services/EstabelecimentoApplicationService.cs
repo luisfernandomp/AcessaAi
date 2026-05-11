@@ -3,6 +3,7 @@ using AcessaAi.Application.Estabelecimentos.Dtos.Responses;
 using AcessaAi.Application.Estabelecimentos.Interfaces;
 using AcessaAi.Application.Storage.Interfaces;
 using AcessaAi.Domain.Common;
+using AcessaAi.Domain.Estabelecimentos.Consultas;
 using AcessaAi.Domain.GestaoEstabelecimentos.Entities;
 using AcessaAi.Domain.GestaoEstabelecimentos.Repositories;
 using AcessaAi.Domain.GestaoEstabelecimentos.ValueObjects;
@@ -112,6 +113,17 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             await _unitOfWork.CommitAsync(cancellationToken);
 
             return Result.Success;
+        }
+
+        public async Task<ErrorOr<IEnumerable<EstabelecimentoResponse>>> FiltrarAsync(
+            EstabelecimentoFiltrarRequest request,
+            CancellationToken cancellationToken)
+        {
+            var consulta = request.Adapt<EstabelecimentoFiltrarConsulta>();
+
+            var estabelecimentos = await _estabelecimentoRepository.FiltrarAsync(consulta, cancellationToken);
+
+            return estabelecimentos.Adapt<ErrorOr<IEnumerable<EstabelecimentoResponse>>>();
         }
     }
 }

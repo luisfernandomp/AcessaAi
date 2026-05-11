@@ -1,14 +1,18 @@
 using AcessaAi.Application.Avaliacoes.Dtos.Responses;
 using AcessaAi.Application.RecursosAcessibilidades.Dtos.Responses;
 using AcessaAi.Application.Dtos;
+using AcessaAi.Application.Dtos.Requests;
+using AcessaAi.Application.Estabelecimentos.Dtos.Requests;
 using AcessaAi.Application.Estabelecimentos.Dtos.Responses;
 using AcessaAi.Application.Usuarios.Dtos.Responses;
 using AcessaAi.Domain.Usuarios.Entities;
 using AcessaAi.Domain.Avaliacoes.Entities;
 using AcessaAi.Domain.RecursosAcessibilidades.Entities;
 using AcessaAi.Domain.Common;
+using AcessaAi.Domain.Estabelecimentos.Consultas;
 using AcessaAi.Domain.GestaoEstabelecimentos.Entities;
 using Mapster;
+using AcessaAi.Domain.GestaoEstabelecimentos.ValueObjects;
 
 namespace AcessaAi.Application.Mappings
 {
@@ -22,9 +26,37 @@ namespace AcessaAi.Application.Mappings
                 .Map(dest => dest.DataNascimento, src => src.DataNascimento.DateTime);
 
             TypeAdapterConfig<Endereco, EnderecoResponse>.NewConfig();
-            TypeAdapterConfig<Avaliacao, AvaliacaoResponse>.NewConfig();
-            TypeAdapterConfig<Estabelecimento, EstabelecimentoResponse>.NewConfig();
+
+            // Geocordenadas é um record com nomes iguais, mas precisa de config explícita
+            TypeAdapterConfig<Geocordenadas, GeocordenadasResponse>.NewConfig();
+
+            // QuantidadeEstrelas → Estrelas
+            TypeAdapterConfig<Avaliacao, AvaliacaoResponse>
+                .NewConfig()
+                .Map(dest => dest.Estrelas, src => src.QuantidadeEstrelas);
+
+            // Geolocalizacao → Geocordenadas (nome diferente); Fotos → UrlFotos (extrai só a Url)
+            TypeAdapterConfig<Estabelecimento, EstabelecimentoResponse>
+                .NewConfig()
+                .Map(dest => dest.Geocordenadas, src => src.Geolocalizacao)
+                .Map(dest => dest.UrlFotos, src => src.Fotos.Select(f => f.Url));
+
             TypeAdapterConfig<RecursoAcessibilidade, RecursoAcessibilidadeResponse>.NewConfig();
+
+            // Request → Consulta (para filtros)
+            TypeAdapterConfig<EnderecoRequest, EnderecoConsulta>.NewConfig();
+            TypeAdapterConfig<GeocordenadasRequest, GeocordenadasConsulta>.NewConfig();
+
+            TypeAdapterConfig<GeocordenadasRequest, Geocordenadas>
+                .NewConfig()
+                .ConstructUsing(src => new Geocordenadas(src.Latitude, src.Longitude));
+
+            TypeAdapterConfig<EstabelecimentoFiltrarRequest, EstabelecimentoFiltrarConsulta>
+                .NewConfig()
+                .Map(dest => dest.EnderecoConsulta, src => src.EnderecoRequest)
+                .Map(dest => dest.GeocordenadasConsulta, src => src.GeocordenadasRequest);
+
+            TypeAdapterConfig.GlobalSettings.Compile();
         }
     }
 }

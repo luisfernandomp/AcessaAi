@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AcessaAi.API.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class EstabelecimentoController : ControllerBase
@@ -21,6 +20,7 @@ namespace AcessaAi.API.Controllers
         /// <summary>
         /// Cria um novo estabelecimento.
         /// </summary>
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CriarAsync([FromBody] EstabelecimentoCriarRequest request, CancellationToken cancellationToken)
         {
@@ -37,6 +37,7 @@ namespace AcessaAi.API.Controllers
         /// <param name="imagem"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [Authorize]
         [HttpPost("{id:int}/imagem")]
         public async Task<IActionResult> SubirImagemAsync(int id, IFormFile imagem, CancellationToken cancellationToken)
         {
@@ -48,6 +49,7 @@ namespace AcessaAi.API.Controllers
         /// <summary>
         /// Atualiza um estabelecimento existente.
         /// </summary>
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> AtualizarAsync(
             int id,
@@ -62,6 +64,7 @@ namespace AcessaAi.API.Controllers
         /// <summary>
         /// Remove um estabelecimento pelo ID.
         /// </summary>
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> ExcluirAsync(int id, CancellationToken cancellationToken)
         {
@@ -72,10 +75,22 @@ namespace AcessaAi.API.Controllers
         /// <summary>
         /// Retorna um estabelecimento pelo ID.
         /// </summary>
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> ObterPorIdAsync(int id, CancellationToken cancellationToken)
         {
             var result = await _estabelecimentoService.ObterPorIdAsync(id, cancellationToken);
+            return result.ToActionResult(Ok);
+        }
+
+        /// <summary>
+        /// Filtra estabelecimentos por nome, recursos de acessibilidade e/ou distância máxima a partir de coordenadas geográficas.
+        /// </summary>
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> FiltrarAsync([FromQuery] EstabelecimentoFiltrarRequest request, CancellationToken cancellationToken)
+        {
+            var result = await _estabelecimentoService.FiltrarAsync(request, cancellationToken);
             return result.ToActionResult(Ok);
         }
     }

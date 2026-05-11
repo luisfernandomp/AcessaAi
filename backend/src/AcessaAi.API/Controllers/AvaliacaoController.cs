@@ -1,10 +1,12 @@
 ﻿using AcessaAi.API.Extensions;
 using AcessaAi.Application.Avaliacoes.Dtos.Requests;
 using AcessaAi.Application.Avaliacoes.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AcessaAi.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AvaliacaoController : ControllerBase

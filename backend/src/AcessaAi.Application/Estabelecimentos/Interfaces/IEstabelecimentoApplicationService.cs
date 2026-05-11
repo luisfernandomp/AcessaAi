@@ -11,5 +11,8 @@ namespace AcessaAi.Application.Estabelecimentos.Interfaces
         Task<ErrorOr<Success>> ExcluirAsync(int id, CancellationToken cancellationToken);
         Task<ErrorOr<EstabelecimentoResponse>> ObterPorIdAsync(int id, CancellationToken cancellationToken);
         Task<ErrorOr<Success>> SubirImagemAsync(int id, EstabelecimentoImagemRequest request, CancellationToken cancellationToken);
+         Task<ErrorOr<IEnumerable<EstabelecimentoResponse>>> FiltrarAsync(
+            EstabelecimentoFiltrarRequest request,
+            CancellationToken cancellationToken);
     }
 }

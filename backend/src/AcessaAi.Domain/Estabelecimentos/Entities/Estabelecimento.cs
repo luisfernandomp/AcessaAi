@@ -1,6 +1,7 @@
 ﻿using AcessaAi.Domain.Avaliacoes.Entities;
 using AcessaAi.Domain.Common;
 using AcessaAi.Domain.GestaoEstabelecimentos.ValueObjects;
+using AcessaAi.Domain.RecursosAcessibilidades.Entities;
 using ErrorOr;
 
 namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
@@ -12,8 +13,9 @@ namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
         public Endereco Endereco { get; private set; }
         public double MediaEstrelas { get; private set; }
         public bool CadastradoRecente { get; private set; }
-        public ICollection<string> UrlFotos { get; private set; }
+        public ICollection<EstabelecimentoFoto> Fotos { get; private set; }
         public ICollection<Avaliacao> Avaliacoes { get; private set; }
+        public ICollection<RecursoAcessibilidade> RecursosAcessibilidade { get; private set; }
 
         private Estabelecimento() { }
 
@@ -97,8 +99,15 @@ namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
 
         public void AdicionarImagem(string url)
         {
-            UrlFotos ??= new List<string>();
-            UrlFotos.Add(url);
+            Fotos ??= new List<EstabelecimentoFoto>();
+            Fotos.Add(new EstabelecimentoFoto(url));
+            DataAtualizacao = DateTime.UtcNow;
+        }
+
+        public void AdicionarRecursoAcessibilidade(RecursoAcessibilidade recurso)
+        {
+            RecursosAcessibilidade ??= new List<RecursoAcessibilidade>();
+            RecursosAcessibilidade.Add(recurso);
             DataAtualizacao = DateTime.UtcNow;
         }
     }

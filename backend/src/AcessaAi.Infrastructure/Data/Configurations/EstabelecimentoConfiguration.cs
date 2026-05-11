@@ -23,12 +23,17 @@ namespace AcessaAi.Infrastructure.Data.Mappings
             builder.ComplexProperty(e => e.Endereco, EnderecoConfiguration.Configure());
             builder.Property(e => e.MediaEstrelas).HasPrecision(3, 2);
             builder.Property(e => e.CadastradoRecente).IsRequired();
-            builder.OwnsMany(e => e.UrlFotos, a =>
+            builder.OwnsMany(e => e.Fotos, foto =>
             {
-                a.Property<string>("UrlFoto").HasColumnName("UrlFoto").IsRequired().HasMaxLength(500);
-                a.ToTable("EstabelecimentoFotos");
-                a.WithOwner().HasForeignKey("EstabelecimentoId");
+                foto.ToTable("EstabelecimentoFotos");
+                foto.HasKey(f => f.Id);
+                foto.Property(f => f.Url).IsRequired().HasMaxLength(500);
+                foto.WithOwner().HasForeignKey(f => f.EstabelecimentoId);
             });
+
+            builder.HasMany(e => e.RecursosAcessibilidade)
+                .WithMany()
+                .UsingEntity(j => j.ToTable("EstabelecimentoRecursosAcessibilidade"));
         }
     }
 }
