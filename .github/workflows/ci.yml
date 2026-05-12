@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./backend/AcessaAi
+        working-directory: ./backend
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,7 +21,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '10.0.x'
 
       - name: Setup Java (SonarScanner)
         uses: actions/setup-java@v4
@@ -53,7 +53,7 @@ jobs:
         run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
       - name: Publish
-        run: dotnet publish -c Release -o ./publish
+        run: dotnet publish src/AcessaAi.API/AcessaAi.API.csproj -c Release -o ./publish
 
       - name: Upload to Nexus
         run: |
@@ -61,6 +61,30 @@ jobs:
           curl -u "${{ secrets.NEXUS_USER }}:${{ secrets.NEXUS_PASSWORD }}" \
             --upload-file acessaai-backend.tar.gz \
             "${{ secrets.NEXUS_URL }}/repository/raw-hosted/acessaai/backend/${{ github.sha }}/acessaai-backend.tar.gz"
+
+      - name: Copiar artefato para EC2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "backend/acessaai-backend.tar.gz"
+          target: "~/"
+          strip_components: 1
+
+      - name: Deploy no EC2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo mkdir -p /opt/acessaai/backend
+            sudo tar xzf ~/acessaai-backend.tar.gz -C /opt/acessaai/backend
+            rm ~/acessaai-backend.tar.gz
+            sudo systemctl restart acessaai-backend
 
   frontend:
     name: Frontend (Angular)
@@ -89,7 +113,31 @@ jobs:
 
       - name: Upload to Nexus
         run: |
-          tar czf acessaai-frontend.tar.gz -C dist .
+          tar czf acessaai-frontend.tar.gz -C dist/acessa-ai-site/browser .
           curl -u "${{ secrets.NEXUS_USER }}:${{ secrets.NEXUS_PASSWORD }}" \
             --upload-file acessaai-frontend.tar.gz \
             "${{ secrets.NEXUS_URL }}/repository/raw-hosted/acessaai/frontend/${{ github.sha }}/acessaai-frontend.tar.gz"
+
+      - name: Copiar frontend para EC2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "frontend/acessa-ai-site/acessaai-frontend.tar.gz"
+          target: "~/"
+          strip_components: 2
+
+      - name: Deploy no EC2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo mkdir -p /var/www/acessaai
+            sudo tar xzf ~/acessaai-frontend.tar.gz -C /var/www/acessaai
+            rm ~/acessaai-frontend.tar.gz
+            sudo systemctl reload nginx
