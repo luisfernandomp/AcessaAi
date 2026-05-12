@@ -35,11 +35,12 @@ jobs:
       - name: Restaurar dependências
         run: dotnet restore
 
-      - name: SonarQube Begin
+      - name: SonarCloud Begin
         run: |
           dotnet sonarscanner begin \
             /k:"acessaai" \
-            /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}" \
+            /o:"${{ secrets.SONAR_ORGANIZATION }}" \
+            /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
 
@@ -49,7 +50,7 @@ jobs:
       - name: Testes unitários com cobertura
         run: dotnet test --verbosity normal --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
-      - name: SonarQube End
+      - name: SonarCloud End
         run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
       - name: Publish
