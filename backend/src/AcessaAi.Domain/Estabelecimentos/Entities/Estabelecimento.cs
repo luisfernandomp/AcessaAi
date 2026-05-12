@@ -19,12 +19,16 @@ namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
 
         private Estabelecimento() { }
 
-        protected Estabelecimento(string nome, Geocordenadas geolocalizacao)
+        protected Estabelecimento(string nome, Geocordenadas geolocalizacao, Endereco endereco)
         {
             Nome = nome;
             Geolocalizacao = geolocalizacao;
+            Endereco = endereco;
             CadastradoRecente = true;
             MediaEstrelas = 0;
+            Fotos = new List<EstabelecimentoFoto>();
+            Avaliacoes = new List<Avaliacao>();
+            RecursosAcessibilidade = new List<RecursoAcessibilidade>();
         }
 
         private static (List<Error> erros, bool hasError) Validar(string nome, Geocordenadas geocordenadas)
@@ -40,14 +44,14 @@ namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
             return (erros, erros.Any());
         }
 
-        public static ErrorOr<Estabelecimento> Criar(string nome, Geocordenadas geocordenadas)
+        public static ErrorOr<Estabelecimento> Criar(string nome, Geocordenadas geocordenadas, Endereco endereco)
         {
             var (erros, hasError) = Validar(nome, geocordenadas);
 
             if(hasError)
                 return erros;
 
-            return new Estabelecimento(nome, geocordenadas);
+            return new Estabelecimento(nome, geocordenadas, endereco);
         }
 
         public ErrorOr<Estabelecimento> Alterar(string nome, Geocordenadas geolocalizacao)

@@ -39,13 +39,17 @@ namespace AcessaAi.Application.Mappings
             TypeAdapterConfig<Estabelecimento, EstabelecimentoResponse>
                 .NewConfig()
                 .Map(dest => dest.Geocordenadas, src => src.Geolocalizacao)
-                .Map(dest => dest.UrlFotos, src => src.Fotos.Select(f => f.Url));
+                .Map(dest => dest.UrlFotos, src => src.Fotos == null ? Enumerable.Empty<string>() : src.Fotos.Select(f => f.Url));
 
             TypeAdapterConfig<RecursoAcessibilidade, RecursoAcessibilidadeResponse>.NewConfig();
 
             // Request → Consulta (para filtros)
             TypeAdapterConfig<EnderecoRequest, EnderecoConsulta>.NewConfig();
             TypeAdapterConfig<GeocordenadasRequest, GeocordenadasConsulta>.NewConfig();
+
+            TypeAdapterConfig<EnderecoRequest, Endereco>
+                .NewConfig()
+                .ConstructUsing(src => new Endereco(src.Logradouro, src.UF, src.Cidade, src.Numero, src.CEP, src.Bairro, src.Complemento));
 
             TypeAdapterConfig<GeocordenadasRequest, Geocordenadas>
                 .NewConfig()

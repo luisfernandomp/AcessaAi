@@ -33,8 +33,9 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             CancellationToken cancellationToken)
         {
             var geocordenadas = request.Geocordenadas.Adapt<Geocordenadas>();
+            var endereco = request.Endereco.Adapt<Endereco>();
 
-            var estabelecimentoResult = Estabelecimento.Criar(request.Nome, geocordenadas);
+            var estabelecimentoResult = Estabelecimento.Criar(request.Nome, geocordenadas, endereco);
 
             if (estabelecimentoResult.IsError)
                 return estabelecimentoResult.Errors;
@@ -48,10 +49,11 @@ namespace AcessaAi.Application.Estabelecimentos.Services
         }
 
         public async Task<ErrorOr<EstabelecimentoResponse>> AtualizarAsync(
+            int id,
             EstabelecimentoAtualizarRequest request,
             CancellationToken cancellationToken)
         {
-            var estabelecimento = await _estabelecimentoRepository.ObterPorIdAsync(request.Id, cancellationToken);
+            var estabelecimento = await _estabelecimentoRepository.ObterPorIdAsync(id, cancellationToken);
             if (estabelecimento is null)
                 return Error.NotFound("Estabelecimento.NaoEncontrado", "Estabelecimento não encontrado.");
 

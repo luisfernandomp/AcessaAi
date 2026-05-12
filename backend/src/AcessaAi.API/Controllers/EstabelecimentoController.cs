@@ -26,7 +26,7 @@ namespace AcessaAi.API.Controllers
         {
             var result = await _estabelecimentoService.CriarAsync(request, cancellationToken);
             return result.ToActionResult(estabelecimento =>
-                CreatedAtAction(nameof(ObterPorIdAsync), new { id = estabelecimento.Id }, estabelecimento));
+                CreatedAtAction("ObterPorId", new { id = estabelecimento.Id }, estabelecimento));
         }
 
 
@@ -56,8 +56,7 @@ namespace AcessaAi.API.Controllers
             [FromBody] EstabelecimentoAtualizarRequest request,
             CancellationToken cancellationToken)
         {
-            request.Id = id;
-            var result = await _estabelecimentoService.AtualizarAsync(request, cancellationToken);
+            var result = await _estabelecimentoService.AtualizarAsync(id, request, cancellationToken);
             return result.ToActionResult(Ok);
         }
 
