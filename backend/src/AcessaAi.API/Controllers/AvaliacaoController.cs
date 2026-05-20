@@ -30,7 +30,7 @@ namespace AcessaAi.API.Controllers
             var result = await _avaliacaoService.CriarAsync(request, cancellationToken);
             
             return result.ToActionResult(avaliacao => 
-                CreatedAtAction(nameof(ObterPorIdAsync), new { id = avaliacao.Id }, avaliacao)
+                CreatedAtAction(nameof(ObterPorIdAsync).Replace("Async", ""), new { id = avaliacao.Id }, avaliacao)
             );
         }
 
@@ -41,7 +41,7 @@ namespace AcessaAi.API.Controllers
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [HttpPatch("{id}")]
+        [HttpPatch("{id:int}")]
         public async Task<IActionResult> Atualizar(
             int id, 
             [FromBody] AvaliacaoUpdateRequest request, 
@@ -58,7 +58,7 @@ namespace AcessaAi.API.Controllers
         /// <param name="id"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> ExcluirAsync(int id, CancellationToken cancellationToken)
         {
             var result = await _avaliacaoService.ExcluirAsync(id, cancellationToken);
@@ -71,7 +71,7 @@ namespace AcessaAi.API.Controllers
         /// <param name="id"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> ObterPorIdAsync(int id, CancellationToken cancellationToken)
         {
             var result = await _avaliacaoService.ObterPorIdAsync(id, cancellationToken);

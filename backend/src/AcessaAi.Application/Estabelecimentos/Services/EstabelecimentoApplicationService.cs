@@ -90,7 +90,10 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             if (estabelecimento is null)
                 return Error.NotFound("Estabelecimento.NaoEncontrado", "Estabelecimento não encontrado.");
 
-            return estabelecimento.Adapt<EstabelecimentoResponse>();
+            var response = estabelecimento.Adapt<EstabelecimentoResponse>();
+            foreach (var foto in response.Fotos)
+                foto.Url = _imageStorageService.GetPresignedUrl(foto.Url);
+            return response;
         }
 
         public async Task<ErrorOr<Success>> SubirImagemAsync(
@@ -125,7 +128,18 @@ namespace AcessaAi.Application.Estabelecimentos.Services
 
             var estabelecimentos = await _estabelecimentoRepository.FiltrarAsync(consulta, cancellationToken);
 
-            return estabelecimentos.Adapt<ErrorOr<IEnumerable<EstabelecimentoResponse>>>();
+            return estabelecimentos.Then(list =>
+            {
+                var responses = list.Adapt<IEnumerable<EstabelecimentoResponse>>();
+                foreach (var r in responses)
+                {
+                    var capa = r.Fotos.FirstOrDefault(f => f.IsCapa);
+                    r.Fotos = capa is not null
+                        ? [new EstabelecimentoFotoResponse { Url = _imageStorageService.GetPresignedUrl(capa.Url), IsCapa = true }]
+                        : [];
+                }
+                return responses;
+            });
         }
     }
 }

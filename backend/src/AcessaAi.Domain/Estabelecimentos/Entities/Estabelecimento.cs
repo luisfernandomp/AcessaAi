@@ -101,10 +101,11 @@ namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
             }
         }
 
-        public void AdicionarImagem(string url)
+        public void AdicionarImagem(string url, bool isCapa = false)
         {
             Fotos ??= new List<EstabelecimentoFoto>();
-            Fotos.Add(new EstabelecimentoFoto(url));
+            var ehCapa = isCapa || !Fotos.Any();
+            Fotos.Add(new EstabelecimentoFoto(url, ehCapa));
             DataAtualizacao = DateTime.UtcNow;
         }
 

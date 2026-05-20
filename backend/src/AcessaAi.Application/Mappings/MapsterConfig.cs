@@ -35,11 +35,15 @@ namespace AcessaAi.Application.Mappings
                 .NewConfig()
                 .Map(dest => dest.Estrelas, src => src.QuantidadeEstrelas);
 
-            // Geolocalizacao → Geocordenadas (nome diferente); Fotos → UrlFotos (extrai só a Url)
+            TypeAdapterConfig<EstabelecimentoFoto, EstabelecimentoFotoResponse>.NewConfig();
+
+            // Geolocalizacao → Geocordenadas (nome diferente)
             TypeAdapterConfig<Estabelecimento, EstabelecimentoResponse>
                 .NewConfig()
                 .Map(dest => dest.Geocordenadas, src => src.Geolocalizacao)
-                .Map(dest => dest.UrlFotos, src => src.Fotos == null ? Enumerable.Empty<string>() : src.Fotos.Select(f => f.Url));
+                .Map(dest => dest.Fotos, src => src.Fotos == null
+                    ? Enumerable.Empty<EstabelecimentoFotoResponse>()
+                    : src.Fotos.Adapt<IEnumerable<EstabelecimentoFotoResponse>>());
 
             TypeAdapterConfig<RecursoAcessibilidade, RecursoAcessibilidadeResponse>.NewConfig();
 

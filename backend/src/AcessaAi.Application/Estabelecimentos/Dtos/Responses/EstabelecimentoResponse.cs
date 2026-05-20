@@ -8,7 +8,7 @@ namespace AcessaAi.Application.Estabelecimentos.Dtos.Responses
         public int Id { get; set; }
         public string Nome { get; set; }
         public GeocordenadasResponse Geocordenadas { get; set; }
-        public IEnumerable<string> UrlFotos { get; set; }
+        public IEnumerable<EstabelecimentoFotoResponse> Fotos { get; set; }
         public IEnumerable<RecursoAcessibilidadeResponse> RecursosAcessibilidade { get; set; }
         public EnderecoResponse Endereco { get; set; }
     }

@@ -18,7 +18,7 @@ public static class S3Extensions
             var s3Config = new AmazonS3Config
             {
                 ServiceURL = configuration["AWS:ServiceURL"],
-                ForcePathStyle = true,
+                ForcePathStyle = configuration.GetValue<bool>("AWS:ForcePathStyle", true),
                 AuthenticationRegion = configuration["AWS:Region"]
             };
 

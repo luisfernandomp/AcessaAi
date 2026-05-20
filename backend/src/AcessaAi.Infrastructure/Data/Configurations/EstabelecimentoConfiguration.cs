@@ -28,6 +28,7 @@ namespace AcessaAi.Infrastructure.Data.Mappings
                 foto.ToTable("EstabelecimentoFotos");
                 foto.HasKey(f => f.Id);
                 foto.Property(f => f.Url).IsRequired().HasMaxLength(500);
+                foto.Property(f => f.IsCapa).IsRequired().HasDefaultValue(false);
                 foto.WithOwner().HasForeignKey(f => f.EstabelecimentoId);
             });
 

@@ -9,4 +9,6 @@ public interface IImageStorageService
         CancellationToken cancellationToken);
 
     Task DeleteAsync(string key, CancellationToken cancellationToken);
+
+    string GetPresignedUrl(string key, int expirationMinutes = 60);
 }

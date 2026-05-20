@@ -50,7 +50,7 @@ namespace AcessaAi.API.Controllers
         /// Atualiza um estabelecimento existente.
         /// </summary>
         [Authorize]
-        [HttpPatch("{id}")]
+        [HttpPatch("{id:int}")]
         public async Task<IActionResult> AtualizarAsync(
             int id,
             [FromBody] EstabelecimentoAtualizarRequest request,
@@ -64,7 +64,7 @@ namespace AcessaAi.API.Controllers
         /// Remove um estabelecimento pelo ID.
         /// </summary>
         [Authorize]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> ExcluirAsync(int id, CancellationToken cancellationToken)
         {
             var result = await _estabelecimentoService.ExcluirAsync(id, cancellationToken);
@@ -75,7 +75,7 @@ namespace AcessaAi.API.Controllers
         /// Retorna um estabelecimento pelo ID.
         /// </summary>
         [AllowAnonymous]
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> ObterPorIdAsync(int id, CancellationToken cancellationToken)
         {
             var result = await _estabelecimentoService.ObterPorIdAsync(id, cancellationToken);

@@ -28,6 +28,7 @@ public class S3ImageStorageService : IImageStorageService
             Key = key,
             InputStream = content,
             ContentType = contentType,
+            UseChunkEncoding = false,
         };
 
         var result = await _s3Client.PutObjectAsync(request);
@@ -42,4 +43,17 @@ public class S3ImageStorageService : IImageStorageService
 
     public Task DeleteAsync(string key, CancellationToken cancellationToken)
         => throw new NotImplementedException();
+
+    public string GetPresignedUrl(string key, int expirationMinutes = 60)
+    {
+        var request = new GetPreSignedUrlRequest
+        {
+            BucketName = _s3Settings.BucketName,
+            Key = key,
+            Expires = DateTime.UtcNow.AddMinutes(expirationMinutes),
+            Verb = HttpVerb.GET,
+        };
+
+        return _s3Client.GetPreSignedURL(request);
+    }
 }
