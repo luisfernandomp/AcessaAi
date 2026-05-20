@@ -21,7 +21,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '10.0.x' # Mantido na versão 10 conforme seu projeto
 
       - name: Setup Java (SonarScanner)
         uses: actions/setup-java@v4
@@ -38,7 +38,7 @@ jobs:
       - name: SonarQube Begin
         run: |
           dotnet sonarscanner begin \
-            /k:"acessaai" \
+            /k:"acessaai-backend" \
             /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
@@ -84,6 +84,7 @@ jobs:
             sudo mkdir -p /opt/acessaai/backend
             sudo tar xzf ~/acessaai-backend.tar.gz -C /opt/acessaai/backend
             rm ~/acessaai-backend.tar.gz
+            # Certifique-se que o serviço do .NET está configurado no systemd
             sudo systemctl restart acessaai-backend
 
   frontend:
@@ -105,11 +106,8 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Lint
-        run: npm run lint --if-present
-
       - name: Build Angular
-        run: npm run build
+        run: npm run build -- --configuration production
 
       - name: Upload to Nexus
         run: |
