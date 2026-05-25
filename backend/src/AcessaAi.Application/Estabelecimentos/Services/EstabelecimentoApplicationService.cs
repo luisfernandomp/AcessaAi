@@ -28,6 +28,13 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             _unitOfWork = unitOfWork;
         }
 
+        private EstabelecimentoResponse ResolverUrls(EstabelecimentoResponse response)
+        {
+            response.Fotos = [.. response.Fotos
+                .Select(f => { f.Url = _imageStorageService.GetPresignedUrl(f.Url); return f; })];
+            return response;
+        }
+
         public async Task<ErrorOr<EstabelecimentoResponse>> CriarAsync(
             EstabelecimentoCriarRequest request,
             CancellationToken cancellationToken)
@@ -35,17 +42,31 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             var geocordenadas = request.Geocordenadas.Adapt<Geocordenadas>();
             var endereco = request.Endereco.Adapt<Endereco>();
 
-            var estabelecimentoResult = Estabelecimento.Criar(request.Nome, geocordenadas, endereco);
+            var estabelecimentoResult = Estabelecimento.Criar(request.Nome, request.Tipo, geocordenadas, endereco);
 
             if (estabelecimentoResult.IsError)
                 return estabelecimentoResult.Errors;
 
             var estabelecimento = estabelecimentoResult.Value;
 
+            if (request.Capa is not null)
+            {
+                var capaUrl = await _imageStorageService.UploadAsync(
+                    request.Capa.Content, request.Capa.FileName, request.Capa.ContentType, cancellationToken);
+                estabelecimento.AdicionarImagem(capaUrl, isCapa: true);
+            }
+
+            foreach (var foto in request.Fotos)
+            {
+                var fotoUrl = await _imageStorageService.UploadAsync(
+                    foto.Content, foto.FileName, foto.ContentType, cancellationToken);
+                estabelecimento.AdicionarImagem(fotoUrl, isCapa: false);
+            }
+
             await _estabelecimentoRepository.AddAsync(estabelecimento, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
 
-            return estabelecimento.Adapt<EstabelecimentoResponse>();
+            return ResolverUrls(estabelecimento.Adapt<EstabelecimentoResponse>());
         }
 
         public async Task<ErrorOr<EstabelecimentoResponse>> AtualizarAsync(
@@ -59,12 +80,12 @@ namespace AcessaAi.Application.Estabelecimentos.Services
 
             var geocordenadas = request.Geocordenadas.Adapt<Geocordenadas>();
 
-            estabelecimento.Alterar(request.Nome, geocordenadas);
+            estabelecimento.Alterar(request.Nome, geocordenadas, request.Tipo);
 
             await _estabelecimentoRepository.UpdateAsync(estabelecimento, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
 
-            return estabelecimento.Adapt<EstabelecimentoResponse>();
+            return ResolverUrls(estabelecimento.Adapt<EstabelecimentoResponse>());
         }
 
         public async Task<ErrorOr<Success>> ExcluirAsync(
@@ -90,10 +111,7 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             if (estabelecimento is null)
                 return Error.NotFound("Estabelecimento.NaoEncontrado", "Estabelecimento não encontrado.");
 
-            var response = estabelecimento.Adapt<EstabelecimentoResponse>();
-            foreach (var foto in response.Fotos)
-                foto.Url = _imageStorageService.GetPresignedUrl(foto.Url);
-            return response;
+            return ResolverUrls(estabelecimento.Adapt<EstabelecimentoResponse>());
         }
 
         public async Task<ErrorOr<Success>> SubirImagemAsync(
@@ -112,7 +130,7 @@ namespace AcessaAi.Application.Estabelecimentos.Services
                 cancellationToken
             );
 
-            estabelecimento.AdicionarImagem(imageUrl);
+            estabelecimento.AdicionarImagem(imageUrl, request.IsCapa);
 
             await _estabelecimentoRepository.UpdateAsync(estabelecimento, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
@@ -128,18 +146,12 @@ namespace AcessaAi.Application.Estabelecimentos.Services
 
             var estabelecimentos = await _estabelecimentoRepository.FiltrarAsync(consulta, cancellationToken);
 
-            return estabelecimentos.Then(list =>
-            {
-                var responses = list.Adapt<IEnumerable<EstabelecimentoResponse>>();
-                foreach (var r in responses)
-                {
-                    var capa = r.Fotos.FirstOrDefault(f => f.IsCapa);
-                    r.Fotos = capa is not null
-                        ? [new EstabelecimentoFotoResponse { Url = _imageStorageService.GetPresignedUrl(capa.Url), IsCapa = true }]
-                        : [];
-                }
-                return responses;
-            });
+            var result = estabelecimentos.Then(list =>
+                list.Adapt<List<EstabelecimentoResponse>>()
+                    .Select(ResolverUrls)
+                    .ToList() as IEnumerable<EstabelecimentoResponse>);
+
+            return result;
         }
     }
 }

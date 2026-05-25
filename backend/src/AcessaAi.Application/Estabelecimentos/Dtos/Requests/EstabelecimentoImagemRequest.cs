@@ -7,4 +7,5 @@ public class EstabelecimentoImagemRequest
     public string FileName { get; set; }
     public string ContentType { get; set; }
     public Stream Content { get; set; }
+    public bool IsCapa { get; set; }
 }

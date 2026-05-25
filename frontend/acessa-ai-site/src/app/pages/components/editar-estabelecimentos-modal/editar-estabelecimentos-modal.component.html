@@ -1,0 +1,92 @@
+<div class="modal-backdrop" (click)="fecharModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>Editar Estabelecimentos</h2>
+      <button class="btn-fechar" (click)="fecharModal()" type="button">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      @if (carregando) {
+        <div class="loading">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <span>Carregando estabelecimentos...</span>
+        </div>
+      } @else if (erro) {
+        <div class="erro">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <p>{{ erro }}</p>
+          <button class="btn-recarregar" (click)="carregarEstabelecimentos()">
+            Tentar novamente
+          </button>
+        </div>
+      } @else if (estabelecimentos.length === 0) {
+        <div class="vazio">
+          <i class="fa-solid fa-inbox"></i>
+          <p>Nenhum estabelecimento cadastrado</p>
+        </div>
+      } @else {
+        <div class="estabelecimentos-list">
+          <div
+            class="estabelecimento-item"
+            *ngFor="let est of estabelecimentos; trackBy: trackById"
+          >
+            <div class="item-header">
+              <h3>{{ est.nome }}</h3>
+              <div class="item-actions">
+                <button
+                  class="btn-action btn-editar"
+                  (click)="onEditar(est)"
+                  title="Editar"
+                  type="button"
+                >
+                  <i class="fa-solid fa-pencil"></i>
+                </button>
+                <button
+                  class="btn-action btn-deletar"
+                  (click)="onDeletar(est.id, est.nome)"
+                  title="Deletar"
+                  type="button"
+                >
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="item-info">
+              <div class="info-row">
+                <i class="fa-solid fa-map-pin"></i>
+                <span>
+                  {{ est.endereco.logradouro }}, {{ est.endereco.numero }} -
+                  {{ est.endereco.cidade }}, {{ est.endereco.uf }}
+                </span>
+              </div>
+
+              @if (est.recursosAcessibilidade.length > 0) {
+                <div class="info-row">
+                  <i class="fa-solid fa-universal-access"></i>
+                  <div class="recursos">
+                    <span
+                      class="recurso-badge"
+                      *ngFor="let recurso of est.recursosAcessibilidade"
+                    >
+                      {{ recurso.nome }}
+                    </span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-fechar-modal" (click)="fecharModal()">Fechar</button>
+    </div>
+  </div>
+</div>

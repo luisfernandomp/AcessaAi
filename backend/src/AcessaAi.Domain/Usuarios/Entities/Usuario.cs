@@ -15,6 +15,7 @@ namespace AcessaAi.Domain.Usuarios.Entities
         public DateTimeOffset? UltimoLogin { get; private set; }
         public string? RefreshToken { get; private set; }
         public DateTimeOffset? RefreshTokenExpiryTime { get; private set; }
+        public string? UrlFotoPerfil { get; private set; }
         public ICollection<Avaliacao> Avaliacoes { get; private set; }
         
         private Usuario() { }
@@ -37,5 +38,9 @@ namespace AcessaAi.Domain.Usuarios.Entities
             Endereco = new Endereco(logradouro, uf, cidade, numero, cep, bairro, complemento);
         }
 
+        public void AtualizarFotoPerfil(string key)
+        {
+            UrlFotoPerfil = key;
+        }
     }
 }

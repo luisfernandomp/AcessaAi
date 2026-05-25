@@ -1,0 +1,42 @@
+<div class="mapa-layout">
+
+  <app-sidebar
+    [lugarSelecionado]="lugarSelecionado"
+    (lugarClick)="selecionarLugar($event)"
+    (lugaresFiltradosChange)="onLugaresFiltrados($event)"
+    (localizacaoObtida)="onLocalizacaoObtida($event)"
+  />
+
+  <!-- Área do Mapa -->
+  <main class="mapa-area">
+
+    @if (semApiKey) {
+      <div class="map-no-key">
+        <i class="fa-solid fa-gear map-no-key-icon"></i>
+        <p class="map-no-key-titulo">API Key não configurada</p>
+        <p class="map-no-key-desc">Configure sua chave do Google Maps em <code>environment.ts</code></p>
+      </div>
+    }
+
+    @if (mapCarregando && !semApiKey) {
+      <div class="map-loading">
+        <div class="map-spinner"></div>
+        <p>Carregando mapa...</p>
+      </div>
+    }
+
+    <div #mapaContainer class="google-maps-canvas" [class.oculto]="mapCarregando || semApiKey"></div>
+
+    <div class="mapa-controles">
+      <button class="btn-mapa-controle" title="Minha localização">
+        <i class="fa-solid fa-location-crosshairs"></i>
+      </button>
+    </div>
+
+    <app-estabelecimento-bottom-sheet
+      [lugar]="lugarSelecionado"
+      (fechar)="fecharBottomSheet()"
+    />
+  </main>
+
+</div>

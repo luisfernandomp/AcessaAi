@@ -1,0 +1,75 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <h1>Cadastro</h1>
+
+    <form [formGroup]="registerForm" (ngSubmit)="submit()">
+      <label>
+        Nome completo
+        <input type="text" formControlName="nome" placeholder="Seu nome" />
+      </label>
+
+      <label>
+        E-mail
+        <input type="email" formControlName="email" placeholder="seu@email.com" />
+      </label>
+
+      <label>
+        Senha
+        <input type="password" formControlName="senha" placeholder="Senha" />
+      </label>
+
+      <label>
+        Data de nascimento
+        <input type="date" formControlName="dataNascimento" />
+      </label>
+
+      <fieldset class="address-group" formGroupName="endereco">
+        <legend>Endereço</legend>
+
+        <label>
+          Logradouro
+          <input type="text" formControlName="logradouro" placeholder="Rua, Avenida" />
+        </label>
+
+        <label>
+          Número
+          <input type="text" formControlName="numero" placeholder="Número" />
+        </label>
+
+        <label>
+          Bairro
+          <input type="text" formControlName="bairro" placeholder="Bairro" />
+        </label>
+
+        <label>
+          Cidade
+          <input type="text" formControlName="cidade" placeholder="Cidade" />
+        </label>
+
+        <label>
+          UF
+          <input type="text" formControlName="uf" placeholder="UF" />
+        </label>
+
+        <label>
+          CEP
+          <input type="text" formControlName="cep" placeholder="00000-000" />
+        </label>
+
+        <label>
+          Complemento
+          <input type="text" formControlName="complemento" placeholder="Complemento" />
+        </label>
+      </fieldset>
+
+      <button type="submit">Cadastrar</button>
+    </form>
+
+    <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <p class="switch-link">
+      Já tem conta? <a routerLink="/login">Faça login</a>
+    </p>
+  </div>
+</section>

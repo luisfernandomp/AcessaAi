@@ -1,3 +1,4 @@
+using AcessaAi.Application.Storage.Interfaces;
 using AcessaAi.Application.Usuarios.Dtos.Requests;
 using AcessaAi.Application.Usuarios.Dtos.Responses;
 using AcessaAi.Application.Usuarios.Interfaces;
@@ -11,10 +12,14 @@ namespace AcessaAi.Application.Usuarios.Services
     public class UsuarioApplicationService : IUsuarioApplicationService
     {
         private readonly IUsuarioRepository _usuarioRepository;
+        private readonly IImageStorageService _storageService;
 
-        public UsuarioApplicationService(IUsuarioRepository usuarioRepository)
+        public UsuarioApplicationService(
+            IUsuarioRepository usuarioRepository,
+            IImageStorageService storageService)
         {
             _usuarioRepository = usuarioRepository;
+            _storageService = storageService;
         }
 
         public async Task<ErrorOr<UsuarioResponse>> CadastrarAsync(UsuariosCadastrarRequest request, CancellationToken cancellationToken)
@@ -50,7 +55,33 @@ namespace AcessaAi.Application.Usuarios.Services
             if (usuario is null)
                 return Error.NotFound("Usuario.NaoEncontrado", "Usuário não encontrado.");
 
-            return usuario.Adapt<UsuarioResponse>();
+            var response = usuario.Adapt<UsuarioResponse>();
+
+            if (!string.IsNullOrEmpty(response.UrlFotoPerfil))
+                response.UrlFotoPerfil = _storageService.GetPresignedUrl(response.UrlFotoPerfil);
+
+            return response;
+        }
+
+        public async Task<ErrorOr<string>> UploadFotoPerfilAsync(int id, Stream conteudo, string nomeArquivo, string contentType, CancellationToken cancellationToken)
+        {
+            var usuario = await _usuarioRepository.ObterPorIdAsync(id, cancellationToken);
+
+            if (usuario is null)
+                return Error.NotFound("Usuario.NaoEncontrado", "Usuário não encontrado.");
+
+            var key = await _storageService.UploadAsync(
+                conteudo,
+                nomeArquivo,
+                contentType,
+                cancellationToken);
+
+            var result = await _usuarioRepository.AtualizarFotoPerfilAsync(id, key, cancellationToken);
+
+            if (result.IsError)
+                return result.Errors;
+
+            return _storageService.GetPresignedUrl(key);
         }
     }
 }

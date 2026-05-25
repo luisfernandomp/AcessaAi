@@ -1,0 +1,296 @@
+/* Modal Backdrop */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal Content */
+.modal-content {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #043959;
+}
+
+.btn-fechar {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btn-fechar:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Modal Body */
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* Estados */
+.loading,
+.erro,
+.vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 200px;
+  text-align: center;
+}
+
+.loading i,
+.erro i,
+.vazio i {
+  font-size: 32px;
+  color: #cbd5e1;
+}
+
+.erro i {
+  color: #dc2626;
+}
+
+.loading span,
+.erro p,
+.vazio p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.btn-recarregar {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: #0889A6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-recarregar:hover {
+  background: #066d82;
+  transform: translateY(-1px);
+}
+
+/* Estabelecimentos List */
+.estabelecimentos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.estabelecimento-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s;
+  background: #f8fafc;
+}
+
+.estabelecimento-item:hover {
+  background: #f1f5f9;
+  border-color: #0889A6;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.item-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #043959;
+  flex: 1;
+}
+
+.item-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-action {
+  background: none;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.btn-editar {
+  color: #0889A6;
+  border-color: #0889A6;
+}
+
+.btn-editar:hover {
+  background: #e0f4f7;
+  transform: scale(1.05);
+}
+
+.btn-deletar {
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
+.btn-deletar:hover {
+  background: #fef2f2;
+  transform: scale(1.05);
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.info-row i {
+  color: #0889A6;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.recursos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.recurso-badge {
+  background: #e0f4f7;
+  color: #0889A6;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-fechar-modal {
+  padding: 8px 16px;
+  background: #f1f5f9;
+  color: #374151;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-fechar-modal:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+/* Scrollbar customizado */
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

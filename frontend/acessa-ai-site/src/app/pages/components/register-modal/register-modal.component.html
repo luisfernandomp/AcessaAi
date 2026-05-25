@@ -1,0 +1,142 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-box" role="dialog" aria-modal="true">
+
+    <div class="modal-header">
+      <div class="modal-titulo-grupo">
+        <div class="modal-logo-badge">♿</div>
+        <div>
+          <h2 class="modal-titulo">Criar conta</h2>
+          <p class="modal-sub">Junte-se à comunidade AcessaAí</p>
+        </div>
+      </div>
+      <button class="btn-close-modal" (click)="fecharModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="steps-bar">
+      <div class="step" [class.ativo]="etapa >= 1" [class.completo]="etapa > 1">
+        <div class="step-circulo">{{ etapa > 1 ? '✓' : '1' }}</div>
+        <span>Dados pessoais</span>
+      </div>
+      <div class="step-linha" [class.ativo]="etapa >= 2"></div>
+      <div class="step" [class.ativo]="etapa >= 2">
+        <div class="step-circulo">2</div>
+        <span>Endereço</span>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="modal-form">
+
+      @if (etapa === 1) {
+        <div class="form-etapa">
+          <div class="form-row">
+            <div class="form-field">
+              <tui-textfield>
+                <label tuiLabel>Nome completo <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="nome" type="text" placeholder="Seu nome completo" />
+              </tui-textfield>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <tui-textfield>
+                <label tuiLabel>E-mail <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="email" type="email" placeholder="seu@email.com" />
+              </tui-textfield>
+            </div>
+          </div>
+          <div class="form-row dois">
+            <div class="form-field">
+              <tui-textfield>
+                <label tuiLabel>Senha <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="senha" type="password" placeholder="Mínimo 6 caracteres" />
+                <tui-icon tuiPassword></tui-icon>
+              </tui-textfield>
+            </div>
+            <div class="form-field">
+              <label>Data de nascimento <span class="obrig">*</span></label>
+              <input type="date" formControlName="dataNascimento" />
+            </div>
+          </div>
+
+          <div class="modal-acoes">
+            <button tuiButton type="button" appearance="outline" size="m" (click)="fecharModal()">Cancelar</button>
+            <button tuiButton type="button" appearance="primary" size="m" (click)="proximaEtapa()">
+              Próximo →
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (etapa === 2) {
+        <div class="form-etapa" formGroupName="endereco">
+          <div class="form-row dois">
+            <div class="form-field flex2">
+              <tui-textfield>
+                <label tuiLabel>Logradouro <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="logradouro" type="text" placeholder="Rua, Avenida..." />
+              </tui-textfield>
+            </div>
+            <div class="form-field">
+              <tui-textfield>
+                <label tuiLabel>Número <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="numero" type="text" placeholder="123" />
+              </tui-textfield>
+            </div>
+          </div>
+          <div class="form-row dois">
+            <div class="form-field">
+              <tui-textfield>
+                <label tuiLabel>Bairro <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="bairro" type="text" placeholder="Bairro" />
+              </tui-textfield>
+            </div>
+            <div class="form-field">
+              <tui-textfield>
+                <label tuiLabel>Complemento</label>
+                <input tuiTextfield formControlName="complemento" type="text" placeholder="Apto, Bloco..." />
+              </tui-textfield>
+            </div>
+          </div>
+          <div class="form-row tres">
+            <div class="form-field flex2">
+              <tui-textfield>
+                <label tuiLabel>Cidade <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="cidade" type="text" placeholder="Cidade" />
+              </tui-textfield>
+            </div>
+            <div class="form-field">
+              <tui-textfield>
+                <label tuiLabel>UF <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="uf" type="text" placeholder="SP" maxlength="2" />
+              </tui-textfield>
+            </div>
+            <div class="form-field">
+              <tui-textfield>
+                <label tuiLabel>CEP <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="cep" type="text" placeholder="00000-000" />
+              </tui-textfield>
+            </div>
+          </div>
+
+          <div class="modal-acoes">
+            <button tuiButton type="button" appearance="outline" size="m" (click)="voltarEtapa()">← Voltar</button>
+            <button tuiButton type="submit" appearance="primary" size="m" [disabled]="carregando">
+              @if (carregando) { Criando conta... } @else { Criar conta }
+            </button>
+          </div>
+        </div>
+      }
+
+    </form>
+
+    <p class="link-login">
+      Já tem conta?
+      <button type="button" class="btn-link" (click)="irParaLogin.emit()">Faça login</button>
+    </p>
+
+  </div>
+</div>

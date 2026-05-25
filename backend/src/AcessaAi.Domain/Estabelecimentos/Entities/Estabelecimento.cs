@@ -1,5 +1,6 @@
 ﻿using AcessaAi.Domain.Avaliacoes.Entities;
 using AcessaAi.Domain.Common;
+using AcessaAi.Domain.GestaoEstabelecimentos.Enums;
 using AcessaAi.Domain.GestaoEstabelecimentos.ValueObjects;
 using AcessaAi.Domain.RecursosAcessibilidades.Entities;
 using ErrorOr;
@@ -8,7 +9,8 @@ namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
 {
     public class Estabelecimento : EntityBase
     {
-        public string Nome { get; private set; }    
+        public string Nome { get; private set; }
+        public TipoEstabelecimento Tipo { get; private set; }
         public Geocordenadas Geolocalizacao { get; private set; }
         public Endereco Endereco { get; private set; }
         public double MediaEstrelas { get; private set; }
@@ -19,9 +21,10 @@ namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
 
         private Estabelecimento() { }
 
-        protected Estabelecimento(string nome, Geocordenadas geolocalizacao, Endereco endereco)
+        protected Estabelecimento(string nome, TipoEstabelecimento tipo, Geocordenadas geolocalizacao, Endereco endereco)
         {
             Nome = nome;
+            Tipo = tipo;
             Geolocalizacao = geolocalizacao;
             Endereco = endereco;
             CadastradoRecente = true;
@@ -44,17 +47,17 @@ namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
             return (erros, erros.Any());
         }
 
-        public static ErrorOr<Estabelecimento> Criar(string nome, Geocordenadas geocordenadas, Endereco endereco)
+        public static ErrorOr<Estabelecimento> Criar(string nome, TipoEstabelecimento tipo, Geocordenadas geocordenadas, Endereco endereco)
         {
             var (erros, hasError) = Validar(nome, geocordenadas);
 
             if(hasError)
                 return erros;
 
-            return new Estabelecimento(nome, geocordenadas, endereco);
+            return new Estabelecimento(nome, tipo, geocordenadas, endereco);
         }
 
-        public ErrorOr<Estabelecimento> Alterar(string nome, Geocordenadas geolocalizacao)
+        public ErrorOr<Estabelecimento> Alterar(string nome, Geocordenadas geolocalizacao, TipoEstabelecimento? tipo = null)
         {
             var (erros, hasError) = Validar(nome, geolocalizacao);
             if(hasError)
@@ -62,6 +65,8 @@ namespace AcessaAi.Domain.GestaoEstabelecimentos.Entities
 
             Nome = nome;
             Geolocalizacao = geolocalizacao;
+            if (tipo.HasValue)
+                Tipo = tipo.Value;
             DataAtualizacao = DateTime.UtcNow;
 
             return this;

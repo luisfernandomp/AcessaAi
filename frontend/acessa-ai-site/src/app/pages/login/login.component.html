@@ -1,0 +1,24 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <h1>Login</h1>
+
+    <form [formGroup]="loginForm" (ngSubmit)="submit()">
+      <tui-textfield>
+        <label tuiLabel>E-mail</label>
+        <input tuiTextfield formControlName="email" type="email" placeholder="seu@email.com" />
+      </tui-textfield>
+
+      <tui-textfield>
+        <label tuiLabel>Senha</label>
+        <input tuiTextfield formControlName="senha" type="password" placeholder="Senha" />
+        <tui-icon tuiPassword></tui-icon>
+      </tui-textfield>
+
+      <button tuiButton type="submit" appearance="primary" size="m">Entrar</button>
+    </form>
+
+    <p class="switch-link">
+      Ainda não tem conta? <a routerLink="/cadastro">Cadastre-se</a>
+    </p>
+  </div>
+</section>

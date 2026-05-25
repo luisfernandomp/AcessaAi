@@ -1,0 +1,305 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-box" role="dialog" aria-modal="true">
+
+    <div class="modal-header">
+      <div class="modal-titulo-grupo">
+        <div class="modal-icon-badge">🏢</div>
+        <div>
+          <h2 class="modal-titulo">Cadastrar estabelecimento</h2>
+          <p class="modal-sub">Ajude outras pessoas a encontrar locais acessíveis</p>
+        </div>
+      </div>
+      <button class="btn-close-modal" (click)="fecharModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps-bar">
+      <div class="step" [class.ativo]="etapa >= 1" [class.completo]="etapa > 1">
+        <div class="step-circulo">{{ etapa > 1 ? '✓' : '1' }}</div>
+        <span>Info</span>
+      </div>
+      <div class="step-linha" [class.ativo]="etapa >= 2"></div>
+      <div class="step" [class.ativo]="etapa >= 2" [class.completo]="etapa > 2">
+        <div class="step-circulo">{{ etapa > 2 ? '✓' : '2' }}</div>
+        <span>Localização</span>
+      </div>
+      <div class="step-linha" [class.ativo]="etapa >= 3"></div>
+      <div class="step" [class.ativo]="etapa >= 3" [class.completo]="etapa > 3">
+        <div class="step-circulo">{{ etapa > 3 ? '✓' : '3' }}</div>
+        <span>Endereço</span>
+      </div>
+      <div class="step-linha" [class.ativo]="etapa >= 4"></div>
+      <div class="step" [class.ativo]="etapa >= 4">
+        <div class="step-circulo">4</div>
+        <span>Imagens</span>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="modal-form">
+
+      <!-- ── Etapa 1: Informações Básicas ── -->
+      @if (etapa === 1) {
+        <div class="form-etapa">
+          <div class="form-field">
+            <tui-textfield>
+              <label tuiLabel>Nome do estabelecimento <span class="obrig">*</span></label>
+              <input tuiTextfield formControlName="nome" type="text" placeholder="Ex: Restaurante Sabor & Arte" />
+            </tui-textfield>
+          </div>
+
+          <div class="form-field">
+            <label>Tipo de estabelecimento <span class="obrig">*</span></label>
+            <div class="tipos-grid">
+              @for (tipo of tiposEstabelecimento; track tipo.id) {
+                <button
+                  type="button"
+                  class="tipo-card"
+                  [class.selecionado]="form.controls.tipoEstabelecimento.value === tipo.id"
+                  [style.--tipo-cor]="tipo.cor"
+                  (click)="selecionarTipo(tipo.id)">
+                  <i [class]="tipo.icone + ' tipo-icone'"></i>
+                  <span class="tipo-label">{{ tipo.label }}</span>
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="modal-acoes">
+            <button tuiButton type="button" appearance="outline" size="m" (click)="fecharModal()">Cancelar</button>
+            <button tuiButton type="button" appearance="primary" size="m" (click)="proximaEtapa()">Próximo →</button>
+          </div>
+        </div>
+      }
+
+      <!-- ── Etapa 2: Seleção de Localização no Mapa ── -->
+      @if (etapa === 2) {
+        <div class="form-etapa">
+          <div class="map-selection-container">
+
+            <div class="mapa-busca">
+              <svg class="mapa-busca-icone" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.3-4.3"/>
+              </svg>
+              <input
+                #buscaInput
+                type="text"
+                class="mapa-busca-input"
+                placeholder="Buscar endereço ou local..."
+                autocomplete="off" />
+              <button type="button" class="mapa-busca-btn" (click)="buscarLocalizacao(buscaInput.value)">
+                Buscar
+              </button>
+            </div>
+
+            <div class="mapa-wrapper">
+              @if (mapCarregando) {
+                <div class="mapa-loading">
+                  <div class="mapa-loading-spinner"></div>
+                  <span>Carregando mapa...</span>
+                </div>
+              }
+              <div #mapaContainer class="mapa-selector"></div>
+            </div>
+
+            @if (localizacaoSelecionada) {
+              <div class="coords-display">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#0889A6;flex-shrink:0">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                  <circle cx="12" cy="9" r="2.5"/>
+                </svg>
+                <span class="coord-item"><span class="coord-label">Lat:</span><span class="coord-valor">{{ localizacaoSelecionada.lat.toFixed(6) }}</span></span>
+                <span class="coord-sep">·</span>
+                <span class="coord-item"><span class="coord-label">Lng:</span><span class="coord-valor">{{ localizacaoSelecionada.lng.toFixed(6) }}</span></span>
+              </div>
+            } @else {
+              <p class="mapa-hint">Busque um endereço ou clique diretamente no mapa para marcar a localização</p>
+            }
+
+          </div>
+
+          <div class="modal-acoes">
+            <button tuiButton type="button" appearance="outline" size="m" (click)="voltarEtapa()">← Voltar</button>
+            <button tuiButton type="button" appearance="primary" size="m" [disabled]="!localizacaoSelecionada" (click)="proximaEtapa()">Próximo →</button>
+          </div>
+        </div>
+      }
+
+      <!-- ── Etapa 3: Endereço ── -->
+      @if (etapa === 3) {
+        <div class="form-etapa" formGroupName="endereco">
+
+          <div class="alerta info">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0">
+              <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+            </svg>
+            Endereço preenchido automaticamente. Corrija os campos ausentes se necessário.
+          </div>
+
+          <div class="form-row dois">
+            <div class="form-field flex2">
+              <tui-textfield>
+                <label tuiLabel>Logradouro <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="logradouro" type="text" placeholder="Rua, Avenida..." />
+              </tui-textfield>
+            </div>
+            <div class="form-field">
+              <tui-textfield>
+                <label tuiLabel>Número <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="numero" type="text" placeholder="123" />
+              </tui-textfield>
+            </div>
+          </div>
+          <div class="form-row dois">
+            <div class="form-field">
+              <tui-textfield>
+                <label tuiLabel>Bairro <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="bairro" type="text" placeholder="Bairro" />
+              </tui-textfield>
+            </div>
+            <div class="form-field">
+              <tui-textfield>
+                <label tuiLabel>Complemento</label>
+                <input tuiTextfield formControlName="complemento" type="text" placeholder="Apto, Bloco..." />
+              </tui-textfield>
+            </div>
+          </div>
+          <div class="form-row tres">
+            <div class="form-field flex2">
+              <tui-textfield>
+                <label tuiLabel>Cidade <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="cidade" type="text" placeholder="São Paulo" />
+              </tui-textfield>
+            </div>
+            <div class="form-field">
+              <tui-textfield>
+                <label tuiLabel>UF <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="uf" type="text" placeholder="SP" maxlength="2" />
+              </tui-textfield>
+            </div>
+            <div class="form-field">
+              <tui-textfield>
+                <label tuiLabel>CEP <span class="obrig">*</span></label>
+                <input tuiTextfield formControlName="cep" type="text" placeholder="00000-000" />
+              </tui-textfield>
+            </div>
+          </div>
+
+          <div class="modal-acoes">
+            <button tuiButton type="button" appearance="outline" size="m" (click)="voltarEtapa()">← Voltar</button>
+            <button tuiButton type="button" appearance="primary" size="m" (click)="proximaEtapa()">Próximo →</button>
+          </div>
+        </div>
+      }
+
+      <!-- ── Etapa 4: Imagens ── -->
+      @if (etapa === 4) {
+        <div class="form-etapa">
+
+          <div class="form-field">
+            <label>Imagem de capa <span class="label-opcional">(opcional)</span></label>
+            <p class="field-descricao">Será exibida como imagem principal do estabelecimento</p>
+
+            @if (!imagemCapaPreview) {
+              <label class="upload-zona" for="imagem-capa-input">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="3" y="3" width="18" height="18" rx="3"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <span class="upload-texto">Clique para adicionar imagem de capa</span>
+                <span class="upload-sub">JPG, PNG ou WEBP — Máx. 5MB</span>
+                <input
+                  id="imagem-capa-input"
+                  type="file"
+                  accept="image/*"
+                  class="input-oculto"
+                  (change)="onImagemCapaChange($event)" />
+              </label>
+            } @else {
+              <div class="imagem-capa-preview">
+                <img [src]="imagemCapaPreview" alt="Preview capa" />
+                <div class="imagem-capa-badge">Capa</div>
+                <button type="button" class="imagem-capa-remover" (click)="removerImagemCapa()" title="Remover capa">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+            }
+          </div>
+
+          <div class="form-field">
+            <label>Fotos adicionais <span class="label-opcional">(até 5 fotos)</span></label>
+            <p class="field-descricao">Imagens exibidas no carrossel do estabelecimento</p>
+
+            @if (imagensCarrossel.length < 5) {
+              <label class="upload-zona" for="carrossel-input">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="3" y="3" width="18" height="18" rx="3"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <span class="upload-texto">Adicionar fotos do carrossel</span>
+                <span class="upload-sub">{{ imagensCarrossel.length }}/5 — JPG, PNG ou WEBP</span>
+                <input
+                  id="carrossel-input"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  class="input-oculto"
+                  (change)="onImagensCarrosselChange($event)" />
+              </label>
+            }
+
+            @if (imagensCarrosselPreviews.length > 0) {
+              <div class="carrossel-previews">
+                @for (preview of imagensCarrosselPreviews; track $index) {
+                  <div class="carrossel-thumb" [class.selecionado]="imagemCapaAtiva === $index">
+                    <img [src]="preview" alt="Preview {{ $index + 1 }}" />
+                    @if (imagemCapaAtiva === $index) {
+                      <div class="thumb-badge">Capa</div>
+                    }
+                    <div class="thumb-acoes">
+                      <button
+                        type="button"
+                        class="btn-thumb-acao"
+                        [class.ativo]="imagemCapaAtiva === $index"
+                        (click)="selecionarImagemComoCapaDoCarrossel($index)"
+                        title="Usar como capa">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        class="btn-thumb-remover"
+                        (click)="removerImagemCarrossel($index)"
+                        title="Remover imagem">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                          <path d="M18 6 6 18M6 6l12 12"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="modal-acoes">
+            <button tuiButton type="button" appearance="outline" size="m" (click)="voltarEtapa()">← Voltar</button>
+            <button tuiButton type="submit" appearance="primary" size="m" [disabled]="carregando">
+              @if (carregando) { Cadastrando... } @else { Cadastrar ✓ }
+            </button>
+          </div>
+        </div>
+      }
+
+    </form>
+  </div>
+</div>

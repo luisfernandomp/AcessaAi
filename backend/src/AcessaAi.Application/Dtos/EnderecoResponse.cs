@@ -8,6 +8,6 @@
         public string Numero { get; init; } = string.Empty;
         public string CEP { get; init; } = string.Empty;
         public string Bairro { get; init; } = string.Empty;
-        public string Complemento { get; init; } = string.Empty;
+        public string? Complemento { get; init; }
     }
 }

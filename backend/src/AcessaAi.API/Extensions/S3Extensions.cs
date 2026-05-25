@@ -13,7 +13,8 @@ public static class S3Extensions
     {
         services.AddSingleton<IImageStorageService>(sp =>
         {
-            var s3Settings = configuration.GetSection("S3Settings").Get<S3Settings>();
+            var s3Settings = configuration.GetSection("S3Settings").Get<S3Settings>()
+                ?? throw new InvalidOperationException("Configuração 'S3Settings' não encontrada no appsettings.");
 
             var s3Config = new AmazonS3Config
             {

@@ -1,0 +1,163 @@
+<!-- Toggle recolher -->
+<button class="btn-recolher" (click)="toggleRecolher()" [title]="recolhido ? 'Expandir menu' : 'Recolher menu'">
+  <i [class]="recolhido ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-left'"></i>
+</button>
+
+@if (!recolhido) {
+  <!-- Busca unificada: nome de estabelecimento + Places Autocomplete -->
+  <div class="busca-container">
+    <div class="busca-wrapper" [class.focado]="buscaFocada">
+      <i [class]="buscaLocalizada ? 'fa-solid fa-location-dot busca-icone-local' : 'fa-solid fa-magnifying-glass busca-svg-fa'"></i>
+      <input
+        #buscaMapa
+        type="text"
+        class="busca-input"
+        placeholder="Buscar estabelecimentos ou endereços..."
+        autocomplete="off"
+        [(ngModel)]="busca"
+        (input)="onBuscaInput()"
+        (focus)="buscaFocada = true"
+        (blur)="buscaFocada = false"
+      />
+      @if (busca || buscaLocalizada) {
+        <button class="busca-limpar" (click)="limparBusca()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      }
+    </div>
+    @if (buscaLocalizada) {
+      <div class="busca-local-tag">
+        <i class="fa-solid fa-location-dot"></i>
+        <span>{{ buscaLocalizadaNome }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- Accordion de filtros -->
+  <tui-accordion [closeOthers]="false" class="filtros-accordion">
+    <tui-accordion-item
+      [open]="filtrosExpandidos"
+      (openChange)="onAccordionToggle($event)"
+      [borders]="null"
+      size="s"
+    >
+      <!-- Cabeçalho do accordion -->
+      <span class="filtros-header">
+        <i class="fa-solid fa-sliders"></i>
+        Filtros
+        @if (filtrosAtivos > 0) {
+          <span tuiChip appearance="primary" size="xs" class="filtros-count">{{ filtrosAtivos }}</span>
+          <button tuiButton type="button" appearance="flat" size="xs" (click)="$event.stopPropagation(); limparFiltros()">
+            Limpar
+          </button>
+        }
+      </span>
+
+      <!-- Conteúdo do accordion -->
+      <ng-template tuiAccordionItemContent>
+        <!-- Categorias (single-choice) -->
+        <div class="categorias-wrapper">
+          <div
+            class="categorias-inner"
+            #catScrollEl
+            (mousemove)="onCategoriasMouseMove($event, catScrollEl)"
+            (mouseleave)="pararScrollCategorias(catScrollEl)"
+          >
+            <tui-segmented
+              [activeItemIndex]="categoriaSelecionadaIndex"
+              (activeItemIndexChange)="onCategoriaChange($event)"
+              size="s"
+            >
+              @for (cat of categorias; track cat.id) {
+                <button type="button" [title]="cat.label + ' (' + contarCategoria(cat.id) + ')'">
+                  <i [class]="cat.icone"></i>
+                  <span>{{ cat.label }}</span>
+                </button>
+              }
+            </tui-segmented>
+          </div>
+        </div>
+
+        <!-- Controles: acessível + ordenação -->
+        <div class="lista-controles">
+          <button
+            class="btn-acessivel-toggle"
+            [class.ativo]="apenasAcessiveis"
+            (click)="toggleAcessiveis()"
+            title="Somente acessíveis"
+          >
+            <i class="fa-solid fa-wheelchair"></i>
+            <span>Acessíveis</span>
+          </button>
+          <div class="ordenacao-grupo">
+            <button class="ord-btn" [class.ativo]="ordenacao === 'distancia'" (click)="ordenarPor('distancia')">Perto</button>
+            <button class="ord-btn" [class.ativo]="ordenacao === 'avaliacao'" (click)="ordenarPor('avaliacao')">Nota</button>
+            <button class="ord-btn" [class.ativo]="ordenacao === 'nome'" (click)="ordenarPor('nome')">A–Z</button>
+          </div>
+        </div>
+
+        <!-- Filtros avançados -->
+        <div class="filtros-avancados">
+          <div class="filtro-grupo">
+            <label class="filtro-label">Distância máxima</label>
+            <input type="range" class="filtro-range" min="0" max="50" step="1" />
+            <span class="filtro-valor">50 km</span>
+          </div>
+          <div class="filtro-grupo">
+            <label class="filtro-label">Avaliação mínima</label>
+            <div class="filtro-stars">
+              @for (e of [1, 2, 3, 4, 5]; track e) {
+                <button class="star-btn" [class.ativo]="e <= 3" title="Mínimo de estrelas">
+                  <i class="fa-solid fa-star"></i>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </tui-accordion-item>
+  </tui-accordion>
+
+  <!-- Contagem -->
+  <div class="lista-meta">
+    <span class="meta-contagem">
+      <strong>{{ lugaresFiltrados.length }}</strong> local{{ lugaresFiltrados.length !== 1 ? 'is' : '' }} encontrado{{ lugaresFiltrados.length !== 1 ? 's' : '' }}
+    </span>
+  </div>
+
+  <!-- Lista de estabelecimentos -->
+  <app-lista-estabelecimentos
+    [lugaresFiltrados]="lugaresFiltrados"
+    [lugarSelecionado]="lugarSelecionado"
+    [carregandoLista]="carregandoLista"
+    (lugarClick)="selecionarLugar($event)"
+    (limparFiltros)="limparFiltros()"
+  />
+}
+
+<!-- Modo recolhido: ícones de categoria na vertical -->
+@if (recolhido) {
+  <div class="sidebar-recolhida">
+    @for (cat of categorias; track cat.id) {
+      <button
+        class="icone-recolhido"
+        [class.ativo]="categoriaSelecionada === cat.id"
+        (click)="selecionarCategoria(cat.id)"
+        [title]="cat.label"
+      >
+        <i [class]="cat.icone"></i>
+      </button>
+    }
+    <div class="divisor-recolhido"></div>
+    <button
+      class="icone-recolhido"
+      [class.ativo]="apenasAcessiveis"
+      (click)="toggleAcessiveis()"
+      title="Somente acessíveis"
+    >
+      <i class="fa-solid fa-wheelchair"></i>
+    </button>
+  </div>
+}

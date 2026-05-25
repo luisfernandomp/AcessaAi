@@ -92,6 +92,11 @@ namespace AcessaAi.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Endereco", "AcessaAi.Domain.GestaoEstabelecimentos.Entities.Estabelecimento.Endereco#Endereco", b1 =>
                         {
                             b1.IsRequired();
@@ -115,7 +120,6 @@ namespace AcessaAi.Infrastructure.Migrations
                                 .HasColumnName("Cidade");
 
                             b1.Property<string>("Complemento")
-                                .IsRequired()
                                 .HasMaxLength(100)
                                 .HasColumnType("character varying(100)")
                                 .HasColumnName("Complemento");
@@ -346,6 +350,9 @@ namespace AcessaAi.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("UltimoLogin")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("UrlFotoPerfil")
+                        .HasColumnType("text");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -371,7 +378,6 @@ namespace AcessaAi.Infrastructure.Migrations
                                 .HasColumnName("Cidade");
 
                             b1.Property<string>("Complemento")
-                                .IsRequired()
                                 .HasMaxLength(100)
                                 .HasColumnType("character varying(100)")
                                 .HasColumnName("Complemento");

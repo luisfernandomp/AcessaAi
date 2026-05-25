@@ -27,6 +27,11 @@ namespace AcessaAi.Infrastructure.Repositories
                 query = query.Where(e => e.Nome.Contains(consulta.Nome));
             }
 
+            if (consulta.Tipo.HasValue)
+            {
+                query = query.Where(e => e.Tipo == consulta.Tipo.Value);
+            }
+
             if (consulta.RecursosAcessabilidadeIds != null && consulta.RecursosAcessabilidadeIds.Any())
             {
                 query = query.Where(e => e.RecursosAcessibilidade.Any(r => consulta.RecursosAcessabilidadeIds.Contains(r.Id)));

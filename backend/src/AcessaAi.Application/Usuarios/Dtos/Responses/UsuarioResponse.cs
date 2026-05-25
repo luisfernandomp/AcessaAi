@@ -8,5 +8,6 @@ namespace AcessaAi.Application.Usuarios.Dtos.Responses
         public EnderecoResponse Endereco { get; set; }
         public DateTime DataNascimento { get; set; }
         public bool Ativo { get; set; } = true;
+        public string? UrlFotoPerfil { get; set; }
     }
 }

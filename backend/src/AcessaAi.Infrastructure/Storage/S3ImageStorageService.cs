@@ -46,6 +46,15 @@ public class S3ImageStorageService : IImageStorageService
 
     public string GetPresignedUrl(string key, int expirationMinutes = 60)
     {
+        if (string.IsNullOrEmpty(key))
+            return key;
+
+        if (key.StartsWith("http://") || key.StartsWith("https://"))
+            return key;
+
+        if (!string.IsNullOrEmpty(_s3Settings.PublicBaseUrl))
+            return $"{_s3Settings.PublicBaseUrl.TrimEnd('/')}/{key}";
+
         var request = new GetPreSignedUrlRequest
         {
             BucketName = _s3Settings.BucketName,

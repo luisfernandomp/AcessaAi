@@ -1,0 +1,50 @@
+<div class="user-menu-wrapper">
+  <button
+    class="user-avatar-btn"
+    (click)="toggleDropdown()"
+  >
+    <div class="avatar-circulo" [style.background]="avatarCor">
+      {{ usuarioIniciais }}
+    </div>
+    <span class="usuario-nome-header">{{ usuarioNome.split(' ')[0] }}</span>
+    <i
+      class="chevron fa-solid fa-chevron-down"
+      [class.aberto]="showDropdown"
+    ></i>
+  </button>
+
+  <div class="user-dropdown" *ngIf="showDropdown">
+    <div class="dropdown-perfil">
+      <div class="avatar-grande" [style.background]="avatarCor">
+        {{ usuarioIniciais }}
+      </div>
+      <div>
+        <span class="dropdown-nome">{{ usuarioNome }}</span>
+        <span class="dropdown-sub">Usuário verificado</span>
+      </div>
+    </div>
+    <div class="dropdown-divider"></div>
+
+    <button class="dropdown-item" (click)="onOpenEstabelecimento()">
+      <i class="fa-solid fa-building"></i>
+      Cadastrar estabelecimento
+    </button>
+
+    <button class="dropdown-item" (click)="onEditEstabelecimentos()">
+      <i class="fa-solid fa-pencil"></i>
+      Editar estabelecimentos
+    </button>
+
+    <button class="dropdown-item">
+      <i class="fa-solid fa-user"></i>
+      Meu perfil
+    </button>
+
+    <div class="dropdown-divider"></div>
+
+    <button class="dropdown-item sair" (click)="onLogout()">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      Sair
+    </button>
+  </div>
+</div>

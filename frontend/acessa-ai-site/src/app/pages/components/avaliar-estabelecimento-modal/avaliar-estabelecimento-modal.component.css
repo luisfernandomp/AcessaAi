@@ -1,0 +1,192 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 1rem;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-titulo-grupo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modal-icon-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.modal-titulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+
+.modal-sub {
+  font-size: 0.78rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.btn-close-modal {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 0.25rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s, background 0.15s;
+}
+
+.btn-close-modal:hover {
+  color: #374151;
+  background: #f3f4f6;
+}
+
+/* ── Body ── */
+.modal-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.campo-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.6rem;
+}
+
+.obrig {
+  color: #ef4444;
+}
+
+.campo-opcional {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: #9ca3af;
+}
+
+/* ── Star rating ── */
+.campo-estrelas {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.estrelas-row {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 0.4rem;
+}
+
+.estrela-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.15rem;
+  font-size: 2rem;
+  color: #d1d5db;
+  transition: color 0.12s, transform 0.1s;
+  line-height: 1;
+}
+
+.estrela-btn.ativa {
+  color: #f59e0b;
+}
+
+.estrela-btn:hover {
+  transform: scale(1.15);
+}
+
+.estrela-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #f59e0b;
+  min-height: 1.2em;
+}
+
+/* ── Textarea ── */
+.campo-comentario {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.textarea-comentario {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  color: #111;
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.textarea-comentario:focus {
+  outline: none;
+  border-color: #0889a6;
+  box-shadow: 0 0 0 3px rgba(8, 137, 166, 0.1);
+}
+
+.textarea-comentario::placeholder {
+  color: #9ca3af;
+}
+
+.char-count {
+  align-self: flex-end;
+  font-size: 0.72rem;
+  color: #9ca3af;
+  margin-top: 0.25rem;
+}
+
+/* ── Footer ── */
+.modal-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem 1.25rem;
+  border-top: 1px solid #f0f0f0;
+}

@@ -18,11 +18,8 @@ namespace AcessaAi.API.Controllers
         }
 
         /// <summary>
-        /// Retorna os dados de um usuário pelo ID.
+        /// Retorna os dados de um usuário pelo ID. O campo UrlFotoPerfil retorna uma URL pré-assinada válida por 60 minutos.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         [Authorize]
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetByIdAsync(int id, CancellationToken cancellationToken)
@@ -34,14 +31,28 @@ namespace AcessaAi.API.Controllers
         /// <summary>
         /// Cadastra um novo usuário no sistema.
         /// </summary>
-        /// <param name="dto"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("cadastrar")]
         public async Task<IActionResult> CadastrarAsync([FromBody] UsuariosCadastrarRequest dto, CancellationToken cancellationToken)
         {
             var result = await _usuarioService.CadastrarAsync(dto, cancellationToken);
+            return result.ToActionResult(Ok);
+        }
+
+        /// <summary>
+        /// Faz o upload da foto de perfil do usuário. Retorna a URL pré-assinada da imagem.
+        /// </summary>
+        [Authorize]
+        [HttpPost("{id:int}/foto-perfil")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadFotoPerfilAsync(int id, IFormFile foto, CancellationToken cancellationToken)
+        {
+            var result = await _usuarioService.UploadFotoPerfilAsync(
+                id,
+                foto.OpenReadStream(),
+                foto.FileName,
+                foto.ContentType,
+                cancellationToken);
             return result.ToActionResult(Ok);
         }
     }

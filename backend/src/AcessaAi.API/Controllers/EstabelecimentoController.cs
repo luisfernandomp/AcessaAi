@@ -1,4 +1,6 @@
 using AcessaAi.API.Extensions;
+using AcessaAi.API.Requests;
+using AcessaAi.Application.Dtos.Requests;
 using AcessaAi.Application.Estabelecimentos.Dtos.Requests;
 using AcessaAi.Application.Estabelecimentos.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -18,12 +20,24 @@ namespace AcessaAi.API.Controllers
         }
 
         /// <summary>
-        /// Cria um novo estabelecimento.
+        /// Cria um novo estabelecimento com fotos (multipart/form-data).
+        /// Envie <c>Capa</c> para a foto de capa e zero ou mais arquivos <c>Fotos</c> para o carrossel.
         /// </summary>
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CriarAsync([FromBody] EstabelecimentoCriarRequest request, CancellationToken cancellationToken)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CriarAsync([FromForm] EstabelecimentoCriarFormRequest form, CancellationToken cancellationToken)
         {
+            var request = new EstabelecimentoCriarRequest
+            {
+                Nome = form.Nome,
+                Tipo = form.Tipo,
+                Geocordenadas = new GeocordenadasRequest { Latitude = form.Latitude, Longitude = form.Longitude },
+                Endereco = new EnderecoRequest(form.Logradouro, form.UF, form.Cidade, form.Numero, form.CEP, form.Bairro, form.Complemento),
+                Capa = form.Capa?.ToEstabelecimentoImagemRequest(isCapa: true),
+                Fotos = form.Fotos?.Select(f => f.ToEstabelecimentoImagemRequest()) ?? []
+            };
+
             var result = await _estabelecimentoService.CriarAsync(request, cancellationToken);
             return result.ToActionResult(estabelecimento =>
                 CreatedAtAction("ObterPorId", new { id = estabelecimento.Id }, estabelecimento));
@@ -32,16 +46,13 @@ namespace AcessaAi.API.Controllers
 
         /// <summary>
         /// Subir uma imagem para um estabelecimento existente. A imagem é enviada como um arquivo multipart/form-data e associada ao estabelecimento pelo ID.
+        /// Use <paramref name="isCapa"/> para indicar se a imagem é a capa do estabelecimento; caso contrário, será adicionada ao carrossel.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="imagem"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         [Authorize]
         [HttpPost("{id:int}/imagem")]
-        public async Task<IActionResult> SubirImagemAsync(int id, IFormFile imagem, CancellationToken cancellationToken)
+        public async Task<IActionResult> SubirImagemAsync(int id, IFormFile imagem, [FromQuery] bool isCapa = false, CancellationToken cancellationToken = default)
         {
-            var request = imagem.ToEstabelecimentoImagemRequest();   
+            var request = imagem.ToEstabelecimentoImagemRequest(isCapa);
             var result = await _estabelecimentoService.SubirImagemAsync(id, request, cancellationToken);
             return result.ToActionResult(_ => NoContent());
         }

@@ -1,0 +1,180 @@
+/* ===== Header principal ===== */
+.app-header {
+  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+  position: relative;
+  z-index: 100;
+  flex-shrink: 0;
+  transition: box-shadow 0.2s;
+}
+
+.app-header.scrolled {
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 24px;
+  margin: 0 auto;
+  gap: 16px;
+}
+
+/* ===== Logo ===== */
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logo-badge {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+  overflow: hidden;
+}
+
+.logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.header-logo:hover .logo-badge {
+  transform: scale(1.05);
+}
+
+.logo-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.logo-nome {
+  font-size: 18px;
+  font-weight: 800;
+  color: #043959;
+  letter-spacing: -0.4px;
+  line-height: 1.1;
+}
+
+.logo-tagline {
+  font-size: 10px;
+  color: #94a3b8;
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+
+/* ===== Nav ===== */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-decoration: none;
+  transition: all 0.2s;
+  background: transparent;
+}
+
+.nav-link:hover {
+  color: #043959;
+  background: #f1f5f9;
+}
+
+.nav-link.ativo {
+  color: #0889A6;
+  background: #e0f4f7;
+}
+
+/* ===== Ações da direita ===== */
+.header-acoes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Entrar */
+.btn-entrar {
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  text-decoration: none;
+  border: 1px solid #d1d5db;
+  background: transparent;
+  transition: all 0.2s;
+}
+
+.btn-entrar:hover {
+  color: #0889A6;
+  border-color: #0889A6;
+  background: #e0f4f7;
+}
+
+/* Criar conta */
+.btn-criar-conta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: #043959;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(4, 57, 89, 0.25);
+}
+
+.btn-criar-conta:hover {
+  background: #0889A6;
+  box-shadow: 0 4px 14px rgba(8, 137, 166, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Cadastrar local */
+.btn-novo-local {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0889A6;
+  background: #e0f4f7;
+  border: 1px solid #b2e3ed;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-novo-local:hover {
+  background: #c2eaf4;
+  border-color: #0889A6;
+  transform: translateY(-1px);
+}

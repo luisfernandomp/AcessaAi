@@ -1,0 +1,74 @@
+<header class="app-header" [class.scrolled]="scrolled">
+  <div class="header-inner">
+
+    <!-- Logo -->
+    <a class="header-logo" routerLink="/mapa">
+      <div class="logo-badge">
+        <img src="assets/images/logo.png" alt="AcessaAí" class="logo-img" />
+      </div>
+      <div class="logo-textos">
+        <span class="logo-nome">AcessaAí</span>
+        <span class="logo-tagline">Locais acessíveis</span>
+      </div>
+    </a>
+
+    <!-- Nav central -->
+    <nav class="header-nav">
+      <a class="nav-link" routerLink="/mapa" routerLinkActive="ativo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+        </svg>
+        Explorar mapa
+      </a>
+    </nav>
+
+    <!-- Ações direita -->
+    <div class="header-acoes">
+
+      @if (!isLoggedIn) {
+        <a tuiButton appearance="outline" size="s" routerLink="/login">Entrar</a>
+        <button tuiButton appearance="primary" size="s" (click)="openRegisterModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+          </svg>
+          Criar conta
+        </button>
+      }
+
+      @if (isLoggedIn) {
+        <app-user-menu
+          [usuarioNome]="usuarioNome"
+          [usuarioIniciais]="usuarioIniciais"
+          [avatarCor]="avatarCor"
+          (openEstabelecimentoModal)="openEstabelecimentoModal()"
+          (editEstabelecimentos)="editEstabelecimentos()"
+        />
+      }
+
+    </div>
+  </div>
+</header>
+
+<!-- Modais -->
+@if (showRegisterModal) {
+  <app-register-modal
+    (fechar)="closeRegisterModal()"
+    (irParaLogin)="registerToLogin()"
+  />
+}
+
+@if (showEstabelecimentoModal) {
+  <app-cadastrar-estabelecimento-modal
+    (fechar)="closeEstabelecimentoModal()"
+    (sucesso)="onEstabelecimentoCadastrado()"
+  />
+}
+
+@if (showEditarEstabelecimentosModal) {
+  <app-editar-estabelecimentos-modal
+    (fechar)="closeEditarEstabelecimentosModal()"
+    (editar)="onEditarEstabelecimento($event)"
+    (deletar)="onDeletarEstabelecimento($event)"
+  />
+}
