@@ -1,168 +1,569 @@
-# AcessaAi - Backend
+# AcessaAi — Backend
 
-Backend da plataforma **AcessaAi**, uma solução completa para avaliação e documentação de acessibilidade em estabelecimentos. Permite que usuários encontrem, avaliem e compartilhem informações sobre recursos de acessibilidade disponíveis em locais públicos e privados.
+Backend da plataforma **AcessaAi**, uma solução colaborativa para avaliação e documentação de acessibilidade em estabelecimentos. Permite que usuários encontrem, avaliem e compartilhem informações sobre recursos de acessibilidade disponíveis em locais públicos e privados.
 
-## 🎯 Objetivo
+---
 
-Conectar pessoas com deficiência ou mobilidade reduzida com informações reais e atualizadas sobre acessibilidade em estabelecimentos, promovendo inclusão através de dados colaborativos.
+## Índice
 
-## 🏗️ Arquitetura
+- [Funcionalidades](#funcionalidades)
+- [Arquitetura](#arquitetura)
+- [Modelo de Dados](#modelo-de-dados)
+- [Stack Tecnológica](#stack-tecnológica)
+- [Configuração e Execução](#configuração-e-execução)
+- [Variáveis de Ambiente](#variáveis-de-ambiente)
+- [Endpoints da API](#endpoints-da-api)
+- [Testes](#testes)
+- [Contribuindo](#contribuindo)
 
-Projeto estruturado em camadas seguindo **Clean Architecture** e **Domain-Driven Design (DDD)**:
+---
 
-- **AcessaAi.API** - Camada de apresentação (Controllers, Middlewares, OpenAPI)
-- **AcessaAi.Application** - Camada de aplicação (Serviços, DTOs, Mapeamentos)
-- **AcessaAi.Domain** - Camada de domínio (Entidades, Interfaces)
-- **AcessaAi.Infrastructure** - Camada de infraestrutura (Repositórios, Banco de dados, Autenticação, Storage)
+## Funcionalidades
 
-## 🔑 Recursos Principais
+### Autenticação
+- Login com retorno de **JWT Bearer Token**
+- Gerenciamento de identidade via **ASP.NET Core Identity**
+- Suporte a **Refresh Token**
 
-### 🔐 Autenticação e Autorização
-- Autenticação via **JWT Bearer Token**
-- Gerenciamento de identidade com ASP.NET Core Identity
-- Endpoints protegidos por autorização
+### Usuários
+- Cadastro com nome, e-mail, senha, data de nascimento e endereço
+- Consulta de perfil com URL pré-assinada da foto (válida por 60 min)
+- Upload de foto de perfil para **Cloudflare R2**
 
-### 👤 Gerenciamento de Usuários
-- Cadastro de novos usuários
-- Login com autenticação JWT
-- Perfil de usuário
+### Estabelecimentos
+- CRUD completo de estabelecimentos
+- Filtro avançado por nome, tipo, distância máxima (km), coordenadas geográficas e recursos de acessibilidade
+- Upload de múltiplas imagens com distinção de **foto de capa** e galeria
 
-### 🏢 Estabelecimentos
-- Criar, visualizar, atualizar e deletar estabelecimentos
-- Filtro avançado por nome, localização (coordenadas/endereço) e recursos de acessibilidade
-- Upload de imagens (armazenamento em AWS S3)
-- Busca por distância máxima
+### Avaliações
+- Criação, edição e exclusão (soft delete) de avaliações
+- Nota de 1 a 5 estrelas e comentário de até 500 caracteres
+- Atualização automática da **média de estrelas** do estabelecimento
 
-### ⭐ Avaliações
-- Criar avaliações para estabelecimentos
-- Avaliar recursos de acessibilidade disponíveis
-- Atualizar e deletar avaliações próprias
+### Recursos de Acessibilidade
+- Listagem de recursos cadastrados e ativos (rampas, elevadores, banheiros acessíveis, etc.)
+- Associação de recursos a estabelecimentos
 
-### ♿ Recursos de Acessibilidade
-- Cadastro de recursos de acessibilidade (rampas, elevadores, banheiros acessíveis, etc.)
-- Listagem de recursos ativos
-- Associação com estabelecimentos
+---
 
-## 📋 Stack Tecnológico
+## Arquitetura
 
-- **Framework:** ASP.NET Core 8+
-- **Banco de Dados:** SQL Server
-- **ORM:** Entity Framework Core
-- **Autenticação:** JWT + ASP.NET Core Identity
-- **Mapeamento:** Mapster
-- **Storage:** AWS S3
-- **Documentação:** OpenAPI/Swagger
-- **CORS:** Configuração via appsettings
+O projeto segue **Clean Architecture** com **Domain-Driven Design (DDD)**, organizado em quatro camadas:
 
-## 🚀 Configuração e Execução
+```
+src/
+├── AcessaAi.API/           → Controllers, Middlewares, OpenAPI
+├── AcessaAi.Application/   → Serviços de aplicação, DTOs, Mapeamentos
+├── AcessaAi.Domain/        → Entidades, Value Objects, Interfaces, Erros de domínio
+└── AcessaAi.Infrastructure/→ Repositórios, DbContext, JWT, Storage (R2)
+```
+
+**Padrões aplicados:**
+- **Repository Pattern** com interface genérica `IRepository<TEntity>`
+- **Unit of Work** para transações
+- **ErrorOr** para tratamento de erros sem exceções na camada de domínio
+- **Factory Methods** nas entidades para garantir invariantes de criação
+- **Soft Delete** em avaliações e estabelecimentos (campo `Ativo`)
+- **Value Objects**: `Geocordenadas` (record) e `Endereco`
+
+---
+
+## Modelo de Dados
+
+```
+┌──────────────┐       ┌─────────────────────┐       ┌──────────────────────────┐
+│   Usuario    │       │   Estabelecimento    │       │  RecursoAcessibilidade   │
+│──────────────│       │─────────────────────│       │──────────────────────────│
+│ Id           │       │ Id                  │       │ Id                       │
+│ NomeCompleto │       │ Nome                │       │ Nome                     │
+│ Email        │       │ Tipo (enum)         │       │ Descricao                │
+│ UrlFotoPerfil│       │ Geolocalizacao ─────┼──┐    │ Icone                    │
+│ DataNascimento│      │ Endereco ───────────┼──┤    │ Ativo                    │
+│ Endereco ────┼──┐   │ MediaEstrelas       │  │    └──────────────────────────┘
+│ RefreshToken │  │   │ CadastradoRecente   │  │            ▲   M:N
+│ Ativo        │  │   │ Ativo               │  │            │
+└──────────────┘  │   └─────────────────────┘  │   ┌────────────────────────┐
+       │          │            │  1:N           │   │  EstabelecimentoFoto   │
+       │ 1:N      │            ▼                │   │────────────────────────│
+       ▼          │   ┌─────────────────────┐   │   │ Id                     │
+┌────────────────┐│   │     Avaliacao       │   │   │ Url                    │
+│   Endereco     ││   │─────────────────────│   │   │ IsCapa                 │
+│(Value Object)  ││   │ Id                  │   │   │ EstabelecimentoId      │
+│────────────────││   │ Comentario          │   │   └────────────────────────┘
+│ Logradouro     ││   │ QuantidadeEstrelas  │   │
+│ UF             ││   │ UsuarioId           │   │   ┌──────────────────────────┐
+│ Cidade         ││   │ EstabelecimentoId   │   │   │      Geocordenadas       │
+│ Numero         ││   │ Ativo               │   │   │   (Value Object/Record)  │
+│ CEP            ││   └─────────────────────┘   │   │──────────────────────────│
+│ Bairro         ││                             └──►│ Latitude                 │
+│ Complemento    ││                                 │ Longitude                │
+└────────────────┘│                                 └──────────────────────────┘
+                  └──── (mesmo tipo, usado em Usuario e Estabelecimento)
+```
+
+### Enum `TipoEstabelecimento`
+
+| Valor | Nome |
+|---|---|
+| 1 | Restaurante |
+| 2 | Farmacia |
+| 3 | Saude |
+| 4 | Banco |
+| 5 | Shopping |
+| 6 | Transporte |
+
+---
+
+## Stack Tecnológica
+
+| Camada | Tecnologia |
+|---|---|
+| Framework | .NET 10 / ASP.NET Core 10 |
+| Banco de Dados | PostgreSQL |
+| ORM | Entity Framework Core 10 + Npgsql |
+| Autenticação | JWT Bearer + ASP.NET Core Identity |
+| Mapeamento | Mapster 4.1 |
+| Storage | Cloudflare R2 (SDK S3-compatível via AWSSDK.S3) |
+| Tratamento de Erros | ErrorOr 2.0 |
+| Documentação | OpenAPI / Swagger UI |
+| Testes | xUnit + FluentAssertions |
+
+---
+
+## Configuração e Execução
 
 ### Pré-requisitos
-- .NET 8 SDK
-- SQL Server
-- Credenciais AWS (para S3)
 
-### Instalação
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- PostgreSQL (local ou Docker)
+- Conta Cloudflare R2 (ou outro storage S3-compatível)
 
-1. Clone o repositório
+### Passo a passo
+
+**1. Clone o repositório**
+
 ```bash
-git clone https://github.com/seu-usuario/AcessaAi.git
+git clone https://github.com/luisfernandomp/AcessaAi.git
 cd AcessaAi/backend
 ```
 
-2. Restaure as dependências
+**2. Configure as variáveis de ambiente**
+
+Crie o arquivo `src/AcessaAi.API/appsettings.Development.json` com base na seção [Variáveis de Ambiente](#variáveis-de-ambiente) abaixo.
+
+**3. Restaure as dependências**
+
 ```bash
 dotnet restore
 ```
 
-3. Configure as variáveis de ambiente no `appsettings.Development.json`:
+**4. Aplique as migrations**
+
+```bash
+dotnet ef database update --project src/AcessaAi.Infrastructure --startup-project src/AcessaAi.API
+```
+
+**5. Inicie a API**
+
+```bash
+dotnet run --project src/AcessaAi.API
+```
+
+A API estará disponível em `https://localhost:5001`.  
+Documentação Swagger: `https://localhost:5001/swagger`
+
+---
+
+### Subindo com Docker (PostgreSQL)
+
+Para subir apenas o banco rapidamente:
+
+```bash
+docker run -d \
+  --name acessaai-db \
+  -e POSTGRES_DB=AcessaAiDb \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=sua_senha \
+  -p 5432:5432 \
+  postgres:16
+```
+
+---
+
+## Variáveis de Ambiente
+
+Configure o arquivo `appsettings.Development.json` (nunca versione credenciais reais):
+
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=.;Database=AcessaAi;Trusted_Connection=true;"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=AcessaAiDb;Username=postgres;Password=sua_senha"
   },
-  "Jwt": {
-    "SecretKey": "sua-chave-secreta-super-segura",
-    "ExpirationMinutes": 60
+  "JwtSettings": {
+    "SecretKey": "chave-secreta-minimo-32-caracteres",
+    "Issuer": "AcessaAi",
+    "Audience": "AcessaAi.Client",
+    "AccessTokenExpirationMinutes": 15,
+    "RefreshTokenExpirationDays": 7
   },
   "AWS": {
-    "AccessKey": "sua-chave-de-acesso",
-    "SecretKey": "sua-chave-secreta",
-    "BucketName": "seu-bucket",
-    "Region": "us-east-1"
+    "Region": "auto",
+    "ServiceURL": "https://<account-id>.r2.cloudflarestorage.com",
+    "ForcePathStyle": true,
+    "AccessKey": "sua-r2-access-key",
+    "SecretKey": "sua-r2-secret-key"
+  },
+  "S3Settings": {
+    "BucketName": "nome-do-bucket",
+    "PublicBaseUrl": "https://<subdomain>.r2.dev"
   },
   "AllowedOrigins": ["http://localhost:4200"]
 }
 ```
 
-4. Aplique as migrations do banco de dados
-```bash
-dotnet ef database update
+> O Cloudflare R2 expõe uma API S3-compatível. Por isso, a configuração usa as chaves `AWS` com `ServiceURL` apontando para o endpoint R2.
+
+### Descrição das variáveis
+
+| Chave | Descrição |
+|---|---|
+| `ConnectionStrings:DefaultConnection` | String de conexão PostgreSQL |
+| `JwtSettings:SecretKey` | Chave secreta HMAC para assinar tokens (mín. 32 chars) |
+| `JwtSettings:Issuer` | Identificador do emissor do JWT |
+| `JwtSettings:Audience` | Público-alvo do JWT |
+| `JwtSettings:AccessTokenExpirationMinutes` | Validade do access token em minutos |
+| `JwtSettings:RefreshTokenExpirationDays` | Validade do refresh token em dias |
+| `AWS:Region` | Região (`auto` para Cloudflare R2) |
+| `AWS:ServiceURL` | Endpoint S3-compatível do Cloudflare R2 |
+| `AWS:ForcePathStyle` | `true` para usar path-style (obrigatório no R2) |
+| `AWS:AccessKey` | Access Key do bucket R2 |
+| `AWS:SecretKey` | Secret Key do bucket R2 |
+| `S3Settings:BucketName` | Nome do bucket no R2 |
+| `S3Settings:PublicBaseUrl` | URL pública do domínio R2 para servir arquivos |
+| `AllowedOrigins` | Origens permitidas pelo CORS |
+
+---
+
+## Endpoints da API
+
+### Autenticação
+
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| `POST` | `/api/auth/login` | Não | Realiza login e retorna JWT |
+
+**Body `POST /api/auth/login`:**
+```json
+{
+  "email": "usuario@email.com",
+  "senha": "senha123"
+}
 ```
 
-5. Inicie a API
-```bash
-dotnet run --project src/AcessaAi.API
+**Response `200 OK`:**
+```json
+{
+  "idUsuario": 1,
+  "nomeUsuario": "João Silva",
+  "token": "eyJhbGciOiJI...",
+  "expiraEm": 15
+}
 ```
 
-A API estará disponível em `https://localhost:5001` com documentação Swagger em `/swagger`.
+---
 
-## 📚 Documentação da API
+### Usuários
 
-Consulte [API.md](API.md) para detalhes completos de endpoints, parâmetros e exemplos de requisição.
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| `POST` | `/api/usuario/cadastrar` | Não | Cadastra novo usuário |
+| `GET` | `/api/usuario/{id}` | Sim | Retorna perfil do usuário |
+| `POST` | `/api/usuario/{id}/foto-perfil` | Sim | Upload de foto de perfil (`multipart/form-data`) |
 
-**Endpoints principais:**
-- `POST /api/auth/login` - Login
-- `POST /api/usuario/cadastrar` - Cadastro
-- `GET /api/estabelecimento` - Listar estabelecimentos
-- `POST /api/avaliacao` - Criar avaliação
-- `GET /api/recursoacessibilidade/listar-ativas` - Listar recursos ativos
+**Body `POST /api/usuario/cadastrar`:**
+```json
+{
+  "nome": "João Silva",
+  "email": "joao@email.com",
+  "senha": "Senha@123",
+  "dataNascimento": "1990-05-15",
+  "endereco": {
+    "logradouro": "Av. Paulista",
+    "uf": "SP",
+    "cidade": "São Paulo",
+    "numero": "1000",
+    "cep": "01310-100",
+    "bairro": "Bela Vista",
+    "complemento": "Apto 42"
+  }
+}
+```
 
-## 🧪 Testes
+**Response `GET /api/usuario/{id}` — `200 OK`:**
+```json
+{
+  "nome": "João Silva",
+  "dataNascimento": "1990-05-15",
+  "ativo": true,
+  "urlFotoPerfil": "https://pub-xxx.r2.dev/profiles/foto.jpg",
+  "endereco": {
+    "logradouro": "Av. Paulista",
+    "uf": "SP",
+    "cidade": "São Paulo",
+    "numero": "1000",
+    "cep": "01310-100",
+    "bairro": "Bela Vista",
+    "complemento": "Apto 42"
+  }
+}
+```
 
-### Testes Unitários
+---
+
+### Estabelecimentos
+
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| `POST` | `/api/estabelecimento` | Sim | Cria estabelecimento com fotos (`multipart/form-data`) |
+| `GET` | `/api/estabelecimento` | Não | Filtra estabelecimentos |
+| `GET` | `/api/estabelecimento/{id}` | Não | Busca estabelecimento por ID |
+| `PATCH` | `/api/estabelecimento/{id}` | Sim | Atualiza dados do estabelecimento |
+| `DELETE` | `/api/estabelecimento/{id}` | Sim | Remove o estabelecimento |
+| `POST` | `/api/estabelecimento/{id}/imagem` | Sim | Upload de imagem para estabelecimento existente |
+
+**Form fields `POST /api/estabelecimento`** (`multipart/form-data`):
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `Nome` | string | Nome do estabelecimento |
+| `Tipo` | int | Valor do enum `TipoEstabelecimento` |
+| `Latitude` | double | Latitude |
+| `Longitude` | double | Longitude |
+| `Logradouro` | string | Rua/avenida |
+| `UF` | string | Estado (ex: SP) |
+| `Cidade` | string | Cidade |
+| `Numero` | string | Número |
+| `CEP` | string | CEP |
+| `Bairro` | string | Bairro |
+| `Complemento` | string? | Complemento (opcional) |
+| `Capa` | file | Foto de capa (opcional) |
+| `Fotos` | file[] | Fotos adicionais (opcional) |
+
+**Query params `GET /api/estabelecimento`:**
+
+| Parâmetro | Tipo | Descrição |
+|---|---|---|
+| `Nome` | string? | Filtro por nome |
+| `Tipo` | int? | Filtro por tipo de estabelecimento |
+| `DistanciaMaxima` | double? | Distância máxima em km |
+| `Latitude` | double? | Latitude para cálculo de distância |
+| `Longitude` | double? | Longitude para cálculo de distância |
+| `RecursosAcessabilidadeIds` | int[]? | IDs dos recursos de acessibilidade |
+
+**Body `PATCH /api/estabelecimento/{id}`:**
+```json
+{
+  "nome": "Novo Nome",
+  "tipo": 1,
+  "geocordenadas": {
+    "latitude": -23.5505,
+    "longitude": -46.6333
+  }
+}
+```
+
+**Query param `POST /api/estabelecimento/{id}/imagem`** (`multipart/form-data`):
+
+| Parâmetro | Tipo | Descrição |
+|---|---|---|
+| `isCapa` | bool | `true` para definir como capa |
+| `file` | file | Arquivo de imagem |
+
+---
+
+### Avaliações
+
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| `POST` | `/api/avaliacao` | Sim | Cria nova avaliação |
+| `GET` | `/api/avaliacao/{id}` | Sim | Busca avaliação por ID |
+| `PATCH` | `/api/avaliacao/{id}` | Sim | Atualiza avaliação existente |
+| `DELETE` | `/api/avaliacao/{id}` | Sim | Exclui avaliação (soft delete) |
+
+**Body `POST /api/avaliacao`:**
+```json
+{
+  "comentario": "Ótimo atendimento e estrutura acessível!",
+  "estrelas": 5,
+  "usuarioId": 1,
+  "estabelecimentoId": 42
+}
+```
+
+**Body `PATCH /api/avaliacao/{id}`:**
+```json
+{
+  "id": 10,
+  "comentario": "Revisando minha avaliação anterior.",
+  "estrelas": 4
+}
+```
+
+**Response `200 OK`:**
+```json
+{
+  "id": 10,
+  "comentario": "Revisando minha avaliação anterior.",
+  "estrelas": 4,
+  "usuarioId": 1,
+  "ativo": true
+}
+```
+
+---
+
+### Recursos de Acessibilidade
+
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| `GET` | `/api/recurso-acessibilidade/listar-ativas` | Não | Lista todos os recursos ativos |
+
+**Response `200 OK`:**
+```json
+[
+  {
+    "id": 1,
+    "nome": "Rampa de Acesso",
+    "descricao": "Rampa para cadeirantes na entrada principal",
+    "icone": "ramp"
+  },
+  {
+    "id": 2,
+    "nome": "Banheiro Adaptado",
+    "descricao": "Banheiro com barras de apoio e espaço para cadeira de rodas",
+    "icone": "accessible-toilet"
+  }
+]
+```
+
+---
+
+### Códigos de resposta comuns
+
+| Código | Significado |
+|---|---|
+| `200 OK` | Sucesso |
+| `201 Created` | Recurso criado |
+| `204 No Content` | Operação concluída sem retorno |
+| `400 Bad Request` | Dados de entrada inválidos |
+| `401 Unauthorized` | Token ausente ou inválido |
+| `404 Not Found` | Recurso não encontrado |
+| `422 Unprocessable Entity` | Erros de validação de domínio |
+
+---
+
+## Testes
+
+O projeto possui testes unitários cobrindo as entidades de domínio (30 testes).
+
 ```bash
+# Rodar todos os testes unitários
 dotnet test tests/AcessaAi.UnitTests
+
+# Rodar com relatório detalhado
+dotnet test tests/AcessaAi.UnitTests --logger "console;verbosity=detailed"
 ```
 
-### Testes de Integração
+### Cobertura atual
+
+| Entidade | Cenários testados |
+|---|---|
+| `Avaliacao` | Criação válida, estrelas inválidas (0 e 6), comentário vazio, comentário > 500 chars, usuário nulo, estabelecimento nulo, múltiplos erros, alteração, exclusão |
+| `Estabelecimento` | Criação válida, nome vazio, geo nula, múltiplos erros, alteração (com/sem tipo), desativação, adição de avaliação (simples e múltiplas com cálculo de média), imagens (capa, não-capa, flag explícita) |
+| `Usuario` | Criação, data de cadastro automática, adicionar endereço, substituir endereço, atualizar foto, substituir foto |
+
+---
+
+## Contribuindo
+
+### Fluxo de trabalho
+
+1. Faça um fork do repositório
+2. Crie uma branch a partir de `main`:
+   ```bash
+   git checkout -b feature/minha-feature
+   ```
+3. Implemente as mudanças seguindo os padrões do projeto
+4. Adicione testes unitários para a lógica de domínio
+5. Certifique-se de que todos os testes passam:
+   ```bash
+   dotnet test
+   ```
+6. Abra um Pull Request descrevendo o que foi feito
+
+### Adicionando uma nova Migration
+
 ```bash
-dotnet test tests/AcessaAi.IntegrationTests
+dotnet ef migrations add NomeDaMigration \
+  --project src/AcessaAi.Infrastructure \
+  --startup-project src/AcessaAi.API
+
+dotnet ef database update \
+  --project src/AcessaAi.Infrastructure \
+  --startup-project src/AcessaAi.API
 ```
 
-## 📁 Estrutura de Diretórios
+### Estrutura de diretórios detalhada
 
 ```
 src/
-├── AcessaAi.API/              # Camada de apresentação
-│   ├── Controllers/           # Endpoints
-│   ├── Middlewares/          # Tratamento de erros global
-│   └── Extensions/           # Extensões de configuração
-├── AcessaAi.Application/      # Lógica de aplicação
-│   ├── Services/             # Serviços da aplicação
-│   ├── Dtos/                 # Data Transfer Objects
-│   └── Mappings/             # Configuração de mapeamento
-├── AcessaAi.Domain/          # Entidades e interfaces
-│   └── Entities/             # Modelos de domínio
-└── AcessaAi.Infrastructure/  # Acesso a dados e serviços externos
-    ├── Data/                 # DbContext
-    ├── Repositories/         # Repositórios
-    └── Migrations/           # EF Core migrations
+├── AcessaAi.API/
+│   ├── Controllers/            # Um controller por agregado
+│   ├── Middlewares/            # Tratamento global de exceções
+│   ├── Extensions/             # Extensões de configuração (DI, Auth, CORS)
+│   └── Requests/               # Modelos de form multipart
+├── AcessaAi.Application/
+│   ├── Autenticacao/
+│   │   ├── Dtos/               # LoginRequest, LoginResponse
+│   │   ├── Interfaces/         # IAutenticacaoApplicationService, ITokenService
+│   │   └── Services/           # AutenticacaoApplicationService
+│   ├── Avaliacoes/
+│   │   ├── Dtos/               # AvaliacaoCreateRequest, AvaliacaoResponse...
+│   │   ├── Interfaces/
+│   │   └── Services/
+│   ├── Estabelecimentos/
+│   ├── RecursosAcessibilidades/
+│   ├── Usuarios/
+│   └── Storage/Interfaces/     # IImageStorageService
+├── AcessaAi.Domain/
+│   ├── Common/                 # EntityBase, IRepository<T>, IUnitOfWork, Endereco
+│   ├── Avaliacoes/             # Avaliacao, AvaliacaoErrors, IAvaliacaoRepository
+│   ├── Estabelecimentos/       # Estabelecimento, EstabelecimentoErros, Geocordenadas...
+│   ├── RecursosAcessibilidades/
+│   └── Usuarios/               # Usuario, IUsuarioRepository
+└── AcessaAi.Infrastructure/
+    ├── Data/                   # AppDbContext, configurações EF
+    ├── Repositories/           # Implementações dos repositórios
+    ├── Migrations/             # EF Core migrations
+    ├── Authentication/         # TokenService (JWT)
+    └── Storage/                # CloudflareR2StorageService
+
 tests/
-├── AcessaAi.UnitTests/       # Testes unitários
-└── AcessaAi.IntegrationTests/ # Testes de integração
+├── AcessaAi.UnitTests/
+│   └── Domain/                 # AvaliacaoTests, EstabelecimentoTests, UsuarioTests
+└── AcessaAi.IntegrationTests/
 ```
 
-## 🤝 Contribuindo
+### Convenções do projeto
 
-1. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-2. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-3. Push para a branch (`git push origin feature/AmazingFeature`)
-4. Abra um Pull Request
+- **Erros de domínio** são retornados via `ErrorOr` — não use exceções para fluxo de negócio
+- **Soft delete** via campo `Ativo = false`, nunca delete físico de avaliações ou estabelecimentos
+- **Factory Methods** nas entidades: use sempre `Entidade.Criar(...)` para garantir invariantes
+- **Mapeamentos** centralizados em `Application/*/Mappings/` via Mapster
+- **Injeção de dependência** registrada em `Extensions/` na camada de API
 
-## 📝 Licença
+---
+
+## Licença
 
 Este projeto está sob a licença MIT.
-
-## 📧 Contato
-
-Para dúvidas ou sugestões, abra uma issue no repositório.
