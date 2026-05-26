@@ -266,8 +266,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
         : `${distanciaKm.toFixed(1).replace('.', ',')} km`;
     }
 
-    const categoria = e.tipo;
-    
+    const categoria = e.tipo != null
+      ? TIPO_REVERSE_MAP[e.tipo] ?? 'todos'
+      : 'todos';
+
     const avaliacoes = e.avaliacaoResponses ?? [];
     const totalAvaliacoes = e.totalAvaliacoes ?? avaliacoes.length;
     const avaliacao = e.mediaEstrelas != null

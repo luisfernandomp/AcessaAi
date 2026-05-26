@@ -1,0 +1,27 @@
+<div class="avaliacoes-card" *ngIf="avaliacoes?.length">
+  <div class="avaliacoes-header">
+    <div>
+      <div class="avaliacoes-score">
+        <span class="avaliacoes-score-value">{{ mediaEstrelas | number:'1.1-1' }}</span>
+        <span class="avaliacoes-score-label">Avaliação</span>
+      </div>
+      <span class="avaliacoes-count">{{ avaliacoes.length }} avaliações</span>
+    </div>
+    <button class="ver-todas" type="button" *ngIf="avaliacoes.length > maxExibir" (click)="verTodas.emit()">
+      Ver todas
+    </button>
+  </div>
+
+  <div class="avaliacoes-list">
+    <div class="avaliacao-item" *ngFor="let avaliacao of avaliacoes.slice(0, maxExibir); trackBy: trackById">
+      <div class="avatar">{{ iniciais(avaliacao.usuarioResponse.nome) }}</div>
+      <div class="avaliacao-body">
+        <div class="avaliacao-meta">
+          <span class="avaliacao-nome">{{ avaliacao.usuarioResponse.nome }}</span>
+          <span class="avaliacao-stars">{{ getEstrelas(avaliacao.estrelas) }}</span>
+        </div>
+        <p class="avaliacao-texto">{{ avaliacao.comentario }}</p>
+      </div>
+    </div>
+  </div>
+</div>

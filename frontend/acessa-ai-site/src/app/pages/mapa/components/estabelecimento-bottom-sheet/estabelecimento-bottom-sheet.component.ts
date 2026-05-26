@@ -14,13 +14,16 @@ import { AvaliarEstabelecimentoModalComponent } from '../../../components/avalia
 import { EstabelecimentoService } from '../../../../core/services/estabelecimento.service';
 import { AvaliacaoResponse } from '../../../../core/models/estabelecimento.model';
 import { RecursoAcessibilidade } from '../../../../core/models/recurso-acessibilidade.model';
+import { AuthService } from '../../../../core/services/auth.service';
+import { ToastrService } from 'ngx-toastr';
+import { AvaliacoesEstabelecimentoComponent } from '../avaliacoes-estabelecimento/avaliacoes-estabelecimento.component';
 
 const CORES_AVATAR = ['#1a73e8', '#137333', '#e37400', '#c5221f', '#7b2d8b', '#0097a7'];
 
 @Component({
   selector: 'app-estabelecimento-bottom-sheet',
   standalone: true,
-  imports: [CommonModule, TuiCarousel, AvaliarEstabelecimentoModalComponent],
+  imports: [CommonModule, TuiCarousel, AvaliarEstabelecimentoModalComponent, AvaliacoesEstabelecimentoComponent],
   templateUrl: './estabelecimento-bottom-sheet.component.html',
   styleUrl: './estabelecimento-bottom-sheet.component.css',
 })
@@ -29,6 +32,8 @@ export class EstabelecimentoBottomSheetComponent implements OnChanges {
   @Output() fechar = new EventEmitter<void>();
 
   private readonly estabelecimentoService = inject(EstabelecimentoService);
+  private readonly authService = inject(AuthService);
+  private readonly toastr = inject(ToastrService);
 
   avaliacoes: AvaliacaoResponse[] = [];
   recursosAcessibilidade: RecursoAcessibilidade[] = [];
@@ -102,6 +107,10 @@ export class EstabelecimentoBottomSheetComponent implements OnChanges {
   }
 
   onAvaliar(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.toastr.warning('Somente usuários logados podem avaliar. Faça login para continuar.');
+      return;
+    }
     this.mostrarModalAvaliar = true;
   }
 

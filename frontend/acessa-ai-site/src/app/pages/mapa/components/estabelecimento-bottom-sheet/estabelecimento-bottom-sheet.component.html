@@ -151,57 +151,24 @@
         </button>
 
         <!-- Accessibility chips -->
-        @if (recursosAcessibilidade.length > 0) {
-          <div class="secao">
-            <h3 class="secao-titulo">
-              <i class="fa-solid fa-wheelchair"></i> Acessibilidade
-            </h3>
-            <div class="chips">
-              @for (r of recursosAcessibilidade; track r.id) {
-                <div class="chip">
-                  <i [class]="'fa-solid ' + r.icone + ' chip-icon'"></i>
-                  <span>{{ r.nome }}</span>
-                </div>
-              }
+        <div class="secao" *ngIf="recursosAcessibilidade.length > 0">
+          <h3 class="secao-titulo">
+            <i class="fa-solid fa-wheelchair"></i> Acessibilidade
+          </h3>
+          <div class="chips">
+            <div class="chip" *ngFor="let r of recursosAcessibilidade">
+              <i [class]="'fa-solid ' + r.icone + ' chip-icon'"></i>
+              <span>{{ r.nome }}</span>
             </div>
           </div>
-        }
+        </div>
 
-        <!-- Reviews -->
-        @if (avaliacoes.length > 0) {
-          <div class="secao">
-            <div class="secao-header">
-              <h3 class="secao-titulo">Avaliações recentes</h3>
-              @if (avaliacoes.length > 2) {
-                <button class="btn-ver-mais">Ver todas</button>
-              }
-            </div>
-            <div class="reviews">
-              @for (av of avaliacoes.slice(0, 2); track av.id) {
-                <div class="review">
-                  <div class="review-top">
-                    <div class="avatar" [style.background]="corAvatar(av.usuarioId)">
-                      {{ iniciais(av.usuarioResponse.nome) }}
-                    </div>
-                    <div class="review-meta">
-                      <span class="review-nome">{{ av.usuarioResponse.nome }}</span>
-                      <div class="review-stars">
-                        @for (e of estrelas(av.estrelas); track $index) {
-                          @if (e.cheia) {
-                            <i class="fa-solid fa-star rev-star"></i>
-                          } @else {
-                            <i class="fa-regular fa-star rev-star empty"></i>
-                          }
-                        }
-                      </div>
-                    </div>
-                  </div>
-                  <p class="review-text">{{ av.comentario }}</p>
-                </div>
-              }
-            </div>
-          </div>
-        }
+        <app-avaliacoes-estabelecimento
+          *ngIf="avaliacoes?.length"
+          [avaliacoes]="avaliacoes"
+          [mediaEstrelas]="mediaEstrelas"
+          [maxExibir]="2"
+        ></app-avaliacoes-estabelecimento>
 
       </div>
       <!-- /card -->
