@@ -1,12 +1,12 @@
 import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { TuiButton } from '@taiga-ui/core';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 import { EstabelecimentoService } from '../../../core/services/estabelecimento.service';
 import { EstabelecimentoResponse } from '../../../core/models/estabelecimento.model';
 import { RegisterModalComponent } from '../register-modal/register-modal.component';
+import { LoginModalComponent } from '../login-modal/login-modal.component';
 import { CadastrarEstabelecimentoModalComponent } from '../cadastrar-estabelecimento-modal/cadastrar-estabelecimento-modal.component';
 import { UserMenuComponent } from '../user-menu/user-menu.component';
 import { EditarEstabelecimentosModalComponent } from '../editar-estabelecimentos-modal/editar-estabelecimentos-modal.component';
@@ -17,7 +17,7 @@ import { EditarEstabelecimentosModalComponent } from '../editar-estabelecimentos
   imports: [
     CommonModule,
     RouterModule,
-    TuiButton,
+    LoginModalComponent,
     RegisterModalComponent,
     CadastrarEstabelecimentoModalComponent,
     UserMenuComponent,
@@ -29,6 +29,7 @@ import { EditarEstabelecimentosModalComponent } from '../editar-estabelecimentos
 export class HeaderComponent implements OnInit {
   private readonly toastr = inject(ToastrService);
 
+  showLoginModal = false;
   showRegisterModal = false;
   showEstabelecimentoModal = false;
   showEditarEstabelecimentosModal = false;
@@ -71,6 +72,19 @@ export class HeaderComponent implements OnInit {
     this.scrolled = window.scrollY > 10;
   }
 
+  openLoginModal(): void {
+    this.showLoginModal = true;
+  }
+
+  closeLoginModal(): void {
+    this.showLoginModal = false;
+  }
+
+  loginToRegister(): void {
+    this.showLoginModal = false;
+    this.showRegisterModal = true;
+  }
+
   openRegisterModal(): void {
     this.showRegisterModal = true;
   }
@@ -81,7 +95,7 @@ export class HeaderComponent implements OnInit {
 
   registerToLogin(): void {
     this.showRegisterModal = false;
-    this.router.navigate(['/login']);
+    this.showLoginModal = true;
   }
 
   handleCadastrarLocal(): void {

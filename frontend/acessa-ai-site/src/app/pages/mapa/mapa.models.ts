@@ -1,3 +1,18 @@
+export const TIPO_MAP: Record<string, number> = {
+  restaurante: 1,
+  farmacia: 2,
+  hospital: 3,
+  banco: 4,
+  shopping: 5,
+  transporte: 6,
+};
+
+export const TIPO_REVERSE_MAP: Record<number, string> = Object.fromEntries(
+  Object.entries(TIPO_MAP).map(([k, v]) => [v, k]),
+) as Record<number, string>;
+
+import { RecursoAcessibilidade } from '../../core/models/recurso-acessibilidade.model';
+
 export interface Lugar {
   id: number;
   nome: string;
@@ -9,6 +24,7 @@ export interface Lugar {
   distancia: string;
   distanciaKm: number;
   recursos: string[];
+  recursosAcessibilidade: RecursoAcessibilidade[];
   aberto?: boolean;
   horario: string;
   lat: number;

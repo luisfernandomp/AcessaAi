@@ -28,7 +28,7 @@
   height: 100%;
   width: 100%;
   overflow: hidden;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif;
 }
 
 /* ===== Mapa ===== */
@@ -120,28 +120,36 @@
 
 .mapa-controles {
   position: absolute;
-  bottom: 24px;
+  bottom: 120px;
   right: 16px;
   z-index: 15;
 }
 
 .btn-mapa-controle {
-  width: 42px;
-  height: 42px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   border: none;
-  background: var(--bg-card);
-  box-shadow: var(--shadow-md);
-  font-size: 18px;
+  background: linear-gradient(135deg, #0889A6, #0F766E);
+  box-shadow: 0 4px 16px rgba(8, 137, 166, 0.45), 0 2px 6px rgba(0,0,0,0.15);
+  font-size: 20px;
+  color: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: box-shadow var(--transition);
+  transition: all var(--transition);
 }
 
 .btn-mapa-controle:hover {
-  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, #077994, #0D6960);
+  box-shadow: 0 6px 24px rgba(8, 137, 166, 0.55), 0 3px 8px rgba(0,0,0,0.18);
+  transform: translateY(-2px) scale(1.05);
+}
+
+.btn-mapa-controle:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 2px 8px rgba(8, 137, 166, 0.35);
 }
 
 /* ===== Responsivo ===== */

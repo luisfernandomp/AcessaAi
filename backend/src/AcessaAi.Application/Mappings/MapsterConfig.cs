@@ -33,14 +33,17 @@ namespace AcessaAi.Application.Mappings
             // QuantidadeEstrelas → Estrelas
             TypeAdapterConfig<Avaliacao, AvaliacaoResponse>
                 .NewConfig()
+                .Map(dest => dest.UsuarioResponse, src => src.Usuario)
                 .Map(dest => dest.Estrelas, src => src.QuantidadeEstrelas);
 
             TypeAdapterConfig<EstabelecimentoFoto, EstabelecimentoFotoResponse>.NewConfig();
 
             // Geolocalizacao → Geocordenadas (nome diferente)
-            TypeAdapterConfig<Estabelecimento, EstabelecimentoResponse>
+            TypeAdapterConfig<Estabelecimento, EstabelecimentoListarResponse>
                 .NewConfig()
                 .Map(dest => dest.Geocordenadas, src => src.Geolocalizacao)
+                .Map(dest => dest.AvaliacaoResponses, src => src.Avaliacoes)
+                .Map(dest => dest.RecursosAcessibilidade, src => src.RecursosAcessibilidade)
                 .Map(dest => dest.Fotos, src => src.Fotos == null
                     ? Enumerable.Empty<EstabelecimentoFotoResponse>()
                     : src.Fotos.Adapt<IEnumerable<EstabelecimentoFotoResponse>>());

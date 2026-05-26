@@ -44,15 +44,18 @@
       <!-- ── Etapa 1: Informações Básicas ── -->
       @if (etapa === 1) {
         <div class="form-etapa">
-          <div class="form-field">
-            <tui-textfield>
-              <label tuiLabel>Nome do estabelecimento <span class="obrig">*</span></label>
-              <input tuiTextfield formControlName="nome" type="text" placeholder="Ex: Restaurante Sabor & Arte" />
-            </tui-textfield>
+
+          <div class="input-group">
+            <label class="input-label">Nome do estabelecimento <span class="obrig">*</span></label>
+            <input
+              class="input-field"
+              formControlName="nome"
+              type="text"
+              placeholder="Ex: Restaurante Sabor & Arte" />
           </div>
 
           <div class="form-field">
-            <label>Tipo de estabelecimento <span class="obrig">*</span></label>
+            <label class="input-label">Tipo de estabelecimento <span class="obrig">*</span></label>
             <div class="tipos-grid">
               @for (tipo of tiposEstabelecimento; track tipo.id) {
                 <button
@@ -61,7 +64,9 @@
                   [class.selecionado]="form.controls.tipoEstabelecimento.value === tipo.id"
                   [style.--tipo-cor]="tipo.cor"
                   (click)="selecionarTipo(tipo.id)">
-                  <i [class]="tipo.icone + ' tipo-icone'"></i>
+                  <div class="tipo-icone-badge">
+                    <i [class]="tipo.icone + ' tipo-icone'"></i>
+                  </div>
                   <span class="tipo-label">{{ tipo.label }}</span>
                 </button>
               }
@@ -69,8 +74,8 @@
           </div>
 
           <div class="modal-acoes">
-            <button tuiButton type="button" appearance="outline" size="m" (click)="fecharModal()">Cancelar</button>
-            <button tuiButton type="button" appearance="primary" size="m" (click)="proximaEtapa()">Próximo →</button>
+            <button class="btn-acao secundario" type="button" (click)="fecharModal()">Cancelar</button>
+            <button class="btn-acao primario" type="button" (click)="proximaEtapa()">Próximo →</button>
           </div>
         </div>
       }
@@ -123,8 +128,8 @@
           </div>
 
           <div class="modal-acoes">
-            <button tuiButton type="button" appearance="outline" size="m" (click)="voltarEtapa()">← Voltar</button>
-            <button tuiButton type="button" appearance="primary" size="m" [disabled]="!localizacaoSelecionada" (click)="proximaEtapa()">Próximo →</button>
+            <button class="btn-acao secundario" type="button" (click)="voltarEtapa()">← Voltar</button>
+            <button class="btn-acao primario" type="button" [disabled]="!localizacaoSelecionada" (click)="proximaEtapa()">Próximo →</button>
           </div>
         </div>
       }
@@ -140,58 +145,70 @@
             Endereço preenchido automaticamente. Corrija os campos ausentes se necessário.
           </div>
 
-          <div class="form-row dois">
-            <div class="form-field flex2">
-              <tui-textfield>
-                <label tuiLabel>Logradouro <span class="obrig">*</span></label>
-                <input tuiTextfield formControlName="logradouro" type="text" placeholder="Rua, Avenida..." />
-              </tui-textfield>
+          <div class="form-row">
+            <div class="input-group flex2">
+              <label class="input-label">Logradouro <span class="obrig">*</span></label>
+              <input class="input-field" formControlName="logradouro" type="text" placeholder="Rua, Avenida..." />
             </div>
-            <div class="form-field">
-              <tui-textfield>
-                <label tuiLabel>Número <span class="obrig">*</span></label>
-                <input tuiTextfield formControlName="numero" type="text" placeholder="123" />
-              </tui-textfield>
-            </div>
-          </div>
-          <div class="form-row dois">
-            <div class="form-field">
-              <tui-textfield>
-                <label tuiLabel>Bairro <span class="obrig">*</span></label>
-                <input tuiTextfield formControlName="bairro" type="text" placeholder="Bairro" />
-              </tui-textfield>
-            </div>
-            <div class="form-field">
-              <tui-textfield>
-                <label tuiLabel>Complemento</label>
-                <input tuiTextfield formControlName="complemento" type="text" placeholder="Apto, Bloco..." />
-              </tui-textfield>
-            </div>
-          </div>
-          <div class="form-row tres">
-            <div class="form-field flex2">
-              <tui-textfield>
-                <label tuiLabel>Cidade <span class="obrig">*</span></label>
-                <input tuiTextfield formControlName="cidade" type="text" placeholder="São Paulo" />
-              </tui-textfield>
-            </div>
-            <div class="form-field">
-              <tui-textfield>
-                <label tuiLabel>UF <span class="obrig">*</span></label>
-                <input tuiTextfield formControlName="uf" type="text" placeholder="SP" maxlength="2" />
-              </tui-textfield>
-            </div>
-            <div class="form-field">
-              <tui-textfield>
-                <label tuiLabel>CEP <span class="obrig">*</span></label>
-                <input tuiTextfield formControlName="cep" type="text" placeholder="00000-000" />
-              </tui-textfield>
+            <div class="input-group">
+              <label class="input-label">Número <span class="obrig">*</span></label>
+              <input class="input-field" formControlName="numero" type="text" placeholder="123" />
             </div>
           </div>
 
+          <div class="form-row">
+            <div class="input-group">
+              <label class="input-label">Bairro <span class="obrig">*</span></label>
+              <input class="input-field" formControlName="bairro" type="text" placeholder="Bairro" />
+            </div>
+            <div class="input-group">
+              <label class="input-label">Complemento</label>
+              <input class="input-field" formControlName="complemento" type="text" placeholder="Apto, Bloco..." />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="input-group flex2">
+              <label class="input-label">Cidade <span class="obrig">*</span></label>
+              <input class="input-field" formControlName="cidade" type="text" placeholder="São Paulo" />
+            </div>
+            <div class="input-group">
+              <label class="input-label">UF <span class="obrig">*</span></label>
+              <input class="input-field" formControlName="uf" type="text" placeholder="SP" maxlength="2" />
+            </div>
+            <div class="input-group">
+              <label class="input-label">CEP <span class="obrig">*</span></label>
+              <input class="input-field" formControlName="cep" type="text" placeholder="00000-000" />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="input-label">Recursos de acessibilidade <span class="obrig">*</span></label>
+            <p class="field-descricao">Selecione os recursos disponíveis neste estabelecimento</p>
+            @if (recursosAcessibilidade.length === 0) {
+              <p class="recursos-vazio">Carregando recursos...</p>
+            } @else {
+              <div class="recursos-grid">
+                @for (recurso of recursosAcessibilidade; track recurso.id) {
+                  <button
+                    type="button"
+                    class="recurso-pill"
+                    [class.selecionado]="isRecursoSelecionado(recurso.id)"
+                    (click)="toggleRecurso(recurso.id)">
+                    @if (isRecursoSelecionado(recurso.id)) {
+                      <i class="fa-solid fa-check check-icone"></i>
+                    }
+                    <i [class]="'fa-solid ' + recurso.icone + ' recurso-icone'"></i>
+                    <span>{{ recurso.nome }}</span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+
           <div class="modal-acoes">
-            <button tuiButton type="button" appearance="outline" size="m" (click)="voltarEtapa()">← Voltar</button>
-            <button tuiButton type="button" appearance="primary" size="m" (click)="proximaEtapa()">Próximo →</button>
+            <button class="btn-acao secundario" type="button" (click)="voltarEtapa()">← Voltar</button>
+            <button class="btn-acao primario" type="button" (click)="proximaEtapa()">Próximo →</button>
           </div>
         </div>
       }
@@ -201,7 +218,7 @@
         <div class="form-etapa">
 
           <div class="form-field">
-            <label>Imagem de capa <span class="label-opcional">(opcional)</span></label>
+            <label class="input-label">Imagem de capa <span class="label-opcional">(opcional)</span></label>
             <p class="field-descricao">Será exibida como imagem principal do estabelecimento</p>
 
             @if (!imagemCapaPreview) {
@@ -234,7 +251,7 @@
           </div>
 
           <div class="form-field">
-            <label>Fotos adicionais <span class="label-opcional">(até 5 fotos)</span></label>
+            <label class="input-label">Fotos adicionais <span class="label-opcional">(até 5 fotos)</span></label>
             <p class="field-descricao">Imagens exibidas no carrossel do estabelecimento</p>
 
             @if (imagensCarrossel.length < 5) {
@@ -292,8 +309,8 @@
           </div>
 
           <div class="modal-acoes">
-            <button tuiButton type="button" appearance="outline" size="m" (click)="voltarEtapa()">← Voltar</button>
-            <button tuiButton type="submit" appearance="primary" size="m" [disabled]="carregando">
+            <button class="btn-acao secundario" type="button" (click)="voltarEtapa()">← Voltar</button>
+            <button class="btn-acao primario" type="submit" [disabled]="carregando">
               @if (carregando) { Cadastrando... } @else { Cadastrar ✓ }
             </button>
           </div>

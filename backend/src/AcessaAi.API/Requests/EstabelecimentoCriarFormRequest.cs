@@ -7,8 +7,8 @@ public class EstabelecimentoCriarFormRequest
     public string Nome { get; set; } = null!;
     public TipoEstabelecimento Tipo { get; set; }
 
-    public double Latitude { get; set; }
-    public double Longitude { get; set; }
+    public string Latitude { get; set; }
+    public string Longitude { get; set; }
 
     public string Logradouro { get; set; } = null!;
     public string UF { get; set; } = null!;
@@ -20,4 +20,5 @@ public class EstabelecimentoCriarFormRequest
 
     public IFormFile? Capa { get; set; }
     public IFormFileCollection? Fotos { get; set; }
+    public int[] RecursosAcessibilidadesIds {get;set;}
 }

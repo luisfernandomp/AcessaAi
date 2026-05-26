@@ -5,11 +5,13 @@ import {
   NgZone,
   OnDestroy,
   ViewChild,
+  inject,
 } from '@angular/core';
 import { EstabelecimentoBottomSheetComponent } from './components/estabelecimento-bottom-sheet/estabelecimento-bottom-sheet.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { environment } from '../../../environments/environment';
 import { Lugar, CATEGORIAS } from './mapa.models';
+import { EstabelecimentoService } from '../../core/services/estabelecimento.service';
 
 const MAP_CENTER = { lat: -23.5560, lng: -46.6620 };
 const MAP_ZOOM_DEFAULT = 14;
@@ -40,6 +42,8 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private markers = new Map<number, any>();
 
+  private readonly estabelecimentoService = inject(EstabelecimentoService);
+
   constructor(private ngZone: NgZone) {}
 
   async ngAfterViewInit(): Promise<void> {
@@ -56,7 +60,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.markers.forEach((m) => m.setMap(null));
+    this.markers.forEach((m) => (m.map = null));
     this.markers.clear();
   }
 
@@ -82,10 +86,39 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     if (anterior) this.atualizarIconeMarker(anterior, false);
     this.atualizarIconeMarker(lugar, true);
 
-    if (this.map) {
+    if (!this.map) return;
+
+    const coordsValidas = lugar.lat !== 0 || lugar.lng !== 0;
+    if (coordsValidas) {
       this.map.panTo({ lat: lugar.lat, lng: lugar.lng });
       this.map.setZoom(MAP_ZOOM_SELECIONADO);
+    } else {
+      this.estabelecimentoService.getById(lugar.id).subscribe({
+        next: (est) => {
+          if (est.geocordenadas?.latitude && est.geocordenadas?.longitude) {
+            lugar.lat = est.geocordenadas.latitude;
+            lugar.lng = est.geocordenadas.longitude;
+            this.atualizarPosicaoMarker(lugar);
+            this.map.panTo({ lat: lugar.lat, lng: lugar.lng });
+            this.map.setZoom(MAP_ZOOM_SELECIONADO);
+          }
+        },
+      });
     }
+  }
+
+  irParaMinhaLocalizacao(): void {
+    if (!navigator.geolocation || !this.map) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        this.ngZone.run(() => {
+          const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          this.map.panTo(coords);
+          this.map.setZoom(MAP_ZOOM_SELECIONADO);
+        });
+      },
+      () => {},
+    );
   }
 
   fecharBottomSheet(): void {
@@ -115,7 +148,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
       }
       const script = document.createElement('script');
       script.id = 'gmaps-script';
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&language=pt-BR&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&language=pt-BR&libraries=places,marker`;
       script.async = true;
       script.defer = true;
       script.onload = () => resolve();
@@ -132,6 +165,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     this.map = new google.maps.Map(this.mapaContainer.nativeElement, {
       center,
       zoom: MAP_ZOOM_DEFAULT,
+      mapId: environment.googleMapsMapId,
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: false,
@@ -151,7 +185,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
 
     this.markers.forEach((marker, id) => {
       if (!idsVisiveis.has(id)) {
-        marker.setMap(null);
+        marker.map = null;
         this.markers.delete(id);
       }
     });
@@ -167,13 +201,12 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   }
 
   private criarMarker(lugar: Lugar, selecionado: boolean): void {
-    const marker = new google.maps.Marker({
+    const marker = new google.maps.marker.AdvancedMarkerElement({
       position: { lat: lugar.lat, lng: lugar.lng },
       map: this.map,
       title: lugar.nome,
-      icon: this.buildIcone(lugar, selecionado),
+      content: this.buildContent(lugar, selecionado),
       zIndex: selecionado ? 100 : 1,
-      optimized: false,
     });
 
     marker.addListener('click', () => {
@@ -186,19 +219,21 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   private atualizarIconeMarker(lugar: Lugar, selecionado: boolean): void {
     const marker = this.markers.get(lugar.id);
     if (!marker) return;
-    marker.setIcon(this.buildIcone(lugar, selecionado));
-    marker.setZIndex(selecionado ? 100 : 1);
+    marker.content = this.buildContent(lugar, selecionado);
+    marker.zIndex = selecionado ? 100 : 1;
   }
 
-  private buildIcone(lugar: Lugar, selecionado: boolean): object {
-    const largura = selecionado ? 56 : 42;
-    const altura = selecionado ? 72 : 54;
-    const svg = this.buildMarkerSvg(lugar, selecionado);
-    return {
-      url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
-      scaledSize: new google.maps.Size(largura, altura),
-      anchor: new google.maps.Point(largura / 2, altura),
-    };
+  private atualizarPosicaoMarker(lugar: Lugar): void {
+    const marker = this.markers.get(lugar.id);
+    if (!marker) return;
+    marker.position = { lat: lugar.lat, lng: lugar.lng };
+  }
+
+  private buildContent(lugar: Lugar, selecionado: boolean): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cursor = 'pointer';
+    el.innerHTML = this.buildMarkerSvg(lugar, selecionado);
+    return el;
   }
 
   private buildMarkerSvg(lugar: Lugar, selecionado: boolean): string {

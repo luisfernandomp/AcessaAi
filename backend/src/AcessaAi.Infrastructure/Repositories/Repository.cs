@@ -15,7 +15,7 @@ namespace AcessaAi.Infrastructure.Repositories
             _dbSet = _context.Set<TEntity>();
         }
 
-        public async Task<TEntity?> ObterPorIdAsync(int id, CancellationToken cancellationToken)
+        public virtual async Task<TEntity?> ObterPorIdAsync(int id, CancellationToken cancellationToken)
         {
             return await _dbSet.FindAsync([id], cancellationToken);
         }

@@ -13,6 +13,16 @@ namespace AcessaAi.Infrastructure.Repositories
         {
         }
 
+        public override async Task<Estabelecimento> ObterPorIdAsync(int id, CancellationToken cancellationToken)
+        {
+            return await _dbSet
+            .Include(x => x.Avaliacoes)
+                .ThenInclude(x => x.Usuario)
+            .Include(x => x.Fotos)
+            .Include(x => x.RecursosAcessibilidade)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        }
+
         public async Task<bool> ExisteEstabelecimentoAsync(int id, CancellationToken cancellationToken)
         {
             return await _context.Estabelecimentos.AnyAsync(x => x.Id == id, cancellationToken);
@@ -20,7 +30,11 @@ namespace AcessaAi.Infrastructure.Repositories
 
         public async Task<ErrorOr<List<Estabelecimento>>> FiltrarAsync(EstabelecimentoFiltrarConsulta consulta, CancellationToken cancellationToken)
         {
-            var query = _context.Estabelecimentos.AsQueryable();
+            var query = _context.Estabelecimentos
+                .Include(e => e.RecursosAcessibilidade)
+                .Include(e => e.Fotos)
+                .Include(e => e.Avaliacoes)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(consulta.Nome))
             {

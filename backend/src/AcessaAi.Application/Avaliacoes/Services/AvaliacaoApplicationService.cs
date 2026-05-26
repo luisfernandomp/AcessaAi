@@ -44,12 +44,16 @@ namespace AcessaAi.Application.Avaliacoes.Services
 
             var avaliacaoResult = Avaliacao.Criar(request.Comentario, request.Estrelas, usuario, estabelecimento);
 
+
             if (avaliacaoResult.IsError)
                 return avaliacaoResult.Errors;
 
             var avaliacao = avaliacaoResult.Value;
+            estabelecimento.AdicionarAvaliacao(avaliacao);
 
             await _avaliacaoRepository.AddAsync(avaliacao, cancellationToken);
+            await _estabelecimentoRepository.UpdateAsync(estabelecimento, cancellationToken);
+
             await _unitOfWork.CommitAsync(cancellationToken);
 
             return avaliacao.Adapt<AvaliacaoResponse>();

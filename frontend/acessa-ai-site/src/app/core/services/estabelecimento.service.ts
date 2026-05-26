@@ -21,6 +21,7 @@ export class EstabelecimentoService {
     let params = new HttpParams();
 
     if (filtro.nome) params = params.set('nome', filtro.nome);
+    if (filtro.tipo != null) params = params.set('tipo', filtro.tipo);
     if (filtro.distanciaMaxima != null)
       params = params.set('distanciaMaxima', filtro.distanciaMaxima);
     if (filtro['geocordenadasRequest.latitude'] != null)

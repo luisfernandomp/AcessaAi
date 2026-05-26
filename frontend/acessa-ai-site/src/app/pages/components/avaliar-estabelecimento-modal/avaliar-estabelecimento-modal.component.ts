@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TuiButton, TuiTextfield } from '@taiga-ui/core';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 import { AvaliacaoService } from '../../../core/services/avaliacao.service';
@@ -9,7 +8,7 @@ import { AvaliacaoService } from '../../../core/services/avaliacao.service';
 @Component({
   selector: 'app-avaliar-estabelecimento-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, TuiTextfield, TuiButton],
+  imports: [CommonModule, FormsModule],
   templateUrl: './avaliar-estabelecimento-modal.component.html',
   styleUrl: './avaliar-estabelecimento-modal.component.css',
 })

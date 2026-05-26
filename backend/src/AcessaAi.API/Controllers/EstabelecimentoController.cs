@@ -1,3 +1,4 @@
+using System.Globalization;
 using AcessaAi.API.Extensions;
 using AcessaAi.API.Requests;
 using AcessaAi.Application.Dtos.Requests;
@@ -32,10 +33,14 @@ namespace AcessaAi.API.Controllers
             {
                 Nome = form.Nome,
                 Tipo = form.Tipo,
-                Geocordenadas = new GeocordenadasRequest { Latitude = form.Latitude, Longitude = form.Longitude },
+                Geocordenadas = new GeocordenadasRequest {
+                    Latitude = double.Parse(form.Latitude, CultureInfo.InvariantCulture),
+                    Longitude = double.Parse(form.Longitude, CultureInfo.InvariantCulture)
+                    },
                 Endereco = new EnderecoRequest(form.Logradouro, form.UF, form.Cidade, form.Numero, form.CEP, form.Bairro, form.Complemento),
                 Capa = form.Capa?.ToEstabelecimentoImagemRequest(isCapa: true),
-                Fotos = form.Fotos?.Select(f => f.ToEstabelecimentoImagemRequest()) ?? []
+                Fotos = form.Fotos?.Select(f => f.ToEstabelecimentoImagemRequest()) ?? [],
+                RecursosAcessibilidadesIds = form.RecursosAcessibilidadesIds 
             };
 
             var result = await _estabelecimentoService.CriarAsync(request, cancellationToken);

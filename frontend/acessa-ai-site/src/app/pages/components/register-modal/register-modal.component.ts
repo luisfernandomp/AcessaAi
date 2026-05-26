@@ -1,8 +1,6 @@
 import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { TuiButton, TuiIcon, TuiTextfield } from '@taiga-ui/core';
-import { TuiPassword } from '@taiga-ui/kit';
 import { ToastrService } from 'ngx-toastr';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { CadastrarUsuarioRequest } from '../../../core/models/usuario.model';
@@ -10,7 +8,7 @@ import { CadastrarUsuarioRequest } from '../../../core/models/usuario.model';
 @Component({
   selector: 'app-register-modal',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule, TuiTextfield, TuiButton, TuiIcon, TuiPassword],
+  imports: [ReactiveFormsModule, RouterModule],
   templateUrl: './register-modal.component.html',
   styleUrl: './register-modal.component.css',
 })
@@ -22,6 +20,7 @@ export class RegisterModalComponent {
 
   etapa = 1;
   carregando = false;
+  mostrarSenha = false;
 
   form = this.fb.group({
     nome: ['', Validators.required],

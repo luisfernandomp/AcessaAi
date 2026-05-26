@@ -12,24 +12,23 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TuiButton } from '@taiga-ui/core';
-import { TuiAccordion, TuiChip, TuiSegmented } from '@taiga-ui/kit';
-import { ListaEstabelecimentosComponent } from '../lista-estabelecimentos/lista-estabelecimentos.component';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare const google: any;
+import { TuiSegmented } from '@taiga-ui/kit';
 import { Subject, Subscription, debounceTime, takeUntil } from 'rxjs';
 import { EstabelecimentoService } from '../../../../core/services/estabelecimento.service';
 import {
   EstabelecimentoResponse,
   FiltroEstabelecimentoRequest,
 } from '../../../../core/models/estabelecimento.model';
-import { Lugar, CATEGORIAS, Ordenacao } from '../../mapa.models';
+import { Lugar, CATEGORIAS, Ordenacao, TIPO_MAP, TIPO_REVERSE_MAP } from '../../mapa.models';
+import { ListaEstabelecimentosComponent } from '../lista-estabelecimentos/lista-estabelecimentos.component';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const google: any;
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, FormsModule, TuiButton, TuiChip, TuiSegmented, ...TuiAccordion, ListaEstabelecimentosComponent],
+  imports: [CommonModule, FormsModule, TuiSegmented, ListaEstabelecimentosComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css',
   host: {
@@ -64,6 +63,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   buscaLocalizada = false;
   buscaLocalizadaNome = '';
   apenasAcessiveis = false;
+  distanciaMaxima = 50;
   recolhido = false;
   buscaFocada = false;
   filtrosExpandidos = false;
@@ -166,9 +166,15 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     const filtro: FiltroEstabelecimentoRequest = {};
     if (this.busca) filtro.nome = this.busca;
+    if (this.categoriaSelecionada !== 'todos') {
+      filtro.tipo = TIPO_MAP[this.categoriaSelecionada];
+    }
     if (this.userLat != null && this.userLng != null) {
       filtro['geocordenadasRequest.latitude'] = this.userLat;
       filtro['geocordenadasRequest.longitude'] = this.userLng;
+      if (this.distanciaMaxima < 50) {
+        filtro.distanciaMaxima = this.distanciaMaxima;
+      }
     }
 
     console.log('Executando busca com filtro:', filtro);
@@ -253,24 +259,30 @@ export class SidebarComponent implements OnInit, OnDestroy {
         : `${distanciaKm.toFixed(1).replace('.', ',')} km`;
     }
 
-    let categoria = 'restaurante';
-    if (e.recursosAcessibilidade && e.recursosAcessibilidade.length > 0) {
-      categoria = 'restaurante';
-    }
+    const categoria = 'restaurante';
+
+    const avaliacoes = e.avaliacaoResponses ?? [];
+    const totalAvaliacoes = e.totalAvaliacoes ?? avaliacoes.length;
+    const avaliacao = e.mediaEstrelas != null
+      ? Math.round(e.mediaEstrelas * 10) / 10
+      : totalAvaliacoes > 0
+        ? Math.round((avaliacoes.reduce((s, a) => s + a.estrelas, 0) / avaliacoes.length) * 10) / 10
+        : 0;
 
     return {
       id: e.id,
       nome: e.nome || 'Estabelecimento sem nome',
       categoria,
       endereco: partes.length > 0 ? partes.join(' · ') : 'Endereço não informado',
-      avaliacao: 0,
-      totalAvaliacoes: 0,
+      avaliacao,
+      totalAvaliacoes,
       acessivel: e.recursosAcessibilidade && e.recursosAcessibilidade.length > 0,
       distancia,
       distanciaKm,
       recursos: (e.recursosAcessibilidade || []).map((r) => r.nome),
-      lat: e.geocordenadas?.latitude || 0,
-      lng: e.geocordenadas?.longitude || 0,
+      recursosAcessibilidade: e.recursosAcessibilidade || [],
+      lat: e.geocordenadas?.latitude ?? 0,
+      lng: e.geocordenadas?.longitude ?? 0,
       fotos: e.fotos || [],
       horario: '',
     };
@@ -347,6 +359,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (this.categoriaSelecionada !== 'todos') count++;
     if (this.busca) count++;
     if (this.buscaLocalizada) count++;
+    if (this.distanciaMaxima < 50) count++;
     return count;
   }
 
@@ -363,6 +376,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.buscaLocalizadaNome = '';
     this.apenasAcessiveis = false;
     this.categoriaSelecionada = 'todos';
+    this.distanciaMaxima = 50;
     this.filtrar();
   }
 

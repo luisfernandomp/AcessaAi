@@ -1,13 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TuiButton, TuiLoader, TuiSurface } from '@taiga-ui/core';
-import { TuiChip } from '@taiga-ui/kit';
+import { TuiButton, TuiLoader } from '@taiga-ui/core';
 import { Lugar, CATEGORIAS } from '../../mapa.models';
 
 @Component({
   selector: 'app-lista-estabelecimentos',
   standalone: true,
-  imports: [CommonModule, TuiLoader, TuiSurface, TuiChip, TuiButton],
+  imports: [CommonModule, TuiLoader, TuiButton],
   templateUrl: './lista-estabelecimentos.component.html',
   styleUrl: './lista-estabelecimentos.component.css',
 })

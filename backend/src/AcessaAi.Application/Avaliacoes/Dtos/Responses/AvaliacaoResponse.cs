@@ -1,3 +1,5 @@
+using AcessaAi.Application.Usuarios.Dtos.Responses;
+
 namespace AcessaAi.Application.Avaliacoes.Dtos.Responses
 {
     public class AvaliacaoResponse
@@ -6,6 +8,7 @@ namespace AcessaAi.Application.Avaliacoes.Dtos.Responses
         public string Comentario { get; set; }
         public ushort Estrelas { get; set; }
         public int UsuarioId { get; set; }
+        public UsuarioResponse UsuarioResponse {get;set;}
         public bool Ativo { get; set; }
     }
 }

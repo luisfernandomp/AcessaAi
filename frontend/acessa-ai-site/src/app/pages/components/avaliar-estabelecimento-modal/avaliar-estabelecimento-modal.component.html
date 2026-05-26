@@ -1,14 +1,13 @@
 <div class="modal-backdrop" (click)="onBackdropClick($event)">
   <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
 
-    <!-- Header -->
     <div class="modal-header">
       <div class="modal-titulo-grupo">
         <div class="modal-icon-badge">
           <i class="fa-solid fa-star"></i>
         </div>
         <div>
-          <h2 class="modal-titulo" id="modal-titulo">Avaliar Estabelecimento</h2>
+          <h2 class="modal-titulo" id="modal-titulo">Avaliar estabelecimento</h2>
           <p class="modal-sub">Compartilhe sua experiência de acessibilidade</p>
         </div>
       </div>
@@ -19,12 +18,11 @@
       </button>
     </div>
 
-    <!-- Body -->
     <div class="modal-body">
 
       <!-- Estrelas -->
-      <div class="campo-estrelas">
-        <p class="campo-label">Sua nota <span class="obrig">*</span></p>
+      <div class="form-field">
+        <label class="input-label">Sua nota <span class="obrig">*</span></label>
         <div class="estrelas-row">
           @for (n of estrelas; track n) {
             <button
@@ -34,8 +32,7 @@
               (mouseenter)="estrelaHover = n"
               (mouseleave)="estrelaHover = 0"
               (click)="estrelaSelecionada = n"
-              [attr.aria-label]="labels[n]"
-            >
+              [attr.aria-label]="labels[n]">
               <i class="fa-solid fa-star"></i>
             </button>
           }
@@ -46,26 +43,30 @@
       </div>
 
       <!-- Comentário -->
-      <div class="campo-comentario">
-        <p class="campo-label">Comentário <span class="campo-opcional">(opcional)</span></p>
+      <div class="form-field">
+        <label class="input-label">
+          Comentário
+          <span class="label-opcional">(opcional)</span>
+        </label>
         <textarea
-          class="textarea-comentario"
+          class="input-field textarea"
           [(ngModel)]="comentario"
           placeholder="Conte como foi sua experiência de acessibilidade neste local..."
           rows="4"
-          maxlength="500"
-        ></textarea>
+          maxlength="500">
+        </textarea>
         <span class="char-count">{{ comentario.length }}/500</span>
       </div>
 
     </div>
 
-    <!-- Footer -->
     <div class="modal-acoes">
-      <button tuiButton type="button" appearance="outline" size="m" (click)="fecharModal()">
-        Cancelar
-      </button>
-      <button tuiButton type="button" appearance="primary" size="m" [disabled]="carregando || estrelaSelecionada === 0" (click)="submit()">
+      <button class="btn-acao secundario" type="button" (click)="fecharModal()">Cancelar</button>
+      <button
+        class="btn-acao primario"
+        type="button"
+        [disabled]="carregando || estrelaSelecionada === 0"
+        (click)="submit()">
         @if (carregando) { Enviando... } @else { Enviar avaliação }
       </button>
     </div>

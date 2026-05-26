@@ -24,17 +24,35 @@ export interface FotoEstabelecimento {
   isCapa: boolean;
 }
 
+export interface UsuarioResponse {
+  nome: string;
+  endereco: Endereco;
+}
+
+export interface AvaliacaoResponse {
+  id: number;
+  comentario: string;
+  estrelas: number;
+  usuarioId: number;
+  usuarioResponse: UsuarioResponse;
+}
+
 export interface EstabelecimentoResponse {
   id: number;
   nome: string;
+  tipo?: number;
   geocordenadas: Geocoordenadas;
   fotos: FotoEstabelecimento[];
   recursosAcessibilidade: RecursoAcessibilidade[];
   endereco: Endereco;
+  avaliacaoResponses: AvaliacaoResponse[];
+  mediaEstrelas?: number;
+  totalAvaliacoes?: number;
 }
 
 export interface FiltroEstabelecimentoRequest {
   nome?: string;
+  tipo?: number;
   distanciaMaxima?: number;
   'geocordenadasRequest.latitude'?: number;
   'geocordenadasRequest.longitude'?: number;

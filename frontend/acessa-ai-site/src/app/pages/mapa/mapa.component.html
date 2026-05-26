@@ -28,7 +28,7 @@
     <div #mapaContainer class="google-maps-canvas" [class.oculto]="mapCarregando || semApiKey"></div>
 
     <div class="mapa-controles">
-      <button class="btn-mapa-controle" title="Minha localização">
+      <button class="btn-mapa-controle" title="Minha localização" (click)="irParaMinhaLocalizacao()">
         <i class="fa-solid fa-location-crosshairs"></i>
       </button>
     </div>

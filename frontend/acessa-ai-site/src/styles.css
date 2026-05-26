@@ -9,7 +9,7 @@ body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', sans-serif;
 }
 
 /* TuiRoot renderiza um div.t-root-content — precisa ser flex para que o layout interno funcione */

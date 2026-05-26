@@ -7,192 +7,196 @@
 }
 
 @if (lugar) {
-  <div class="bottom-sheet" [class.expandido]="expandido">
+  <div class="sheet" [class.expandido]="expandido">
 
-    <!-- Handle -->
-    <div class="sheet-handle" (click)="toggleExpandido()">
-      <div class="handle-bar"></div>
-    </div>
+    <!-- Scrollable body: hero + card -->
+    <div class="sheet-body">
 
-    <!-- Layout principal: carrossel | descrição + avaliações -->
-    <div class="sheet-main">
+      <!-- ── Hero ── -->
+      <div class="hero">
 
-      <!-- Esquerda: Carrossel -->
-      <div class="painel-carousel">
         @if (lugar.fotos && lugar.fotos.length > 0) {
           <tui-carousel
             #carousel
-            class="carousel-tui"
+            class="hero-carousel"
             [(index)]="fotoAtual"
             [itemsCount]="1"
             [draggable]="true"
           >
             @for (foto of lugar.fotos; track $index) {
               <ng-template tuiItem>
-                <img class="carousel-img" [src]="foto.url" [alt]="lugar.nome" />
+                <img class="hero-img" [src]="foto.url" [alt]="lugar.nome" />
               </ng-template>
             }
           </tui-carousel>
 
           @if (lugar.fotos.length > 1) {
-            <button class="carousel-nav carousel-prev" type="button" (click)="carousel.prev()">
+            <button class="nav-btn nav-prev" type="button" (click)="carousel.prev()">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <button class="carousel-nav carousel-next" type="button" (click)="carousel.next()">
+            <button class="nav-btn nav-next" type="button" (click)="carousel.next()">
               <i class="fa-solid fa-chevron-right"></i>
             </button>
-            <div class="carousel-dots">
+            <div class="hero-dots">
               @for (f of lugar.fotos; track $index) {
                 <span class="dot" [class.ativo]="$index === fotoAtual"></span>
               }
             </div>
           }
         } @else {
-          <div class="carousel-placeholder">
+          <div class="hero-placeholder">
             <i class="fa-solid fa-image"></i>
           </div>
         }
-      </div>
 
-      <!-- Direita: Descrição + Avaliações (scrollável) -->
-      <div class="painel-descricao">
+        <!-- Gradient overlay -->
+        <div class="hero-gradient"></div>
 
-        <!-- Nome + badges + fechar -->
-        <div class="descricao-header">
-          <div class="header-info">
-            <h2 class="sheet-nome">{{ lugar.nome }}</h2>
-            <div class="sheet-badges">
-              <span class="badge-status" [class.aberto]="lugar.aberto" [class.fechado]="!lugar.aberto">
-                <i class="fa-solid fa-circle badge-dot"></i>
-                {{ lugar.aberto ? 'Aberto' : 'Fechado' }}
+        <!-- Title + rating overlaid on image -->
+        <div class="hero-content">
+          <h2 class="hero-nome">{{ lugar.nome }}</h2>
+          <div class="hero-sub">
+            @if (avaliacoes.length > 0) {
+              <span class="hero-rating">
+                <i class="fa-solid fa-star"></i>
+                {{ mediaEstrelas | number:'1.1-1' }}
+                <span class="hero-rating-count">({{ avaliacoes.length }})</span>
               </span>
-              <span class="badge-sep">·</span>
-              <span class="badge-distancia">{{ lugar.distancia }}</span>
-              @if (lugar.acessivel) {
-                <span class="badge-sep">·</span>
-                <span class="badge-acessivel"><i class="fa-solid fa-wheelchair"></i></span>
-              }
-            </div>
-            <div class="header-meta">
-              <span><i class="fa-regular fa-clock"></i> {{ lugar.horario }}</span>
-              <span><i class="fa-solid fa-location-dot"></i> {{ lugar.endereco }}</span>
-            </div>
+              <span class="hero-sep">·</span>
+            }
+            <span class="hero-loc">
+              <i class="fa-solid fa-location-dot"></i>
+              {{ lugar.endereco }}
+            </span>
           </div>
-          <button class="btn-fechar" (click)="onFechar()" title="Fechar">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
         </div>
 
-        <!-- Ações rápidas -->
-        <div class="sheet-acoes">
-          <button class="acao-btn" title="Rotas">
-            <i class="fa-solid fa-route acao-icone"></i>
+        <!-- Close -->
+        <button class="btn-close" (click)="onFechar()" title="Fechar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+      </div>
+      <!-- /hero -->
+
+      <!-- ── Content card ── -->
+      <div class="card">
+
+        <!-- Handle inside card -->
+        <div class="card-handle" (click)="toggleExpandido()">
+          <div class="handle-pill"></div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="acoes">
+          <button class="acao" title="Rotas">
+            <div class="acao-icon"><i class="fa-solid fa-route"></i></div>
             <span>Rotas</span>
           </button>
-          <button class="acao-btn" title="Compartilhar">
-            <i class="fa-solid fa-share-nodes acao-icone"></i>
+          <button class="acao" title="Compartilhar">
+            <div class="acao-icon"><i class="fa-solid fa-share-nodes"></i></div>
             <span>Compartilhar</span>
           </button>
-          <button class="acao-btn" title="Fotos">
-            <i class="fa-solid fa-camera acao-icone"></i>
+          <button class="acao" title="Fotos">
+            <div class="acao-icon"><i class="fa-solid fa-camera"></i></div>
             <span>Fotos</span>
           </button>
         </div>
 
-        <!-- Avaliações - Seção Principal -->
-        <div class="secao secao-avaliacoes">
-          @if (lugar.totalAvaliacoes > 0) {
-            <div class="nota-resumo">
-              <div class="nota-numero">{{ lugar.avaliacao }}</div>
-              <div class="nota-detalhes">
-                <div class="estrelas-grandes">
-                  @for (e of estrelasParciais(lugar.avaliacao); track $index) {
+        <!-- Rating block -->
+        <div class="rating-block">
+          @if (avaliacoes.length > 0) {
+            <div class="rating-summary">
+              <span class="rating-number">{{ mediaEstrelas | number:'1.1-1' }}</span>
+              <div class="rating-right">
+                <div class="stars-row">
+                  @for (e of estrelasParciais(mediaEstrelas); track $index) {
                     @if (e.tipo === 'cheia') {
-                      <i class="fa-solid fa-star estrela-lg cheia"></i>
+                      <i class="fa-solid fa-star star"></i>
                     } @else if (e.tipo === 'meia') {
-                      <i class="fa-solid fa-star-half-stroke estrela-lg meia"></i>
+                      <i class="fa-solid fa-star-half-stroke star"></i>
                     } @else {
-                      <i class="fa-regular fa-star estrela-lg"></i>
+                      <i class="fa-regular fa-star star empty"></i>
                     }
                   }
                 </div>
-                <span class="nota-base">{{ lugar.totalAvaliacoes }} avaliações</span>
+                <span class="rating-count">{{ avaliacoes.length }} avaliações</span>
               </div>
             </div>
-          } @else {
-            <div class="sem-avaliacoes">
-              <i class="fa-regular fa-star sem-avaliacoes-icone"></i>
-              <span class="sem-avaliacoes-texto">Sem avaliações ainda</span>
-              <span class="sem-avaliacoes-sub">Seja o primeiro a avaliar este local!</span>
-            </div>
-          }
 
-          <!-- Botão Avaliar Destacado -->
-          <button class="btn-avaliar-principal" (click)="onAvaliar()">
-            <i class="fa-solid fa-star-half-stroke"></i>
-            <span>Avaliar Estabelecimento</span>
-          </button>
-
-          <!-- Distribuição de notas -->
-          @if (lugar.totalAvaliacoes > 0) {
-            <div class="distribuicao">
+            <div class="dist-bars">
               @for (nota of [5, 4, 3, 2, 1]; track nota) {
-                <div class="barra-row">
-                  <span class="barra-label">{{ nota }}<i class="fa-solid fa-star"></i></span>
-                  <div class="barra">
-                    <div class="barra-fill" [style.width.%]="getBarraPercentual(nota)"></div>
+                <div class="dist-row">
+                  <span class="dist-label">{{ nota }}</span>
+                  <i class="fa-solid fa-star dist-star"></i>
+                  <div class="dist-bar">
+                    <div class="dist-fill" [style.width.%]="getBarraPercentual(nota)"></div>
                   </div>
                 </div>
               }
             </div>
+          } @else {
+            <div class="no-rating">
+              <i class="fa-regular fa-star no-rating-icon"></i>
+              <span class="no-rating-title">Sem avaliações ainda</span>
+              <span class="no-rating-sub">Seja o primeiro a avaliar este local!</span>
+            </div>
           }
         </div>
 
-        <!-- Avaliações Recentes -->
-        @if (avaliacoes.length > 0) {
-          <div class="secao">
-            <div class="secao-header">
-              <h3 class="secao-titulo">Avaliações Recentes</h3>
-              <button class="btn-ver-todas" *ngIf="avaliacoes.length > 2">Ver todas</button>
-            </div>
+        <!-- CTA -->
+        <button class="btn-avaliar" (click)="onAvaliar()">
+          <i class="fa-solid fa-star"></i>
+          Avaliar estabelecimento
+        </button>
 
-            <div class="avaliacoes-lista">
-              @for (av of avaliacoes.slice(0, 2); track av.id) {
-                <div class="avaliacao-card">
-                  <div class="av-topo">
-                    <div class="av-avatar" [style.background]="av.cor">{{ av.iniciais }}</div>
-                    <div class="av-meta">
-                      <span class="av-autor">{{ av.autor }}</span>
-                      <div class="av-estrelas">
-                        @for (e of estrelas(av.estrelas); track $index) {
-                          @if (e.cheia) {
-                            <i class="fa-solid fa-star estrela-av cheia"></i>
-                          } @else {
-                            <i class="fa-regular fa-star estrela-av"></i>
-                          }
-                        }
-                        <span class="av-data">{{ av.data }}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <p class="av-comentario">{{ av.comentario }}</p>
+        <!-- Accessibility chips -->
+        @if (recursosAcessibilidade.length > 0) {
+          <div class="secao">
+            <h3 class="secao-titulo">
+              <i class="fa-solid fa-wheelchair"></i> Acessibilidade
+            </h3>
+            <div class="chips">
+              @for (r of recursosAcessibilidade; track r.id) {
+                <div class="chip">
+                  <i [class]="'fa-solid ' + r.icone + ' chip-icon'"></i>
+                  <span>{{ r.nome }}</span>
                 </div>
               }
             </div>
           </div>
         }
 
-        <!-- Acessibilidade -->
-        @if (lugar.acessivel && lugar.recursos.length > 0) {
+        <!-- Reviews -->
+        @if (avaliacoes.length > 0) {
           <div class="secao">
-            <h3 class="secao-titulo">
-              <i class="fa-solid fa-wheelchair"></i> Acessibilidade
-            </h3>
-            <div class="recursos-grid">
-              @for (recurso of lugar.recursos; track recurso) {
-                <div class="recurso-item">
-                  <i class="fa-solid fa-check recurso-check"></i>
-                  <span>{{ recurso }}</span>
+            <div class="secao-header">
+              <h3 class="secao-titulo">Avaliações recentes</h3>
+              @if (avaliacoes.length > 2) {
+                <button class="btn-ver-mais">Ver todas</button>
+              }
+            </div>
+            <div class="reviews">
+              @for (av of avaliacoes.slice(0, 2); track av.id) {
+                <div class="review">
+                  <div class="review-top">
+                    <div class="avatar" [style.background]="corAvatar(av.usuarioId)">
+                      {{ iniciais(av.usuarioResponse.nome) }}
+                    </div>
+                    <div class="review-meta">
+                      <span class="review-nome">{{ av.usuarioResponse.nome }}</span>
+                      <div class="review-stars">
+                        @for (e of estrelas(av.estrelas); track $index) {
+                          @if (e.cheia) {
+                            <i class="fa-solid fa-star rev-star"></i>
+                          } @else {
+                            <i class="fa-regular fa-star rev-star empty"></i>
+                          }
+                        }
+                      </div>
+                    </div>
+                  </div>
+                  <p class="review-text">{{ av.comentario }}</p>
                 </div>
               }
             </div>
@@ -200,8 +204,10 @@
         }
 
       </div>
+      <!-- /card -->
+
     </div>
+    <!-- /sheet-body -->
 
   </div>
 }
-

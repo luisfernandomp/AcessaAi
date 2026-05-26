@@ -1,9 +1,10 @@
 import { Component, ElementRef, EventEmitter, NgZone, OnInit, Output, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TuiButton, TuiTextfield } from '@taiga-ui/core';
 import { ToastrService } from 'ngx-toastr';
 import { EstabelecimentoService } from '../../../core/services/estabelecimento.service';
+import { RecursoAcessibilidadeService } from '../../../core/services/recurso-acessibilidade.service';
+import { RecursoAcessibilidade } from '../../../core/models/recurso-acessibilidade.model';
 import { CATEGORIAS } from '../../mapa/mapa.models';
 import { environment } from '../../../../environments/environment';
 
@@ -22,7 +23,7 @@ const TIPO_ENUM: Record<string, number> = {
 @Component({
   selector: 'app-cadastrar-estabelecimento-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TuiTextfield, TuiButton],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './cadastrar-estabelecimento-modal.component.html',
   styleUrl: './cadastrar-estabelecimento-modal.component.css',
 })
@@ -31,6 +32,7 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
   @Output() sucesso = new EventEmitter<void>();
 
   private readonly toastr = inject(ToastrService);
+  private readonly recursoService = inject(RecursoAcessibilidadeService);
 
   etapa = 1;
   readonly totalEtapas = 4;
@@ -40,6 +42,8 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
   tiposEstabelecimento = CATEGORIAS.filter((c) => c.id !== 'todos');
 
   localizacaoSelecionada: { lat: number; lng: number } | null = null;
+
+  recursosAcessibilidade: RecursoAcessibilidade[] = [];
 
   imagemCapa: File | null = null;
   imagemCapaPreview: string | null = null;
@@ -78,6 +82,7 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
   form = this.fb.group({
     nome: ['', Validators.required],
     tipoEstabelecimento: ['', Validators.required],
+    recursosIds: this.fb.control<number[]>([]),
     endereco: this.fb.group({
       logradouro: ['', Validators.required],
       numero:     ['', Validators.required],
@@ -95,7 +100,22 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
     private estabelecimentoService: EstabelecimentoService,
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.recursoService.listarAtivas().subscribe({
+      next: (r) => (this.recursosAcessibilidade = r),
+      error: () => {},
+    });
+  }
+
+  toggleRecurso(id: number): void {
+    const ctrl = this.form.controls.recursosIds;
+    const atual = ctrl.value ?? [];
+    ctrl.setValue(atual.includes(id) ? atual.filter((v) => v !== id) : [...atual, id]);
+  }
+
+  isRecursoSelecionado(id: number): boolean {
+    return (this.form.controls.recursosIds.value ?? []).includes(id);
+  }
 
   selecionarTipo(id: string): void {
     this.form.controls.tipoEstabelecimento.setValue(id);
@@ -183,6 +203,10 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
         this.toastr.warning('Logradouro, Número, Bairro, Cidade, UF e CEP são obrigatórios.');
         return;
       }
+      if (!(this.form.controls.recursosIds.value ?? []).length) {
+        this.toastr.warning('Selecione ao menos um recurso de acessibilidade.');
+        return;
+      }
     }
 
     this.etapa++;
@@ -213,8 +237,8 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
     const formData = new FormData();
     formData.append('Nome',       v.nome!);
     formData.append('Tipo',       String(TIPO_ENUM[v.tipoEstabelecimento!] ?? 1));
-    formData.append('Latitude',   String(this.localizacaoSelecionada.lat));
-    formData.append('Longitude',  String(this.localizacaoSelecionada.lng));
+    formData.append('Latitude',   this.localizacaoSelecionada.lat.toFixed(7));
+    formData.append('Longitude',  this.localizacaoSelecionada.lng.toFixed(7));
     formData.append('Logradouro', end.logradouro ?? '');
     formData.append('UF',         end.uf ?? '');
     formData.append('Cidade',     end.cidade ?? '');
@@ -222,6 +246,9 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
     formData.append('CEP',        end.cep ?? '');
     formData.append('Bairro',     end.bairro ?? '');
     formData.append('Complemento',end.complemento ?? '');
+
+    (v.recursosIds ?? [])
+      .forEach((id) => formData.append('RecursosAcessibilidadesIds', String(id)));
 
     if (this.imagemCapa) {
       formData.append('Capa', this.imagemCapa, this.imagemCapa.name);
@@ -256,13 +283,12 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
     this.map.panTo(position);
     this.map.setZoom(16);
     if (this.marcadorSeletor) {
-      this.marcadorSeletor.setPosition(position);
+      this.marcadorSeletor.position = position;
     } else {
-      this.marcadorSeletor = new google.maps.Marker({
+      this.marcadorSeletor = new google.maps.marker.AdvancedMarkerElement({
         position,
         map: this.map,
         title: 'Localização selecionada',
-        animation: google.maps.Animation.DROP,
       });
     }
   }
@@ -301,6 +327,7 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
       this.map = new google.maps.Map(container, {
         center,
         zoom: 13,
+        mapId: environment.googleMapsMapId,
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,
@@ -309,7 +336,7 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
       });
 
       if (this.localizacaoSelecionada) {
-        this.marcadorSeletor = new google.maps.Marker({
+        this.marcadorSeletor = new google.maps.marker.AdvancedMarkerElement({
           position: center,
           map: this.map,
           title: 'Localização selecionada',
@@ -384,7 +411,7 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
       }
       const script = document.createElement('script');
       script.id = 'gmaps-script';
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&language=pt-BR&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&language=pt-BR&libraries=places,marker`;
       script.async = true;
       script.defer = true;
       script.onload = () => resolve();

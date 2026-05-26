@@ -1,4 +1,5 @@
 <div class="lista-wrapper">
+
   @if (carregandoLista) {
     <div class="lista-loading-overlay">
       <tui-loader [showLoader]="true" size="m" />
@@ -6,84 +7,82 @@
   }
 
   <div class="lista-scroll">
+
     @for (lugar of lugaresFiltrados; track lugar.id; let i = $index) {
       <div
-        tuiSurface="elevated"
-        class="lugar-card"
+        class="card"
         [class.selecionado]="lugarSelecionado?.id === lugar.id"
         (click)="selecionarLugar(lugar)"
-        [style.animation-delay]="(i * 40) + 'ms'"
+        [style.animation-delay]="(i * 35) + 'ms'"
       >
-        <!-- Imagem de capa -->
-        <div class="card-imagem">
+        <!-- Imagem -->
+        <div class="card-img-wrap">
           @if (capaUrl(lugar); as url) {
-            <img [src]="url" [alt]="lugar.nome" class="cover-img" />
+            <img [src]="url" [alt]="lugar.nome" class="card-img" loading="lazy" />
           } @else {
-            <div class="cover-placeholder">
+            <div class="card-img-placeholder">
               <i [class]="categoriaIcone(lugar.categoria)"></i>
+            </div>
+          }
+          @if (lugar.acessivel) {
+            <div class="card-badge-acessivel" title="Local acessível">
+              <i class="fa-solid fa-wheelchair"></i>
             </div>
           }
         </div>
 
         <!-- Conteúdo -->
-        <div class="card-conteudo">
-          <div class="card-cabecalho">
-            <h3 class="card-nome">{{ lugar.nome }}</h3>
-            @if (lugar.acessivel) {
-              <span class="card-acessivel-badge" title="Local acessível">
-                <i class="fa-solid fa-wheelchair"></i>
-              </span>
+        <div class="card-body">
+
+          <h3 class="card-nome">{{ lugar.nome }}</h3>
+
+          <div class="card-rating">
+            @for (e of estrelas(lugar.avaliacao); track $index) {
+              <i [class]="e.cheia ? 'fa-solid fa-star estrela' : 'fa-regular fa-star estrela vazia'"></i>
+            }
+            @if (lugar.totalAvaliacoes > 0) {
+              <span class="rating-valor">{{ lugar.avaliacao }}</span>
+              <span class="rating-count">({{ lugar.totalAvaliacoes }})</span>
+            } @else {
+              <span class="rating-sem">Sem avaliações</span>
             }
           </div>
 
-          @if (lugar.totalAvaliacoes > 0) {
-            <div class="card-row-meta">
-              <span class="card-nota">{{ lugar.avaliacao }}</span>
-              <div class="estrelas-row">
-                @for (e of estrelas(lugar.avaliacao); track $index) {
-                  @if (e.cheia) {
-                    <i class="fa-solid fa-star estrela cheia"></i>
-                  } @else {
-                    <i class="fa-regular fa-star estrela"></i>
-                  }
-                }
-              </div>
-              <span class="card-total-av">({{ lugar.totalAvaliacoes }})</span>
+          <p class="card-endereco">
+            <i class="fa-solid fa-location-dot endereco-icone"></i>
+            <span>{{ lugar.endereco }}</span>
+          </p>
+
+          @if (lugar.recursosAcessibilidade.length > 0) {
+            <div class="card-chips">
+              @for (r of lugar.recursosAcessibilidade.slice(0, 2); track r.id) {
+                <span class="chip">
+                  <i [class]="'fa-solid ' + r.icone + ' chip-icon'"></i>
+                  {{ r.nome }}
+                </span>
+              }
+              @if (lugar.recursosAcessibilidade.length > 2) {
+                <span class="chip chip-mais">+{{ lugar.recursosAcessibilidade.length - 2 }}</span>
+              }
             </div>
           }
 
-          <p class="card-endereco">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;margin-top:1px">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-            </svg>
-            {{ lugar.endereco }}
-          </p>
-
-          <div class="card-rodape">
-            @if (lugar.distancia) {
+          @if (lugar.distancia) {
+            <div class="card-footer">
               <span class="card-distancia">
                 <i class="fa-solid fa-location-arrow"></i>
                 {{ lugar.distancia }}
               </span>
-            }
-            @if (lugar.recursos.length > 0) {
-              <div class="card-recursos">
-                @for (r of lugar.recursos.slice(0, 1); track r) {
-                  <span tuiChip appearance="info" size="xs">{{ r }}</span>
-                }
-                @if (lugar.recursos.length > 1) {
-                  <span tuiChip appearance="neutral" size="xs">+{{ lugar.recursos.length - 1 }}</span>
-                }
-              </div>
-            }
-          </div>
+            </div>
+          }
+
         </div>
       </div>
     }
 
     @if (lugaresFiltrados.length === 0 && !carregandoLista) {
       <div class="lista-vazia">
-        <div class="vazia-ilustracao"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <div class="vazia-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
         <p class="vazia-titulo">Nenhum local encontrado</p>
         <span class="vazia-sub">Tente ajustar os filtros ou a busca</span>
         <button tuiButton type="button" appearance="primary" size="m" (click)="limparFiltros.emit()">
@@ -91,5 +90,6 @@
         </button>
       </div>
     }
+
   </div>
 </div>

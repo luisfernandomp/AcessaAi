@@ -7,6 +7,7 @@ using AcessaAi.Domain.Estabelecimentos.Consultas;
 using AcessaAi.Domain.GestaoEstabelecimentos.Entities;
 using AcessaAi.Domain.GestaoEstabelecimentos.Repositories;
 using AcessaAi.Domain.GestaoEstabelecimentos.ValueObjects;
+using AcessaAi.Domain.RecursosAcessibilidades.Repositories;
 using ErrorOr;
 using Mapster;
 
@@ -15,27 +16,30 @@ namespace AcessaAi.Application.Estabelecimentos.Services
     public class EstabelecimentoApplicationService : IEstabelecimentoApplicationService
     {
         private readonly IEstabelecimentoRepository _estabelecimentoRepository;
+        private readonly IRecursoAcessibilidadeRepository _recursoAcessibilidadeRepository;
         private readonly IImageStorageService _imageStorageService;
         private readonly IUnitOfWork _unitOfWork;
 
         public EstabelecimentoApplicationService(
             IEstabelecimentoRepository estabelecimentoRepository,
+            IRecursoAcessibilidadeRepository recursoAcessibilidadeRepository,
             IImageStorageService imageStorageService,
             IUnitOfWork unitOfWork)
         {
             _estabelecimentoRepository = estabelecimentoRepository;
-            _imageStorageService = imageStorageService; 
+            _recursoAcessibilidadeRepository = recursoAcessibilidadeRepository;
+            _imageStorageService = imageStorageService;
             _unitOfWork = unitOfWork;
         }
 
-        private EstabelecimentoResponse ResolverUrls(EstabelecimentoResponse response)
+        private EstabelecimentoListarResponse ResolverUrls(EstabelecimentoListarResponse response)
         {
             response.Fotos = [.. response.Fotos
                 .Select(f => { f.Url = _imageStorageService.GetPresignedUrl(f.Url); return f; })];
             return response;
         }
 
-        public async Task<ErrorOr<EstabelecimentoResponse>> CriarAsync(
+        public async Task<ErrorOr<EstabelecimentoListarResponse>> CriarAsync(
             EstabelecimentoCriarRequest request,
             CancellationToken cancellationToken)
         {
@@ -63,13 +67,20 @@ namespace AcessaAi.Application.Estabelecimentos.Services
                 estabelecimento.AdicionarImagem(fotoUrl, isCapa: false);
             }
 
+            foreach (var id in request.RecursosAcessibilidadesIds ?? [])
+            {
+                var recurso = await _recursoAcessibilidadeRepository.ObterPorIdAsync(id, cancellationToken);
+                if (recurso is not null)
+                    estabelecimento.AdicionarRecursoAcessibilidade(recurso);
+            }
+
             await _estabelecimentoRepository.AddAsync(estabelecimento, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
 
-            return ResolverUrls(estabelecimento.Adapt<EstabelecimentoResponse>());
+            return ResolverUrls(estabelecimento.Adapt<EstabelecimentoListarResponse>());
         }
 
-        public async Task<ErrorOr<EstabelecimentoResponse>> AtualizarAsync(
+        public async Task<ErrorOr<EstabelecimentoListarResponse>> AtualizarAsync(
             int id,
             EstabelecimentoAtualizarRequest request,
             CancellationToken cancellationToken)
@@ -85,7 +96,7 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             await _estabelecimentoRepository.UpdateAsync(estabelecimento, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
 
-            return ResolverUrls(estabelecimento.Adapt<EstabelecimentoResponse>());
+            return ResolverUrls(estabelecimento.Adapt<EstabelecimentoListarResponse>());
         }
 
         public async Task<ErrorOr<Success>> ExcluirAsync(
@@ -102,7 +113,7 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             return Result.Success;
         }
 
-        public async Task<ErrorOr<EstabelecimentoResponse>> ObterPorIdAsync(
+        public async Task<ErrorOr<EstabelecimentoListarResponse>> ObterPorIdAsync(
             int id,
             CancellationToken cancellationToken)
         {
@@ -111,7 +122,7 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             if (estabelecimento is null)
                 return Error.NotFound("Estabelecimento.NaoEncontrado", "Estabelecimento não encontrado.");
 
-            return ResolverUrls(estabelecimento.Adapt<EstabelecimentoResponse>());
+            return ResolverUrls(estabelecimento.Adapt<EstabelecimentoListarResponse>());
         }
 
         public async Task<ErrorOr<Success>> SubirImagemAsync(
@@ -138,7 +149,7 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             return Result.Success;
         }
 
-        public async Task<ErrorOr<IEnumerable<EstabelecimentoResponse>>> FiltrarAsync(
+        public async Task<ErrorOr<IEnumerable<EstabelecimentoListarResponse>>> FiltrarAsync(
             EstabelecimentoFiltrarRequest request,
             CancellationToken cancellationToken)
         {
@@ -147,9 +158,9 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             var estabelecimentos = await _estabelecimentoRepository.FiltrarAsync(consulta, cancellationToken);
 
             var result = estabelecimentos.Then(list =>
-                list.Adapt<List<EstabelecimentoResponse>>()
+                list.Adapt<List<EstabelecimentoListarResponse>>()
                     .Select(ResolverUrls)
-                    .ToList() as IEnumerable<EstabelecimentoResponse>);
+                    .ToList() as IEnumerable<EstabelecimentoListarResponse>);
 
             return result;
         }
