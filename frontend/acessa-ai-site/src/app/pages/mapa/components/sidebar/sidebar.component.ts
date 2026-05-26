@@ -266,8 +266,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
         : `${distanciaKm.toFixed(1).replace('.', ',')} km`;
     }
 
-    const categoria = 'restaurante';
-
+    const categoria = e.tipo;
+    
     const avaliacoes = e.avaliacaoResponses ?? [];
     const totalAvaliacoes = e.totalAvaliacoes ?? avaliacoes.length;
     const avaliacao = e.mediaEstrelas != null

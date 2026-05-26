@@ -1,6 +1,15 @@
 import { Endereco } from './endereco.model';
 import { RecursoAcessibilidade } from './recurso-acessibilidade.model';
 
+export enum TipoEstabelecimento {
+  Restaurante = 1,
+  Farmacia = 2,
+  Saude = 3,
+  Banco = 4,
+  Shopping = 5,
+  Transporte = 6,
+}
+
 export interface Geocoordenadas {
   latitude: number;
   longitude: number;
@@ -8,7 +17,7 @@ export interface Geocoordenadas {
 
 export interface CriarEstabelecimentoRequest {
   nome: string;
-  tipoEstabelecimento?: string;
+  tipoEstabelecimento?: TipoEstabelecimento;
   geocordenadas: Geocoordenadas;
   endereco: Endereco;
   recursosAcessibilidadeIds?: number[];
@@ -40,7 +49,7 @@ export interface AvaliacaoResponse {
 export interface EstabelecimentoResponse {
   id: number;
   nome: string;
-  tipo?: number;
+  tipo?: TipoEstabelecimento;
   geocordenadas: Geocoordenadas;
   fotos: FotoEstabelecimento[];
   recursosAcessibilidade: RecursoAcessibilidade[];
@@ -52,7 +61,7 @@ export interface EstabelecimentoResponse {
 
 export interface FiltroEstabelecimentoRequest {
   nome?: string;
-  tipo?: number;
+  tipo?: TipoEstabelecimento;
   distanciaMaxima?: number;
   'geocordenadasRequest.latitude'?: number;
   'geocordenadasRequest.longitude'?: number;

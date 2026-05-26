@@ -5,19 +5,20 @@ import { ToastrService } from 'ngx-toastr';
 import { EstabelecimentoService } from '../../../core/services/estabelecimento.service';
 import { RecursoAcessibilidadeService } from '../../../core/services/recurso-acessibilidade.service';
 import { RecursoAcessibilidade } from '../../../core/models/recurso-acessibilidade.model';
+import { TipoEstabelecimento } from '../../../core/models/estabelecimento.model';
 import { CATEGORIAS } from '../../mapa/mapa.models';
 import { environment } from '../../../../environments/environment';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const google: any;
 
-const TIPO_ENUM: Record<string, number> = {
-  restaurante: 1,
-  farmacia:    2,
-  hospital:    3,
-  banco:       4,
-  shopping:    5,
-  transporte:  6,
+const TIPO_ENUM: Record<string, TipoEstabelecimento> = {
+  restaurante: TipoEstabelecimento.Restaurante,
+  farmacia:    TipoEstabelecimento.Farmacia,
+  saude:       TipoEstabelecimento.Saude,
+  banco:       TipoEstabelecimento.Banco,
+  shopping:    TipoEstabelecimento.Shopping,
+  transporte:  TipoEstabelecimento.Transporte,
 };
 
 @Component({
