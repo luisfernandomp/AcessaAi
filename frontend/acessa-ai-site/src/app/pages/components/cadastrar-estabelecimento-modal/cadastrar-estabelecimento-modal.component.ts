@@ -412,7 +412,7 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
       }
       const script = document.createElement('script');
       script.id = 'gmaps-script';
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&language=pt-BR&libraries=places,marker&loading=async`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&language=pt-BR&libraries=places,marker`;
       script.async = true;
       script.defer = true;
       script.onload = () => resolve();
