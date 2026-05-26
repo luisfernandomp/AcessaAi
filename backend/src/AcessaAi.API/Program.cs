@@ -13,6 +13,15 @@ using AcessaAi.Infrastructure.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+if (string.IsNullOrWhiteSpace(urls))
+{
+    urls = builder.Environment.IsDevelopment()
+        ? "http://localhost:5000"
+        : "http://0.0.0.0:5000";
+}
+builder.WebHost.UseUrls(urls);
+
 builder.Services.AddServicesExtensions(builder.Configuration);
 
 builder.Services.AddCors(opt =>
@@ -97,7 +106,10 @@ if (enableSwagger)
 app.UseRouting();
 app.UseCors();
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
