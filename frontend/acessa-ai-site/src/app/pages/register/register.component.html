@@ -17,6 +17,12 @@
         Senha
         <input type="password" formControlName="senha" placeholder="Senha" />
       </label>
+      <ng-container *ngIf="registerForm.get('senha')?.touched">
+        <p class="error" *ngIf="registerForm.get('senha')?.errors?.['required']">Senha é obrigatória.</p>
+        <p class="error" *ngIf="registerForm.get('senha')?.errors?.['minLength']">A senha deve ter pelo menos 6 caracteres.</p>
+        <p class="error" *ngIf="registerForm.get('senha')?.errors?.['requireDigit']">A senha deve conter pelo menos um número.</p>
+        <p class="error" *ngIf="registerForm.get('senha')?.errors?.['requireUppercase']">A senha deve conter pelo menos uma letra maiúscula.</p>
+      </ng-container>
 
       <label>
         Data de nascimento

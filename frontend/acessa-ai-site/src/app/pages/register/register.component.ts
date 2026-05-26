@@ -1,9 +1,18 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UsuarioService } from '../../core/services/usuario.service';
 import { CadastrarUsuarioRequest } from '../../core/models/usuario.model';
+
+function senhaValidator(control: AbstractControl): ValidationErrors | null {
+  const v: string = control.value ?? '';
+  const erros: ValidationErrors = {};
+  if (v.length < 6) erros['minLength'] = true;
+  if (!/[0-9]/.test(v)) erros['requireDigit'] = true;
+  if (!/[A-Z]/.test(v)) erros['requireUppercase'] = true;
+  return Object.keys(erros).length ? erros : null;
+}
 
 @Component({
   selector: 'app-register',
@@ -19,7 +28,7 @@ export class RegisterComponent {
   registerForm = this.fb.group({
     nome: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    senha: ['', Validators.required],
+    senha: ['', [Validators.required, senhaValidator]],
     dataNascimento: ['', Validators.required],
     endereco: this.fb.group({
       logradouro: ['', Validators.required],
