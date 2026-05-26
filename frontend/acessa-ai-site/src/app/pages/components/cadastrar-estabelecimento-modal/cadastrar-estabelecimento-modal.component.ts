@@ -298,9 +298,7 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
     if (!this.buscaInputEl || !this.map || this.autocomplete) return;
     if (typeof google === 'undefined' || !google.maps?.places) return;
 
-    const AutocompleteClass = google.maps.places.PlaceAutocompleteElement ?? google.maps.places.Autocomplete;
-    this.autocomplete = new AutocompleteClass({
-      inputElement: this.buscaInputEl,
+    this.autocomplete = new google.maps.places.Autocomplete(this.buscaInputEl, {
       componentRestrictions: { country: 'BR' },
       fields: ['geometry', 'address_components'],
     });

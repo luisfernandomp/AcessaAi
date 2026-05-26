@@ -406,9 +406,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
     if (!this.mapInputEl || this.autocomplete) return;
 
-    const AutocompleteClass = google.maps.places.PlaceAutocompleteElement ?? google.maps.places.Autocomplete;
-    this.autocomplete = new AutocompleteClass({
-      inputElement: this.mapInputEl,
+    this.autocomplete = new google.maps.places.Autocomplete(this.mapInputEl, {
       componentRestrictions: { country: 'BR' },
       fields: ['geometry', 'name'],
     });
