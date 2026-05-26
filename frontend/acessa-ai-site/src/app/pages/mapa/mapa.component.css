@@ -1,5 +1,8 @@
 /* ===== Tokens (herdados pelos componentes filhos via cascade) ===== */
 :host {
+  display: block;
+  height: 100%;
+  overflow: hidden;
   --primary: #0889A6;
   --primary-light: #e0f4f7;
   --primary-border: #a8dde6;
