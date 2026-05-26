@@ -108,6 +108,7 @@ if (enableSwagger)
     app.MapOpenApi();
     app.UseSwaggerUI(options =>
     {
+        options.RoutePrefix = "api/swagger";
         options.SwaggerEndpoint("/openapi/v1.json", "v1");
     });
 }
