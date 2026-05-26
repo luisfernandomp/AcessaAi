@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://98.85.166.70/api',
+  apiUrl: 'https://acessaai2002.duckdns.org/api',
   googleMapsApiKey: '',
   googleMapsMapId: 'DEMO_MAP_ID',
 };

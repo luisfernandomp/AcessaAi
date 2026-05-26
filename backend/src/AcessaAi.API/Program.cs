@@ -4,6 +4,7 @@ using AcessaAi.Domain.Usuarios.Entities;
 using AcessaAi.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Options;
@@ -102,6 +103,11 @@ if (enableSwagger)
         options.SwaggerEndpoint("/openapi/v1.json", "v1");
     });
 }
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.UseRouting();
 app.UseCors();
