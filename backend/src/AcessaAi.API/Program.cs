@@ -18,15 +18,18 @@ var urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
 if (string.IsNullOrWhiteSpace(urls))
 {
     urls = builder.Environment.IsDevelopment()
-        ? "http://localhost:5000;https://localhost:5001"
-        : "http://0.0.0.0:5000;https://0.0.0.0:5001";
+        ? "http://localhost:5000"
+        : "http://0.0.0.0:5000";
 }
 builder.WebHost.UseUrls(urls);
 
-builder.Services.AddHttpsRedirection(options =>
+if (builder.Environment.IsDevelopment())
 {
-    options.HttpsPort = 5001;
-});
+    builder.Services.AddHttpsRedirection(options =>
+    {
+        options.HttpsPort = 5001;
+    });
+}
 
 builder.Services.AddServicesExtensions(builder.Configuration);
 
@@ -117,7 +120,12 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 app.UseRouting();
 app.UseCors();
 
-app.UseHttpsRedirection();
+app.UseForwardedHeaders();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
