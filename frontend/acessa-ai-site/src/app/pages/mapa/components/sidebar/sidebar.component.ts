@@ -160,6 +160,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
     );
   }
 
+  setUserLocation(coords: { lat: number; lng: number }): void {
+    this.userLat = coords.lat;
+    this.userLng = coords.lng;
+    this.localizacaoObtida.emit(coords);
+    this.executarBusca();
+  }
+
   private executarBusca(): void {
     this.listaSubscription?.unsubscribe();
     this.carregandoLista = true;

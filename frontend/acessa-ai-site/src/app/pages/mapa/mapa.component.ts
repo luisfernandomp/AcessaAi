@@ -29,6 +29,7 @@ declare const google: any;
 })
 export class MapaComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mapaContainer') mapaContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild(SidebarComponent) private sidebar?: SidebarComponent;
 
   lugarSelecionado: Lugar | null = null;
   mapCarregando = true;
@@ -113,8 +114,11 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
       (pos) => {
         this.ngZone.run(() => {
           const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          this.userLat = coords.lat;
+          this.userLng = coords.lng;
           this.map.panTo(coords);
           this.map.setZoom(MAP_ZOOM_SELECIONADO);
+          this.sidebar?.setUserLocation(coords);
         });
       },
       () => {},
