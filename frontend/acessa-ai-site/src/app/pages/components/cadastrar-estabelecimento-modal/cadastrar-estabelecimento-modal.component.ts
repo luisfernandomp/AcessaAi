@@ -298,7 +298,9 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
     if (!this.buscaInputEl || !this.map || this.autocomplete) return;
     if (typeof google === 'undefined' || !google.maps?.places) return;
 
-    this.autocomplete = new google.maps.places.Autocomplete(this.buscaInputEl, {
+    const AutocompleteClass = google.maps.places.PlaceAutocompleteElement ?? google.maps.places.Autocomplete;
+    this.autocomplete = new AutocompleteClass({
+      inputElement: this.buscaInputEl,
       componentRestrictions: { country: 'BR' },
       fields: ['geometry', 'address_components'],
     });
@@ -412,7 +414,7 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
       }
       const script = document.createElement('script');
       script.id = 'gmaps-script';
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&language=pt-BR&libraries=places,marker`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}&language=pt-BR&libraries=places,marker&loading=async`;
       script.async = true;
       script.defer = true;
       script.onload = () => resolve();

@@ -49,9 +49,9 @@ builder.Services.AddS3(builder.Configuration);
 builder.Services
     .AddIdentity<Usuario, IdentityRole<int>>(opt =>
     {
-        opt.Password.RequireDigit = true;
-        opt.Password.RequiredLength = 6;
-        opt.Password.RequireUppercase = true;
+        opt.Password.RequireDigit = false;
+        opt.Password.RequiredLength = 1;
+        opt.Password.RequireUppercase = false;
         opt.User.RequireUniqueEmail = true;
         opt.SignIn.RequireConfirmedEmail = false;
     })
