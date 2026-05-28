@@ -19,6 +19,8 @@ const TIPO_ENUM: Record<string, TipoEstabelecimento> = {
   banco:       TipoEstabelecimento.Banco,
   shopping:    TipoEstabelecimento.Shopping,
   transporte:  TipoEstabelecimento.Transporte,
+  educacao:    TipoEstabelecimento.Educacao,
+  outros:      TipoEstabelecimento.Outros,
 };
 
 @Component({

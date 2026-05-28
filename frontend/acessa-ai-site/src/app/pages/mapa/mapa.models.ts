@@ -8,6 +8,8 @@ export const TIPO_MAP: Record<string, TipoEstabelecimento> = {
   banco: TipoEstabelecimento.Banco,
   shopping: TipoEstabelecimento.Shopping,
   transporte: TipoEstabelecimento.Transporte,
+  educacao: TipoEstabelecimento.Educacao,
+  outros: TipoEstabelecimento.Outros,
 };
 
 export const TIPO_REVERSE_MAP: Record<TipoEstabelecimento, string> = Object.fromEntries(
@@ -43,4 +45,6 @@ export const CATEGORIAS = [
   { id: 'banco',       label: 'Bancos',       icone: 'fa-solid fa-building-columns', emoji: '🏦', cor: '#f59e0b' },
   { id: 'shopping',    label: 'Shopping',     icone: 'fa-solid fa-bag-shopping',     emoji: '🛍️', cor: '#8b5cf6' },
   { id: 'transporte',  label: 'Transporte',   icone: 'fa-solid fa-bus',              emoji: '🚌', cor: '#06b6d4' },
+  { id: 'educacao',   label: 'Educação',     icone: 'fa-solid fa-graduation-cap',   emoji: '🎓', cor: '#f97316' },
+  { id: 'outros',     label: 'Outros',       icone: 'fa-solid fa-ellipsis',         emoji: '📌', cor: '#64748b' },
 ];

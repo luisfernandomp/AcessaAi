@@ -77,6 +77,7 @@ wwwroot/dist/
 
 ## Local settings
 appsettings.Development.json
+appsettings.Production.json
 appsettings.Local.json
 secrets.json
 
@@ -107,8 +108,10 @@ bazel-out/
 ## Angular cache
 .angular/
 
-## Environment files
+## Environment files — só o example é rastreado; os demais ficam locais
 src/environments/environment.local.ts
+src/environments/environment.ts
+src/environments/environment.prod.ts
 
 ## IDEs
 .project

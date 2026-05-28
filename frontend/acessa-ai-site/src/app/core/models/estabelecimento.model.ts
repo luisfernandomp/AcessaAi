@@ -8,6 +8,8 @@ export enum TipoEstabelecimento {
   Banco = 4,
   Shopping = 5,
   Transporte = 6,
+  Educacao = 7,
+  Outros = 8,
 }
 
 export interface Geocoordenadas {

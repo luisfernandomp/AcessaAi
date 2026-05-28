@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   AtualizarEstabelecimentoRequest,
@@ -12,6 +12,8 @@ import {
 export class EstabelecimentoService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/estabelecimento`;
+
+  readonly cadastroRealizado$ = new Subject<void>();
 
   criar(formData: FormData): Observable<EstabelecimentoResponse> {
     return this.http.post<EstabelecimentoResponse>(this.baseUrl, formData);

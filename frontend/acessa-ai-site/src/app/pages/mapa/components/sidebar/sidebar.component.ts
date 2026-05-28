@@ -84,6 +84,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$),
     ).subscribe(() => this.executarBusca());
 
+    this.estabelecimentoService.cadastroRealizado$.pipe(
+      takeUntil(this.destroy$),
+    ).subscribe(() => this.executarBusca());
+
     this.obterLocalizacao();
   }
 

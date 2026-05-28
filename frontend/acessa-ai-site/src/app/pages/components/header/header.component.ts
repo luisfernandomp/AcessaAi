@@ -116,6 +116,7 @@ export class HeaderComponent implements OnInit {
 
   onEstabelecimentoCadastrado(): void {
     this.showEstabelecimentoModal = false;
+    this.estabelecimentoService.cadastroRealizado$.next();
   }
 
   editEstabelecimentos(): void {
