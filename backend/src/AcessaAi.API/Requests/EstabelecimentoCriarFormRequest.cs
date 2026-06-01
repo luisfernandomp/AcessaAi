@@ -18,7 +18,7 @@ public class EstabelecimentoCriarFormRequest
     public string Bairro { get; set; } = null!;
     public string? Complemento { get; set; }
 
-    public IFormFile? Capa { get; set; }
-    public IFormFileCollection? Fotos { get; set; }
-    public int[] RecursosAcessibilidadesIds {get;set;}
+    public string? CapaChave { get; set; }
+    public string[]? FotosChaves { get; set; }
+    public int[] RecursosAcessibilidadesIds { get; set; }
 }

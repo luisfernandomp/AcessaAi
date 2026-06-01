@@ -25,6 +25,23 @@ export interface CriarEstabelecimentoRequest {
   recursosAcessibilidadeIds?: number[];
 }
 
+export interface CriarEstabelecimentoJsonRequest {
+  nome: string;
+  tipo: TipoEstabelecimento;
+  latitude: string;
+  longitude: string;
+  logradouro: string;
+  uf: string;
+  cidade: string;
+  numero: string;
+  cep: string;
+  bairro: string;
+  complemento?: string;
+  recursosAcessibilidadesIds: number[];
+  capaChave?: string;
+  fotosChaves: string[];
+}
+
 export interface AtualizarEstabelecimentoRequest {
   nome: string;
   geocordenadas: Geocoordenadas;

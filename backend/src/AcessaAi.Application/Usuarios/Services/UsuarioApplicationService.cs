@@ -63,6 +63,32 @@ namespace AcessaAi.Application.Usuarios.Services
             return response;
         }
 
+        public async Task<ErrorOr<UsuarioResponse>> AtualizarAsync(int id, UsuariosAtualizarRequest request, CancellationToken cancellationToken)
+        {
+            var usuario = await _usuarioRepository.ObterPorIdAsync(id, cancellationToken);
+
+            if (usuario is null)
+                return Error.NotFound("Usuario.NaoEncontrado", "Usuário não encontrado.");
+
+            usuario.Atualizar(
+                request.Nome,
+                new DateTimeOffset(request.DataNascimento, TimeSpan.Zero),
+                request.Endereco.Logradouro,
+                request.Endereco.UF,
+                request.Endereco.Cidade,
+                request.Endereco.Numero,
+                request.Endereco.CEP,
+                request.Endereco.Bairro,
+                request.Endereco.Complemento);
+
+            var result = await _usuarioRepository.AtualizarAsync(usuario, cancellationToken);
+
+            if (result.IsError)
+                return result.Errors;
+
+            return result.Value.Adapt<UsuarioResponse>();
+        }
+
         public async Task<ErrorOr<string>> UploadFotoPerfilAsync(int id, Stream conteudo, string nomeArquivo, string contentType, CancellationToken cancellationToken)
         {
             var usuario = await _usuarioRepository.ObterPorIdAsync(id, cancellationToken);

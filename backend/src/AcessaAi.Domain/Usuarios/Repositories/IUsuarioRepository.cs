@@ -11,5 +11,6 @@ namespace AcessaAi.Domain.GestaoUsuarios.Repositories
         Task<bool> ValidarSenhaAsync(Usuario usuario, string senha, CancellationToken cancellationToken);
         Task<IList<string>> ObterRolesAsync(Usuario usuario, CancellationToken cancellationToken);
         Task<ErrorOr<Updated>> AtualizarFotoPerfilAsync(int id, string key, CancellationToken cancellationToken);
+        Task<ErrorOr<Usuario>> AtualizarAsync(Usuario usuario, CancellationToken cancellationToken);
     }
 }

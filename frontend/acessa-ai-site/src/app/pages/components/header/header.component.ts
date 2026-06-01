@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
+import { UsuarioService } from '../../../core/services/usuario.service';
 import { EstabelecimentoService } from '../../../core/services/estabelecimento.service';
 import { EstabelecimentoResponse } from '../../../core/models/estabelecimento.model';
+import { UsuarioResponse } from '../../../core/models/usuario.model';
 import { RegisterModalComponent } from '../register-modal/register-modal.component';
 import { LoginModalComponent } from '../login-modal/login-modal.component';
 import { CadastrarEstabelecimentoModalComponent } from '../cadastrar-estabelecimento-modal/cadastrar-estabelecimento-modal.component';
@@ -34,13 +36,16 @@ export class HeaderComponent implements OnInit {
   showEstabelecimentoModal = false;
   showEditarEstabelecimentosModal = false;
   showEditarEstabelecimentoModal = false;
+  showPerfilModal = false;
   estabelecimentoSelecionado: EstabelecimentoResponse | null = null;
+  dadosPerfil: UsuarioResponse | null = null;
   scrolled = false;
 
   constructor(
     public authService: AuthService,
     private router: Router,
     private estabelecimentoService: EstabelecimentoService,
+    private usuarioService: UsuarioService,
   ) {}
 
   ngOnInit(): void {}
@@ -178,5 +183,24 @@ export class HeaderComponent implements OnInit {
 
   onDeletarEstabelecimento(id: number): void {
     console.log('Deletar estabelecimento:', id);
+  }
+
+  openPerfilModal(): void {
+    const usuario = this.authService.getUsuarioLogado();
+    if (!usuario) return;
+    this.usuarioService.getById(usuario.id).subscribe({
+      next: (dados) => {
+        this.dadosPerfil = dados;
+        this.showPerfilModal = true;
+      },
+      error: () => {
+        this.showPerfilModal = true;
+      },
+    });
+  }
+
+  closePerfilModal(): void {
+    this.showPerfilModal = false;
+    this.dadosPerfil = null;
   }
 }

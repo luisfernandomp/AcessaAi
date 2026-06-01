@@ -18,3 +18,7 @@ body {
   flex-direction: column;
   flex: 1;
 }
+
+body.galeria-aberta app-header {
+  display: none;
+}

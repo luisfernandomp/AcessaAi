@@ -7,6 +7,8 @@ using AcessaAi.Application.RecursosAcessibilidades.Interfaces;
 using AcessaAi.Application.RecursosAcessibilidades.Services;
 using AcessaAi.Application.Estabelecimentos.Interfaces;
 using AcessaAi.Application.Estabelecimentos.Services;
+using AcessaAi.Application.Imagens.Interfaces;
+using AcessaAi.Application.Imagens.Services;
 using AcessaAi.Application.Mappings;
 using AcessaAi.Application.Usuarios.Interfaces;
 using AcessaAi.Application.Usuarios.Services;
@@ -42,6 +44,7 @@ namespace AcessaAi.API.Extensions
             services.AddScoped<IAutenticacaoApplicationService, AutenticacaoApplicationService>();
             services.AddScoped<IUsuarioApplicationService, UsuarioApplicationService>();
             services.AddScoped<IEstabelecimentoApplicationService, EstabelecimentoApplicationService>();
+            services.AddScoped<IImagemApplicationService, ImagemApplicationService>();
             services.AddScoped<IAvaliacaoApplicationService, AvaliacaoApplicationService>();
             services.AddScoped<IRecursoAcessibilidadeApplicationService, RecursoAcessibilidadeApplicationService>();
 

@@ -3,10 +3,10 @@
 
     <div class="modal-header">
       <div class="modal-titulo-grupo">
-        <div class="modal-icon-badge">♿</div>
+        <div class="modal-icon-badge">{{ modoEdicao ? '👤' : '♿' }}</div>
         <div>
-          <h2 class="modal-titulo">Criar conta</h2>
-          <p class="modal-sub">Junte-se à comunidade AcessaAí</p>
+          <h2 class="modal-titulo">{{ modoEdicao ? 'Meu perfil' : 'Criar conta' }}</h2>
+          <p class="modal-sub">{{ modoEdicao ? 'Atualize suas informações' : 'Junte-se à comunidade AcessaAí' }}</p>
         </div>
       </div>
       <button class="btn-close-modal" (click)="fecharModal()">
@@ -36,53 +36,62 @@
             <input class="input-field" formControlName="nome" type="text" placeholder="Seu nome completo" autocomplete="name" />
           </div>
 
-          <div class="input-group">
-            <label class="input-label">E-mail <span class="obrig">*</span></label>
-            <input class="input-field" formControlName="email" type="email" placeholder="seu@email.com" autocomplete="email" />
-          </div>
-
-          <div class="form-row">
-            <div class="input-group flex1">
-              <label class="input-label">Senha <span class="obrig">*</span></label>
-              <div class="senha-wrapper">
-                <input
-                  class="input-field"
-                  formControlName="senha"
-                  [type]="mostrarSenha ? 'text' : 'password'"
-                  placeholder="Mínimo 6 caracteres"
-                  autocomplete="new-password" />
-                <button
-                  type="button"
-                  class="btn-toggle-senha"
-                  (click)="mostrarSenha = !mostrarSenha"
-                  [title]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'">
-                  @if (mostrarSenha) {
-                    <i class="fa-solid fa-eye-slash"></i>
-                  } @else {
-                    <i class="fa-solid fa-eye"></i>
-                  }
-                </button>
-              </div>
-              @if (form.get('senha')?.touched) {
-                @if (form.get('senha')?.errors?.['required']) {
-                  <span class="field-error">Senha é obrigatória.</span>
-                }
-                @if (form.get('senha')?.errors?.['minLength']) {
-                  <span class="field-error">A senha deve ter pelo menos 6 caracteres.</span>
-                }
-                @if (form.get('senha')?.errors?.['requireDigit']) {
-                  <span class="field-error">A senha deve conter pelo menos um número.</span>
-                }
-                @if (form.get('senha')?.errors?.['requireUppercase']) {
-                  <span class="field-error">A senha deve conter pelo menos uma letra maiúscula.</span>
-                }
-              }
+          @if (!modoEdicao) {
+            <div class="input-group">
+              <label class="input-label">E-mail <span class="obrig">*</span></label>
+              <input class="input-field" formControlName="email" type="email" placeholder="seu@email.com" autocomplete="email" />
             </div>
-            <div class="input-group flex1">
+
+            <div class="form-row">
+              <div class="input-group flex1">
+                <label class="input-label">Senha <span class="obrig">*</span></label>
+                <div class="senha-wrapper">
+                  <input
+                    class="input-field"
+                    formControlName="senha"
+                    [type]="mostrarSenha ? 'text' : 'password'"
+                    placeholder="Mínimo 6 caracteres"
+                    autocomplete="new-password" />
+                  <button
+                    type="button"
+                    class="btn-toggle-senha"
+                    (click)="mostrarSenha = !mostrarSenha"
+                    [title]="mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'">
+                    @if (mostrarSenha) {
+                      <i class="fa-solid fa-eye-slash"></i>
+                    } @else {
+                      <i class="fa-solid fa-eye"></i>
+                    }
+                  </button>
+                </div>
+                @if (form.get('senha')?.touched) {
+                  @if (form.get('senha')?.errors?.['required']) {
+                    <span class="field-error">Senha é obrigatória.</span>
+                  }
+                  @if (form.get('senha')?.errors?.['minLength']) {
+                    <span class="field-error">A senha deve ter pelo menos 6 caracteres.</span>
+                  }
+                  @if (form.get('senha')?.errors?.['requireDigit']) {
+                    <span class="field-error">A senha deve conter pelo menos um número.</span>
+                  }
+                  @if (form.get('senha')?.errors?.['requireUppercase']) {
+                    <span class="field-error">A senha deve conter pelo menos uma letra maiúscula.</span>
+                  }
+                }
+              </div>
+              <div class="input-group flex1">
+                <label class="input-label">Data de nascimento <span class="obrig">*</span></label>
+                <input class="input-field" type="date" formControlName="dataNascimento" />
+              </div>
+            </div>
+          }
+
+          @if (modoEdicao) {
+            <div class="input-group">
               <label class="input-label">Data de nascimento <span class="obrig">*</span></label>
               <input class="input-field" type="date" formControlName="dataNascimento" />
             </div>
-          </div>
+          }
 
           <div class="modal-acoes">
             <button class="btn-acao secundario" type="button" (click)="fecharModal()">Cancelar</button>
@@ -134,7 +143,11 @@
           <div class="modal-acoes">
             <button class="btn-acao secundario" type="button" (click)="voltarEtapa()">← Voltar</button>
             <button class="btn-acao primario" type="submit" [disabled]="carregando">
-              @if (carregando) { Criando conta... } @else { Criar conta }
+              @if (carregando) {
+                {{ modoEdicao ? 'Salvando...' : 'Criando conta...' }}
+              } @else {
+                {{ modoEdicao ? 'Salvar alterações' : 'Criar conta' }}
+              }
             </button>
           </div>
         </div>
@@ -142,10 +155,12 @@
 
     </form>
 
-    <p class="link-footer">
-      Já tem conta?
-      <button type="button" class="btn-link" (click)="irParaLogin.emit()">Faça login</button>
-    </p>
+    @if (!modoEdicao) {
+      <p class="link-footer">
+        Já tem conta?
+        <button type="button" class="btn-link" (click)="irParaLogin.emit()">Faça login</button>
+      </p>
+    }
 
   </div>
 </div>

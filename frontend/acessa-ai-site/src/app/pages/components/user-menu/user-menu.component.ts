@@ -17,6 +17,7 @@ export class UserMenuComponent {
 
   @Output() openEstabelecimentoModal = new EventEmitter<void>();
   @Output() editEstabelecimentos = new EventEmitter<void>();
+  @Output() openPerfil = new EventEmitter<void>();
   @Output() logout = new EventEmitter<void>();
 
   showDropdown = false;
@@ -46,6 +47,11 @@ export class UserMenuComponent {
 
   onEditEstabelecimentos(): void {
     this.editEstabelecimentos.emit();
+    this.closeDropdown();
+  }
+
+  onOpenPerfil(): void {
+    this.openPerfil.emit();
     this.closeDropdown();
   }
 

@@ -21,14 +21,21 @@ import {
 } from '../../../../core/models/estabelecimento.model';
 import { Lugar, CATEGORIAS, Ordenacao, TIPO_MAP, TIPO_REVERSE_MAP } from '../../mapa.models';
 import { ListaEstabelecimentosComponent } from '../lista-estabelecimentos/lista-estabelecimentos.component';
+import { EstabelecimentoFiltrarSidebarComponent } from '../estabelecimento-filtrar-sidebar/estabelecimento-filtrar-sidebar.component';
+import { EstabelecimentoSidebarComponent } from '../estabelecimento-sidebar/estabelecimento-sidebar.component';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const google: any;
 
+export enum Tabs {
+  ListagemEstabelecimento,
+  DetalhesEstabelecimento
+}
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, FormsModule, TuiSegmented, ListaEstabelecimentosComponent],
+  imports: [CommonModule, FormsModule, TuiSegmented, ListaEstabelecimentosComponent, EstabelecimentoFiltrarSidebarComponent, EstabelecimentoSidebarComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css',
   host: {
@@ -57,6 +64,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
   }
 
+  tabsType = Tabs;
   categorias = CATEGORIAS;
   categoriaSelecionada = 'todos';
   busca = '';
@@ -70,6 +78,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ordenacao: Ordenacao = 'distancia';
   carregandoLista = true;
   lugaresFiltrados: Lugar[] = [];
+  
+  tabSelecionada = Tabs.ListagemEstabelecimento;
 
   private todosLugares: Lugar[] = [];
   private userLat?: number;
@@ -396,7 +406,18 @@ export class SidebarComponent implements OnInit, OnDestroy {
   // ─── Utilitários de template ─────────────────────────────────────────────
 
   selecionarLugar(lugar: Lugar): void {
+    this.lugarSelecionado = lugar;
+    this.tabSelecionada = Tabs.DetalhesEstabelecimento;
     this.lugarClick.emit(lugar);
+  }
+
+  fecharBottomSheet(): void {
+    this.tabSelecionada = Tabs.ListagemEstabelecimento;
+  }
+
+  abrirDetalhes(lugar: Lugar): void {
+    this.lugarSelecionado = lugar;
+    this.tabSelecionada = Tabs.DetalhesEstabelecimento;
   }
 
   // ─── Google Maps Places Autocomplete ────────────────────────────────────

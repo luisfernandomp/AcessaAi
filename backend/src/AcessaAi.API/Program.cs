@@ -12,6 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using AcessaAi.Infrastructure.Configurations;
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 var urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
@@ -23,7 +25,7 @@ if (string.IsNullOrWhiteSpace(urls))
 }
 builder.WebHost.UseUrls(urls);
 
-if (builder.Environment.IsDevelopment())
+if (!builder.Environment.IsDevelopment())
 {
     builder.Services.AddHttpsRedirection(options =>
     {

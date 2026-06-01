@@ -38,6 +38,13 @@ namespace AcessaAi.Domain.Usuarios.Entities
             Endereco = new Endereco(logradouro, uf, cidade, numero, cep, bairro, complemento);
         }
 
+        public void Atualizar(string nomeCompleto, DateTimeOffset dataNascimento, string logradouro, string uf, string cidade, string numero, string cep, string bairro, string? complemento)
+        {
+            NomeCompleto = nomeCompleto;
+            DataNascimento = dataNascimento;
+            Endereco = new Endereco(logradouro, uf, cidade, numero, cep, bairro, complemento ?? string.Empty);
+        }
+
         public void AtualizarFotoPerfil(string key)
         {
             UrlFotoPerfil = key;

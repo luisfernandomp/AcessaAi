@@ -4,6 +4,7 @@ import { Observable, Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   AtualizarEstabelecimentoRequest,
+  CriarEstabelecimentoJsonRequest,
   EstabelecimentoResponse,
   FiltroEstabelecimentoRequest,
 } from '../models/estabelecimento.model';
@@ -12,11 +13,24 @@ import {
 export class EstabelecimentoService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/estabelecimento`;
+ 
 
   readonly cadastroRealizado$ = new Subject<void>();
 
-  criar(formData: FormData): Observable<EstabelecimentoResponse> {
-    return this.http.post<EstabelecimentoResponse>(this.baseUrl, formData);
+  constructor() {
+     console.log(`${environment.apiUrl}/estabelecimento`
+      
+     )
+  }
+
+  criar(request: CriarEstabelecimentoJsonRequest): Observable<EstabelecimentoResponse> {
+    return this.http.post<EstabelecimentoResponse>(this.baseUrl, request);
+  }
+
+  uploadImagemParaStorage(file: File): Observable<{ chave: string }> {
+    const fd = new FormData();
+    fd.append('imagem', file, file.name);
+    return this.http.post<{ chave: string }>(`${environment.apiUrl}/imagem`, fd);
   }
 
   filtrar(filtro: FiltroEstabelecimentoRequest = {}): Observable<EstabelecimentoResponse[]> {

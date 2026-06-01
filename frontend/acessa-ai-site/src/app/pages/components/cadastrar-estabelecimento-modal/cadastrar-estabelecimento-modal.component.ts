@@ -1,6 +1,8 @@
 import { Component, ElementRef, EventEmitter, NgZone, OnInit, Output, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { forkJoin, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { EstabelecimentoService } from '../../../core/services/estabelecimento.service';
 import { RecursoAcessibilidadeService } from '../../../core/services/recurso-acessibilidade.service';
@@ -237,28 +239,35 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
     const v = this.form.value;
     const end = v.endereco!;
 
-    const formData = new FormData();
-    formData.append('Nome',       v.nome!);
-    formData.append('Tipo',       String(TIPO_ENUM[v.tipoEstabelecimento!] ?? 1));
-    formData.append('Latitude',   this.localizacaoSelecionada.lat.toFixed(7));
-    formData.append('Longitude',  this.localizacaoSelecionada.lng.toFixed(7));
-    formData.append('Logradouro', end.logradouro ?? '');
-    formData.append('UF',         end.uf ?? '');
-    formData.append('Cidade',     end.cidade ?? '');
-    formData.append('Numero',     end.numero ?? '');
-    formData.append('CEP',        end.cep ?? '');
-    formData.append('Bairro',     end.bairro ?? '');
-    formData.append('Complemento',end.complemento ?? '');
+    const capaUpload$ = this.imagemCapa
+      ? this.estabelecimentoService.uploadImagemParaStorage(this.imagemCapa)
+      : of(null);
 
-    (v.recursosIds ?? [])
-      .forEach((id) => formData.append('RecursosAcessibilidadesIds', String(id)));
+    const fotosUpload$ = this.imagensCarrossel.length
+      ? forkJoin(this.imagensCarrossel.map((f) => this.estabelecimentoService.uploadImagemParaStorage(f)))
+      : of([] as { chave: string }[]);
 
-    if (this.imagemCapa) {
-      formData.append('Capa', this.imagemCapa, this.imagemCapa.name);
-    }
-    this.imagensCarrossel.forEach((f) => formData.append('Fotos', f, f.name));
-
-    this.estabelecimentoService.criar(formData).subscribe({
+    forkJoin([capaUpload$, fotosUpload$]).pipe(
+      switchMap(([capaRes, fotosRes]) => {
+        const request = {
+          nome:       v.nome!,
+          tipo:       TIPO_ENUM[v.tipoEstabelecimento!] ?? TipoEstabelecimento.Outros,
+          latitude:   this.localizacaoSelecionada!.lat.toFixed(7),
+          longitude:  this.localizacaoSelecionada!.lng.toFixed(7),
+          logradouro: end.logradouro ?? '',
+          uf:         end.uf ?? '',
+          cidade:     end.cidade ?? '',
+          numero:     end.numero ?? '',
+          cep:        end.cep ?? '',
+          bairro:     end.bairro ?? '',
+          complemento: end.complemento ?? '',
+          recursosAcessibilidadesIds: (v.recursosIds ?? []) as number[],
+          capaChave:  capaRes?.chave,
+          fotosChaves: (fotosRes as { chave: string }[]).map((r) => r.chave),
+        };
+        return this.estabelecimentoService.criar(request);
+      })
+    ).subscribe({
       next: () => {
         this.carregando = false;
         this.toastr.success('Estabelecimento cadastrado com sucesso!');

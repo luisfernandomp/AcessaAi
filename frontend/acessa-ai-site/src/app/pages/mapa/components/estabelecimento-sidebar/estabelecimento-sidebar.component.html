@@ -1,0 +1,227 @@
+@if (mostrarLoginModal) {
+  <app-login-modal
+    (fechar)="mostrarLoginModal = false"
+  />
+}
+
+@if (lugar) {
+
+  @if (mostrarGaleria && lugar.fotos && lugar.fotos.length > 0) {
+    <div class="galeria-overlay" (click)="fecharGaleria()">
+      <button class="galeria-fechar" (click)="fecharGaleria()" title="Fechar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="galeria-modal" (click)="$event.stopPropagation()">
+        <div class="galeria-contador">{{ fotoGaleria + 1 }} / {{ lugar.fotos.length }}</div>
+        <img class="galeria-img" [src]="lugar.fotos[fotoGaleria].url" [alt]="lugar.nome" />
+        @if (lugar.fotos.length > 1) {
+          <button class="galeria-nav galeria-prev" type="button" (click)="prevGaleria()">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <button class="galeria-nav galeria-next" type="button" (click)="nextGaleria()">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+          <div class="galeria-dots">
+            @for (f of lugar.fotos; track $index) {
+              <span class="galeria-dot" [class.ativo]="$index === fotoGaleria"
+                    (click)="fotoGaleria = $index"></span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="sheet" [class.expandido]="expandido">
+
+    <!-- Scrollable body: hero + card -->
+    <div class="sheet-body">
+
+      <!-- ── Hero ── -->
+      <div class="hero">
+
+        @if (lugar.fotos && lugar.fotos.length > 0) {
+          <div class="hero-carousel">
+            <img class="hero-img" [src]="lugar.fotos[fotoAtual].url" [alt]="lugar.nome" />
+
+            @if (lugar.fotos.length > 1) {
+              <button class="nav-btn nav-prev" type="button" (click)="prevFoto()">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <button class="nav-btn nav-next" type="button" (click)="nextFoto()">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+              <div class="hero-dots">
+                @for (f of lugar.fotos; track $index) {
+                  <span class="dot" [class.ativo]="$index === fotoAtual"></span>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="hero-placeholder">
+            <i class="fa-solid fa-image"></i>
+          </div>
+        }
+
+        <!-- Gradient overlay -->
+        <div class="hero-gradient"></div>
+
+        <!-- Title + rating overlaid on image -->
+        <div class="hero-content">
+          <h2 class="hero-nome">{{ lugar.nome }}</h2>
+          <div class="hero-sub">
+            @if (avaliacoes.length > 0) {
+              <span class="hero-rating">
+                <i class="fa-solid fa-star"></i>
+                {{ mediaEstrelas | number:'1.1-1' }}
+                <span class="hero-rating-count">({{ avaliacoes.length }})</span>
+              </span>
+              <span class="hero-sep">·</span>
+            }
+            <span class="hero-loc">
+              <i class="fa-solid fa-location-dot"></i>
+              {{ lugar.endereco }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Back -->
+        <button class="btn-voltar" (click)="onFechar()" title="Voltar">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+
+      </div>
+      <!-- /hero -->
+
+      <!-- ── Content card ── -->
+      <div class="card">
+
+        <!-- Quick actions -->
+        <div class="acoes">
+          <button class="acao" title="Compartilhar" (click)="onCompartilhar()">
+            <div class="acao-icon"><i class="fa-solid fa-share-nodes"></i></div>
+            <span>Compartilhar</span>
+          </button>
+          <button class="acao" title="Fotos" (click)="onGaleria()"
+                  [disabled]="!lugar.fotos || lugar.fotos.length === 0">
+            <div class="acao-icon"><i class="fa-solid fa-camera"></i></div>
+            <span>Fotos</span>
+          </button>
+        </div>
+
+        <!-- Rating block -->
+        <div class="rating-block">
+          @if (avaliacoes.length > 0) {
+            <div class="rating-summary">
+              <span class="rating-number">{{ mediaEstrelas | number:'1.1-1' }}</span>
+              <div class="rating-right">
+                <div class="stars-row">
+                  @for (e of estrelasParciais(mediaEstrelas); track $index) {
+                    @if (e.tipo === 'cheia') {
+                      <i class="fa-solid fa-star star"></i>
+                    } @else if (e.tipo === 'meia') {
+                      <i class="fa-solid fa-star-half-stroke star"></i>
+                    } @else {
+                      <i class="fa-regular fa-star star empty"></i>
+                    }
+                  }
+                </div>
+                <span class="rating-count">{{ avaliacoes.length }} avaliações</span>
+              </div>
+            </div>
+
+            <div class="dist-bars">
+              @for (nota of [5, 4, 3, 2, 1]; track nota) {
+                <div class="dist-row">
+                  <span class="dist-label">{{ nota }}</span>
+                  <i class="fa-solid fa-star dist-star"></i>
+                  <div class="dist-bar">
+                    <div class="dist-fill" [style.width.%]="getBarraPercentual(nota)"></div>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="no-rating">
+              <i class="fa-regular fa-star no-rating-icon"></i>
+              <span class="no-rating-title">Sem avaliações ainda</span>
+              <span class="no-rating-sub">Seja o primeiro a avaliar este local!</span>
+            </div>
+          }
+        </div>
+
+        <!-- CTA / Inline rating form -->
+        @if (!mostrarFormAvaliar) {
+          <button class="btn-avaliar" (click)="onAvaliar()">
+            <i class="fa-solid fa-star"></i>
+            Avaliar estabelecimento
+          </button>
+        } @else {
+          <div class="avaliacao-inline">
+            <p class="avaliacao-inline-titulo">Compartilhe sua experiência</p>
+            <div class="estrelas-inline">
+              @for (n of [1,2,3,4,5]; track n) {
+                <button
+                  class="estrela-btn"
+                  type="button"
+                  (mouseenter)="estrelaHover = n"
+                  (mouseleave)="estrelaHover = 0"
+                  (click)="estrelaSelecionada = n"
+                >
+                  <i [class]="n <= estrelaAtiva ? 'fa-solid fa-star estrela-ativa' : 'fa-regular fa-star estrela-vazia'"></i>
+                </button>
+              }
+            </div>
+            @if (estrelaAtiva > 0) {
+              <span class="estrela-label">{{ labelsEstrela[estrelaAtiva] }}</span>
+            }
+            <textarea
+              class="comentario-inline"
+              [(ngModel)]="comentario"
+              placeholder="Comentário opcional..."
+              rows="3"
+              maxlength="500"
+            ></textarea>
+            <div class="avaliacao-acoes">
+              <button class="btn-cancelar" type="button" (click)="onCancelarAvaliacao()">Cancelar</button>
+              <button class="btn-confirmar" type="button" (click)="onConfirmarAvaliacao()" [disabled]="carregandoAvaliacao">
+                @if (carregandoAvaliacao) { Enviando... } @else { Confirmar }
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Accessibility chips -->
+        @if (recursosAcessibilidade.length > 0) {
+          <div class="secao">
+            <h3 class="secao-titulo">
+              <i class="fa-solid fa-wheelchair"></i> Acessibilidade
+            </h3>
+            <div class="chips">
+              @for (r of recursosAcessibilidade; track r.nome) {
+                <div class="chip">
+                  <i [class]="'fa-solid ' + r.icone + ' chip-icon'"></i>
+                  <span>{{ r.nome }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (avaliacoes?.length) {
+          <app-avaliacoes-estabelecimento
+            [avaliacoes]="avaliacoes"
+            [mediaEstrelas]="mediaEstrelas"
+            [maxExibir]="2"
+          />
+        }
+
+      </div>
+      <!-- /card -->
+
+    </div>
+    <!-- /sheet-body -->
+
+  </div>
+}

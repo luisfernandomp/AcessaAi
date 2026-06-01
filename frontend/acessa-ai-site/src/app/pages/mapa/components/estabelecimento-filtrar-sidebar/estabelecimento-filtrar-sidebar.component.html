@@ -1,0 +1,134 @@
+<!-- Busca unificada: nome de estabelecimento + Places Autocomplete -->
+  <div class="busca-container">
+    <div class="busca-wrapper" [class.focado]="buscaFocada">
+      <i [class]="buscaLocalizada ? 'fa-solid fa-location-dot busca-icone-local' : 'fa-solid fa-magnifying-glass busca-svg-fa'"></i>
+      <input
+        #buscaMapa
+        type="text"
+        class="busca-input"
+        placeholder="Buscar estabelecimentos ou endereços..."
+        autocomplete="off"
+        [(ngModel)]="busca"
+        (input)="onBuscaInput()"
+        (focus)="buscaFocada = true"
+        (blur)="buscaFocada = false"
+      />
+      @if (busca || buscaLocalizada) {
+        <button class="busca-limpar" (click)="limparBusca()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      }
+    </div>
+    @if (buscaLocalizada) {
+      <div class="busca-local-tag">
+        <i class="fa-solid fa-location-dot"></i>
+        <span>{{ buscaLocalizadaNome }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- Accordion de filtros -->
+  <div class="filtros-accordion">
+    <button
+      class="filtros-toggle"
+      type="button"
+      (click)="onAccordionToggle(!filtrosExpandidos)">
+      <span class="filtros-header">
+        <i class="fa-solid fa-sliders"></i>
+        Filtros
+        @if (filtrosAtivos > 0) {
+          <span class="filtros-badge">{{ filtrosAtivos }}</span>
+          <button
+            type="button"
+            class="btn-limpar"
+            (click)="$event.stopPropagation(); limparFiltros()">
+            Limpar
+          </button>
+        }
+      </span>
+      <i class="fa-solid fa-chevron-down filtros-chevron" [class.aberto]="filtrosExpandidos"></i>
+    </button>
+
+    @if (filtrosExpandidos) {
+      <div class="filtros-body">
+
+        <!-- Categorias (single-choice) -->
+        <div class="categorias-wrapper">
+          <div
+            class="categorias-inner"
+            #catScrollEl
+            (mousemove)="onCategoriasMouseMove($event, catScrollEl)"
+            (mouseleave)="pararScrollCategorias(catScrollEl)"
+          >
+            <div class="categorias-segmented">
+              @for (cat of categorias; track cat.id; let i = $index) {
+                <button
+                  type="button"
+                  class="cat-btn"
+                  [class.ativo]="categoriaSelecionadaIndex === i"
+                  [title]="cat.label + ' (' + contarCategoria(cat.id) + ')'"
+                  (click)="onCategoriaChange(i)"
+                >
+                  <i [class]="cat.icone"></i>
+                  <span>{{ cat.label }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Controles: acessível + ordenação -->
+        <div class="lista-controles">
+          <button
+            class="btn-acessivel-toggle"
+            [class.ativo]="apenasAcessiveis"
+            (click)="toggleAcessiveis()"
+            title="Somente acessíveis">
+            <i class="fa-solid fa-wheelchair"></i>
+            <span>Acessíveis</span>
+          </button>
+          <div class="ordenacao-grupo">
+            <button class="ord-btn" [class.ativo]="ordenacao === 'distancia'" (click)="ordenarPor('distancia')">Perto</button>
+            <button class="ord-btn" [class.ativo]="ordenacao === 'avaliacao'" (click)="ordenarPor('avaliacao')">Nota</button>
+            <button class="ord-btn" [class.ativo]="ordenacao === 'nome'" (click)="ordenarPor('nome')">A–Z</button>
+          </div>
+        </div>
+
+        <!-- Filtros avançados -->
+        <div class="filtros-avancados">
+          <div class="filtro-grupo">
+            <label class="filtro-label">Distância máxima</label>
+            <input
+              type="range"
+              class="filtro-range"
+              min="1"
+              max="50"
+              step="1"
+              [(ngModel)]="distanciaMaxima"
+              (change)="filtrar()"
+            />
+            <span class="filtro-valor">{{ distanciaMaxima === 50 ? 'Qualquer distância' : distanciaMaxima + ' km' }}</span>
+          </div>
+        </div>
+
+      </div>
+    }
+  </div>
+
+  <!-- Contagem -->
+  <div class="lista-meta">
+    <span class="meta-contagem">
+      <strong>{{ lugaresFiltrados.length }}</strong> loca{{ lugaresFiltrados.length !== 1 ? 'is' : 'l' }} encontrado{{ lugaresFiltrados.length !== 1 ? 's' : '' }}
+    </span>
+  </div>
+
+  <!-- Lista de estabelecimentos -->
+  <app-lista-estabelecimentos
+    [lugaresFiltrados]="lugaresFiltrados"
+    [lugarSelecionado]="lugarSelecionado"
+    [carregandoLista]="carregandoLista"
+    (lugarClick)="selecionarLugar($event)"
+    (limparFiltros)="limparFiltros()"
+  />

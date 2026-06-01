@@ -7,11 +7,13 @@ import {
   ViewChild,
   inject,
 } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { EstabelecimentoBottomSheetComponent } from './components/estabelecimento-bottom-sheet/estabelecimento-bottom-sheet.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { environment } from '../../../environments/environment';
-import { Lugar, CATEGORIAS } from './mapa.models';
+import { Lugar, CATEGORIAS, TIPO_REVERSE_MAP } from './mapa.models';
 import { EstabelecimentoService } from '../../core/services/estabelecimento.service';
+import { EstabelecimentoResponse } from '../../core/models/estabelecimento.model';
 
 const MAP_CENTER = { lat: -23.5560, lng: -46.6620 };
 const MAP_ZOOM_DEFAULT = 14;
@@ -43,7 +45,12 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private markers = new Map<number, any>();
 
+  private todosLugares: Lugar[] = [];
+  private deepLinkProcessado = false;
+
   private readonly estabelecimentoService = inject(EstabelecimentoService);
+  private readonly router = inject(Router);
+  private readonly activatedRoute = inject(ActivatedRoute);
 
   constructor(private ngZone: NgZone) {}
 
@@ -55,6 +62,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     try {
       await this.carregarScriptMaps();
       this.inicializarMapa();
+      this.processarParamRota();
     } catch {
       this.mapCarregando = false;
     }
@@ -77,7 +85,8 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   }
 
   onLugaresFiltrados(lugares: Lugar[]): void {
-    this.renderizarMarcadores(lugares);
+    this.todosLugares = lugares;
+    this.atualizarMarcadoresVisiveis();
   }
 
   selecionarLugar(lugar: Lugar): void {
@@ -86,6 +95,8 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
 
     if (anterior) this.atualizarIconeMarker(anterior, false);
     this.atualizarIconeMarker(lugar, true);
+
+    this.router.navigate(['/mapa', lugar.id], { replaceUrl: true });
 
     if (!this.map) return;
 
@@ -134,6 +145,46 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
       this.map.panTo(MAP_CENTER);
       this.map.setZoom(MAP_ZOOM_DEFAULT);
     }
+    this.router.navigate(['/mapa'], { replaceUrl: true });
+  }
+
+  // ─── Deep link ───────────────────────────────────────────────────────────
+
+  private processarParamRota(): void {
+    const idParam = this.activatedRoute.snapshot.paramMap.get('idEstabelecimento');
+    if (!idParam || this.deepLinkProcessado) return;
+    this.deepLinkProcessado = true;
+    const id = Number(idParam);
+    if (isNaN(id)) return;
+
+    this.estabelecimentoService.getById(id).subscribe({
+      next: (est) => {
+        const lugar = this.construirLugarMinimo(est);
+        this.sidebar?.abrirDetalhes(lugar);
+        this.selecionarLugar(lugar);
+      },
+      error: () => this.router.navigate(['/mapa'], { replaceUrl: true }),
+    });
+  }
+
+  private construirLugarMinimo(est: EstabelecimentoResponse): Lugar {
+    return {
+      id: est.id,
+      nome: est.nome || 'Estabelecimento',
+      categoria: est.tipo != null ? (TIPO_REVERSE_MAP[est.tipo] ?? 'todos') : 'todos',
+      endereco: 'Carregando...',
+      avaliacao: 0,
+      totalAvaliacoes: 0,
+      acessivel: (est.recursosAcessibilidade?.length ?? 0) > 0,
+      distancia: '',
+      distanciaKm: 0,
+      recursos: [],
+      recursosAcessibilidade: est.recursosAcessibilidade ?? [],
+      horario: '',
+      lat: est.geocordenadas?.latitude ?? 0,
+      lng: est.geocordenadas?.longitude ?? 0,
+      fotos: est.fotos ?? [],
+    };
   }
 
   // ─── Google Maps ─────────────────────────────────────────────────────────
@@ -179,7 +230,24 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
       },
     });
 
+    this.map.addListener('idle', () => {
+      this.ngZone.run(() => this.atualizarMarcadoresVisiveis());
+    });
+
     this.mapCarregando = false;
+  }
+
+  private atualizarMarcadoresVisiveis(): void {
+    if (!this.map) return;
+    const bounds = this.map.getBounds();
+    if (!bounds) {
+      this.renderizarMarcadores(this.todosLugares);
+      return;
+    }
+    const visiveis = this.todosLugares.filter(
+      (l) => l.lat !== 0 && l.lng !== 0 && bounds.contains({ lat: l.lat, lng: l.lng }),
+    );
+    this.renderizarMarcadores(visiveis);
   }
 
   private renderizarMarcadores(lugares: Lugar[]): void {

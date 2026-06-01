@@ -9,8 +9,8 @@ namespace AcessaAi.Application.Estabelecimentos.Dtos.Requests
         public TipoEstabelecimento Tipo { get; set; }
         public GeocordenadasRequest Geocordenadas { get; set; } = null!;
         public EnderecoRequest Endereco { get; set; } = null!;
-        public EstabelecimentoImagemRequest? Capa { get; set; }
-        public IEnumerable<int> RecursosAcessibilidadesIds { get; set; }
-        public IEnumerable<EstabelecimentoImagemRequest> Fotos { get; set; } = [];
+        public string? CapaChave { get; set; }
+        public IEnumerable<string> FotosChaves { get; set; } = [];
+        public IEnumerable<int> RecursosAcessibilidadesIds { get; set; } = [];
     }
 }

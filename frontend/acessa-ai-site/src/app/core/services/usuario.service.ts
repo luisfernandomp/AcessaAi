@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CadastrarUsuarioRequest, UsuarioResponse } from '../models/usuario.model';
+import { AtualizarUsuarioRequest, CadastrarUsuarioRequest, UsuarioResponse } from '../models/usuario.model';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
@@ -15,5 +15,9 @@ export class UsuarioService {
 
   getById(id: number): Observable<UsuarioResponse> {
     return this.http.get<UsuarioResponse>(`${this.baseUrl}/${id}`);
+  }
+
+  atualizar(id: number, request: AtualizarUsuarioRequest): Observable<UsuarioResponse> {
+    return this.http.put<UsuarioResponse>(`${this.baseUrl}/${id}`, request);
   }
 }

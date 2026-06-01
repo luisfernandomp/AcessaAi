@@ -41,4 +41,11 @@ export class AuthService {
     const raw = localStorage.getItem(USER_KEY);
     return raw ? JSON.parse(raw) : null;
   }
+
+  atualizarNomeUsuario(nome: string): void {
+    const usuario = this.getUsuarioLogado();
+    if (usuario) {
+      localStorage.setItem(USER_KEY, JSON.stringify({ ...usuario, nome }));
+    }
+  }
 }

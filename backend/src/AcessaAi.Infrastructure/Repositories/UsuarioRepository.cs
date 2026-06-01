@@ -39,6 +39,18 @@ namespace AcessaAi.Infrastructure.Repositories
         public async Task<IList<string>> ObterRolesAsync(Usuario usuario, CancellationToken cancellationToken)
             => await _userManager.GetRolesAsync(usuario);
 
+        public async Task<ErrorOr<Usuario>> AtualizarAsync(Usuario usuario, CancellationToken cancellationToken)
+        {
+            var result = await _userManager.UpdateAsync(usuario);
+
+            if (!result.Succeeded)
+                return result.Errors
+                    .Select(e => Error.Validation(e.Code, e.Description))
+                    .ToList();
+
+            return usuario;
+        }
+
         public async Task<ErrorOr<Updated>> AtualizarFotoPerfilAsync(int id, string key, CancellationToken cancellationToken)
         {
             var usuario = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);

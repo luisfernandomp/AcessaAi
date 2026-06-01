@@ -260,32 +260,46 @@
 
 .categorias-inner::-webkit-scrollbar { display: none; }
 
-.categorias-inner tui-segmented {
+.categorias-segmented {
+  display: flex;
+  gap: 4px;
   min-width: max-content;
-  --tui-background-base: #0F766E;
-  --tui-background-neutral-1: rgba(15, 118, 110, 0.07);
-  --tui-background-neutral-1-hover: rgba(15, 118, 110, 0.14);
-  --t-padding: 0.75rem;
+  background: rgba(15, 118, 110, 0.07);
   border-radius: 10px;
+  padding: 3px;
 }
 
-.categorias-inner tui-segmented button {
+.cat-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 3px;
-  padding-block: 5px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
   font-size: 10px;
   font-weight: 500;
   color: #64748B;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: inherit;
+  white-space: nowrap;
 }
 
-.categorias-inner tui-segmented button i { font-size: 14px; }
+.cat-btn i { font-size: 14px; }
 
-.categorias-inner ::ng-deep tui-segmented button.tui-segmented_active {
+.cat-btn:hover {
+  background: rgba(15, 118, 110, 0.14);
+  color: #0F766E;
+}
+
+.cat-btn.ativo {
+  background: #0F766E;
   color: #fff;
   font-weight: 600;
+  box-shadow: 0 2px 6px rgba(15, 118, 110, 0.3);
 }
 
 /* ── Controles da lista ── */

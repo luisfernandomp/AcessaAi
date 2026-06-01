@@ -7,6 +7,7 @@ using AcessaAi.Application.Estabelecimentos.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace AcessaAi.API.Controllers
 {
     [Route("api/[controller]")]
@@ -26,8 +27,7 @@ namespace AcessaAi.API.Controllers
         /// </summary>
         [Authorize]
         [HttpPost]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CriarAsync([FromForm] EstabelecimentoCriarFormRequest form, CancellationToken cancellationToken)
+        public async Task<IActionResult> CriarAsync([FromBody] EstabelecimentoCriarFormRequest form, CancellationToken cancellationToken)
         {
             var request = new EstabelecimentoCriarRequest
             {
@@ -38,9 +38,9 @@ namespace AcessaAi.API.Controllers
                     Longitude = double.Parse(form.Longitude, CultureInfo.InvariantCulture)
                     },
                 Endereco = new EnderecoRequest(form.Logradouro, form.UF, form.Cidade, form.Numero, form.CEP, form.Bairro, form.Complemento),
-                Capa = form.Capa?.ToEstabelecimentoImagemRequest(isCapa: true),
-                Fotos = form.Fotos?.Select(f => f.ToEstabelecimentoImagemRequest()) ?? [],
-                RecursosAcessibilidadesIds = form.RecursosAcessibilidadesIds 
+                CapaChave = form.CapaChave,
+                FotosChaves = form.FotosChaves ?? [],
+                RecursosAcessibilidadesIds = form.RecursosAcessibilidadesIds
             };
 
             var result = await _estabelecimentoService.CriarAsync(request, cancellationToken);

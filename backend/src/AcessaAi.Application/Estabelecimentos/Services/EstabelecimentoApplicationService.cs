@@ -53,19 +53,11 @@ namespace AcessaAi.Application.Estabelecimentos.Services
 
             var estabelecimento = estabelecimentoResult.Value;
 
-            if (request.Capa is not null)
-            {
-                var capaUrl = await _imageStorageService.UploadAsync(
-                    request.Capa.Content, request.Capa.FileName, request.Capa.ContentType, cancellationToken);
-                estabelecimento.AdicionarImagem(capaUrl, isCapa: true);
-            }
+            if (request.CapaChave is not null)
+                estabelecimento.AdicionarImagem(request.CapaChave, isCapa: true);
 
-            foreach (var foto in request.Fotos)
-            {
-                var fotoUrl = await _imageStorageService.UploadAsync(
-                    foto.Content, foto.FileName, foto.ContentType, cancellationToken);
-                estabelecimento.AdicionarImagem(fotoUrl, isCapa: false);
-            }
+            foreach (var chave in request.FotosChaves)
+                estabelecimento.AdicionarImagem(chave, isCapa: false);
 
             foreach (var id in request.RecursosAcessibilidadesIds ?? [])
             {

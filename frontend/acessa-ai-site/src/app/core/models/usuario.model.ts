@@ -14,3 +14,9 @@ export interface UsuarioResponse {
   ativo: boolean;
   endereco: Endereco;
 }
+
+export interface AtualizarUsuarioRequest {
+  nome: string;
+  dataNascimento: string;
+  endereco: Endereco;
+}

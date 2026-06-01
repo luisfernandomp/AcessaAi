@@ -8,6 +8,7 @@ namespace AcessaAi.Application.Usuarios.Interfaces
     {
         Task<ErrorOr<UsuarioResponse>> ObterPorIdAsync(int id, CancellationToken cancellationToken);
         Task<ErrorOr<UsuarioResponse>> CadastrarAsync(UsuariosCadastrarRequest request, CancellationToken cancellationToken);
+        Task<ErrorOr<UsuarioResponse>> AtualizarAsync(int id, UsuariosAtualizarRequest request, CancellationToken cancellationToken);
         Task<ErrorOr<string>> UploadFotoPerfilAsync(int id, Stream conteudo, string nomeArquivo, string contentType, CancellationToken cancellationToken);
     }
 }

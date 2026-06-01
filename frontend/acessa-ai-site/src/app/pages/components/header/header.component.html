@@ -43,6 +43,7 @@
           [avatarCor]="avatarCor"
           (openEstabelecimentoModal)="openEstabelecimentoModal()"
           (editEstabelecimentos)="editEstabelecimentos()"
+          (openPerfil)="openPerfilModal()"
         />
       }
 
@@ -77,5 +78,14 @@
     (fechar)="closeEditarEstabelecimentosModal()"
     (editar)="onEditarEstabelecimento($event)"
     (deletar)="onDeletarEstabelecimento($event)"
+  />
+}
+
+@if (showPerfilModal) {
+  <app-register-modal
+    [modoEdicao]="true"
+    [dadosIniciais]="dadosPerfil"
+    (fechar)="closePerfilModal()"
+    (perfilAtualizado)="closePerfilModal()"
   />
 }

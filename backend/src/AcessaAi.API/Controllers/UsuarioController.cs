@@ -40,6 +40,17 @@ namespace AcessaAi.API.Controllers
         }
 
         /// <summary>
+        /// Atualiza os dados de um usuário (nome, data de nascimento, endereço).
+        /// </summary>
+        [Authorize]
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> AtualizarAsync(int id, [FromBody] UsuariosAtualizarRequest dto, CancellationToken cancellationToken)
+        {
+            var result = await _usuarioService.AtualizarAsync(id, dto, cancellationToken);
+            return result.ToActionResult(Ok);
+        }
+
+        /// <summary>
         /// Faz o upload da foto de perfil do usuário. Retorna a URL pré-assinada da imagem.
         /// </summary>
         [Authorize]
