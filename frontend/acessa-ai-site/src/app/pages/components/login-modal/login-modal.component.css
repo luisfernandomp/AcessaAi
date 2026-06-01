@@ -26,6 +26,13 @@
   overflow: hidden;
 }
 
+.modal-box::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: var(--grad-brand-h, linear-gradient(90deg, #0889A6, #14B8A6, #0F766E));
+}
+
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(24px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -47,16 +54,17 @@
 }
 
 .modal-icon-badge {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 14px;
   background: linear-gradient(135deg, #0889A6, #0F766E);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 18px;
+  color: #fff;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(8, 137, 166, 0.3);
+  box-shadow: 0 4px 14px rgba(8, 137, 166, 0.35);
 }
 
 .modal-titulo {
@@ -137,6 +145,7 @@
 .input-field:focus {
   border-color: #0889A6;
   box-shadow: 0 0 0 3px rgba(8, 137, 166, 0.12), 0 1px 4px rgba(15, 23, 42, 0.05);
+  background: #FDFEFF;
 }
 
 /* ── Senha com toggle ── */

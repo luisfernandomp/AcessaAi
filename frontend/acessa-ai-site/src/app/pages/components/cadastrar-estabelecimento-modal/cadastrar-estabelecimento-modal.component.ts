@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, NgZone, OnInit, Output, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, NgZone, OnInit, Output, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forkJoin, of } from 'rxjs';
@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { EstabelecimentoService } from '../../../core/services/estabelecimento.service';
 import { RecursoAcessibilidadeService } from '../../../core/services/recurso-acessibilidade.service';
 import { RecursoAcessibilidade } from '../../../core/models/recurso-acessibilidade.model';
-import { TipoEstabelecimento } from '../../../core/models/estabelecimento.model';
+import { EstabelecimentoResponse, TipoEstabelecimento } from '../../../core/models/estabelecimento.model';
 import { CATEGORIAS } from '../../mapa/mapa.models';
 import { environment } from '../../../../environments/environment';
 
@@ -25,6 +25,10 @@ const TIPO_ENUM: Record<string, TipoEstabelecimento> = {
   outros:      TipoEstabelecimento.Outros,
 };
 
+const TIPO_REVERSO: Record<number, string> = Object.fromEntries(
+  Object.entries(TIPO_ENUM).map(([k, v]) => [v, k]),
+);
+
 @Component({
   selector: 'app-cadastrar-estabelecimento-modal',
   standalone: true,
@@ -33,6 +37,9 @@ const TIPO_ENUM: Record<string, TipoEstabelecimento> = {
   styleUrl: './cadastrar-estabelecimento-modal.component.css',
 })
 export class CadastrarEstabelecimentoModalComponent implements OnInit {
+  @Input() modoEdicao = false;
+  @Input() estabelecimento: EstabelecimentoResponse | null = null;
+
   @Output() fechar = new EventEmitter<void>();
   @Output() sucesso = new EventEmitter<void>();
 
@@ -40,7 +47,7 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
   private readonly recursoService = inject(RecursoAcessibilidadeService);
 
   etapa = 1;
-  readonly totalEtapas = 4;
+  get totalEtapas(): number { return this.modoEdicao ? 3 : 4; }
   carregando = false;
   mapCarregando = false;
 
@@ -107,9 +114,41 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.recursoService.listarAtivas().subscribe({
-      next: (r) => (this.recursosAcessibilidade = r),
+      next: (r) => {
+        this.recursosAcessibilidade = r;
+        if (this.modoEdicao && this.estabelecimento) {
+          this.preencherFormularioEdicao();
+        }
+      },
       error: () => {},
     });
+  }
+
+  private preencherFormularioEdicao(): void {
+    const est = this.estabelecimento!;
+    const tipoStr = est.tipo != null ? (TIPO_REVERSO[est.tipo] ?? '') : '';
+
+    this.form.patchValue({
+      nome: est.nome,
+      tipoEstabelecimento: tipoStr,
+      recursosIds: est.recursosAcessibilidade.map((r) => r.id),
+      endereco: {
+        logradouro:  est.endereco?.logradouro  ?? '',
+        numero:      est.endereco?.numero      ?? '',
+        complemento: est.endereco?.complemento ?? '',
+        bairro:      est.endereco?.bairro      ?? '',
+        cidade:      est.endereco?.cidade      ?? '',
+        uf:          est.endereco?.uf          ?? '',
+        cep:         est.endereco?.cep         ?? '',
+      },
+    });
+
+    if (est.geocordenadas) {
+      this.localizacaoSelecionada = {
+        lat: est.geocordenadas.latitude,
+        lng: est.geocordenadas.longitude,
+      };
+    }
   }
 
   toggleRecurso(id: number): void {
@@ -235,6 +274,37 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
       return;
     }
 
+    if (this.modoEdicao) {
+      this.submitEdicao();
+    } else {
+      this.submitCriacao();
+    }
+  }
+
+  private submitEdicao(): void {
+    const v = this.form.value;
+    this.carregando = true;
+    this.estabelecimentoService.atualizar(this.estabelecimento!.id, {
+      nome: v.nome!,
+      tipo: TIPO_ENUM[v.tipoEstabelecimento!] ?? TipoEstabelecimento.Outros,
+      geocordenadas: {
+        latitude:  this.localizacaoSelecionada!.lat,
+        longitude: this.localizacaoSelecionada!.lng,
+      },
+    }).subscribe({
+      next: () => {
+        this.carregando = false;
+        this.toastr.success('Estabelecimento atualizado com sucesso!');
+        setTimeout(() => this.sucesso.emit(), 1000);
+      },
+      error: () => {
+        this.carregando = false;
+        this.toastr.error('Erro ao atualizar. Verifique os dados e tente novamente.');
+      },
+    });
+  }
+
+  private submitCriacao(): void {
     this.carregando = true;
     const v = this.form.value;
     const end = v.endereco!;

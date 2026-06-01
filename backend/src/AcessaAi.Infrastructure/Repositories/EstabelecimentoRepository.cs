@@ -51,10 +51,10 @@ namespace AcessaAi.Infrastructure.Repositories
                 query = query.Where(e => e.RecursosAcessibilidade.Any(r => consulta.RecursosAcessabilidadeIds.Contains(r.Id)));
             }
 
-            if (consulta.GeocordenadasConsulta != null && consulta.DistanciaMaxima.HasValue)
+            if (consulta.Latitude.HasValue && consulta.Longitude.HasValue && consulta.DistanciaMaxima.HasValue)
             {
-                var lat = consulta.GeocordenadasConsulta.Latitude;
-                var lng = consulta.GeocordenadasConsulta.Longitude;
+                var lat = consulta.Latitude.Value;
+                var lng = consulta.Longitude.Value;
                 var distKm = consulta.DistanciaMaxima.Value;
 
                 var latDelta = distKm / 111.0;
@@ -67,6 +67,18 @@ namespace AcessaAi.Infrastructure.Repositories
                     e.Geolocalizacao.Longitude <= lng + lngDelta);
 
                 var candidatos = await query.ToListAsync(cancellationToken);
+
+                var teste = candidatos.Select(e =>
+                {
+                    var dLat = (e.Geolocalizacao.Latitude - lat) * Math.PI / 180.0;
+                    var dLng = (e.Geolocalizacao.Longitude - lng) * Math.PI / 180.0;
+                    var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                            Math.Cos(lat * Math.PI / 180.0) * Math.Cos(e.Geolocalizacao.Latitude * Math.PI / 180.0) *
+                            Math.Sin(dLng / 2) * Math.Sin(dLng / 2);
+                    var distancia = 6371.0 * 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+                    return distancia;
+                }).ToList();
+
 
                 return candidatos.Where(e =>
                 {

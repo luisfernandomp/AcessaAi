@@ -3,7 +3,7 @@
 
     <div class="modal-header">
       <div class="modal-titulo-grupo">
-        <div class="modal-icon-badge">{{ modoEdicao ? '👤' : '♿' }}</div>
+        <div class="modal-icon-badge"><i [class]="modoEdicao ? 'fa-solid fa-user' : 'fa-solid fa-wheelchair'"></i></div>
         <div>
           <h2 class="modal-titulo">{{ modoEdicao ? 'Meu perfil' : 'Criar conta' }}</h2>
           <p class="modal-sub">{{ modoEdicao ? 'Atualize suas informações' : 'Junte-se à comunidade AcessaAí' }}</p>

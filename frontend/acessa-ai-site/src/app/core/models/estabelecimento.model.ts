@@ -44,6 +44,7 @@ export interface CriarEstabelecimentoJsonRequest {
 
 export interface AtualizarEstabelecimentoRequest {
   nome: string;
+  tipo?: TipoEstabelecimento;
   geocordenadas: Geocoordenadas;
 }
 
@@ -76,14 +77,15 @@ export interface EstabelecimentoResponse {
   avaliacaoResponses: AvaliacaoResponse[];
   mediaEstrelas?: number;
   totalAvaliacoes?: number;
+  distanciaKm?: number;
 }
 
 export interface FiltroEstabelecimentoRequest {
   nome?: string;
   tipo?: TipoEstabelecimento;
   distanciaMaxima?: number;
-  'geocordenadasRequest.latitude'?: number;
-  'geocordenadasRequest.longitude'?: number;
+  latitude?: number;
+  longitude?: number;
   'enderecoRequest.logradouro'?: string;
   'enderecoRequest.cidade'?: string;
   'enderecoRequest.uf'?: string;

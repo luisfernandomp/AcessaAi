@@ -12,9 +12,10 @@ namespace AcessaAi.Application.Estabelecimentos.Dtos.Responses
         public decimal MediaEstrelas {get;set;}
         public TipoEstabelecimento Tipo { get; set; }
         public GeocordenadasResponse Geocordenadas { get; set; }
-        public IEnumerable<AvaliacaoResponse> AvaliacaoResponses { get; set; } 
+        public IEnumerable<AvaliacaoResponse> AvaliacaoResponses { get; set; }
         public IEnumerable<EstabelecimentoFotoResponse> Fotos { get; set; }
         public IEnumerable<RecursoAcessibilidadeResponse> RecursosAcessibilidade { get; set; }
         public EnderecoResponse Endereco { get; set; }
+        public double? DistanciaKm { get; set; }
     }
 }

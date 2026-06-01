@@ -145,14 +145,43 @@ namespace AcessaAi.Application.Estabelecimentos.Services
             EstabelecimentoFiltrarRequest request,
             CancellationToken cancellationToken)
         {
-            var consulta = request.Adapt<EstabelecimentoFiltrarConsulta>();
+            var consulta = new EstabelecimentoFiltrarConsulta
+            {
+                Nome = request.Nome,
+                Tipo = request.Tipo,
+                DistanciaMaxima = request.DistanciaMaxima,
+                Latitude = request.LatitudeResolvida,
+                Longitude = request.LongitudeResolvida,
+                EnderecoConsulta = request.EnderecoRequest?.Adapt<EnderecoConsulta>(),
+                RecursosAcessabilidadeIds = request.RecursosAcessabilidadeIds,
+            };
 
             var estabelecimentos = await _estabelecimentoRepository.FiltrarAsync(consulta, cancellationToken);
 
             var result = estabelecimentos.Then(list =>
-                list.Adapt<List<EstabelecimentoListarResponse>>()
+            {
+                var responses = list.Adapt<List<EstabelecimentoListarResponse>>()
                     .Select(ResolverUrls)
-                    .ToList() as IEnumerable<EstabelecimentoListarResponse>);
+                    .ToList();
+
+                if (consulta.Latitude.HasValue && consulta.Longitude.HasValue)
+                {
+                    var lat = consulta.Latitude.Value;
+                    var lng = consulta.Longitude.Value;
+                    foreach (var r in responses)
+                    {
+                        var dLat = (r.Geocordenadas.Latitude - lat) * Math.PI / 180.0;
+                        var dLng = (r.Geocordenadas.Longitude - lng) * Math.PI / 180.0;
+                        var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2)
+                              + Math.Cos(lat * Math.PI / 180.0)
+                              * Math.Cos(r.Geocordenadas.Latitude * Math.PI / 180.0)
+                              * Math.Sin(dLng / 2) * Math.Sin(dLng / 2);
+                        r.DistanciaKm = 6371.0 * 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+                    }
+                }
+
+                return responses as IEnumerable<EstabelecimentoListarResponse>;
+            });
 
             return result;
         }

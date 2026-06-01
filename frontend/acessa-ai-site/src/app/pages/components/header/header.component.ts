@@ -134,51 +134,19 @@ export class HeaderComponent implements OnInit {
 
   onEditarEstabelecimento(estabelecimento: EstabelecimentoResponse): void {
     this.estabelecimentoSelecionado = estabelecimento;
-    const novoNome = window
-      .prompt('Informe o novo nome do estabelecimento:', estabelecimento.nome)
-      ?.trim();
-
-    if (!novoNome) return;
-
-    const latitudeTexto = window.prompt(
-      'Informe a nova latitude:',
-      String(estabelecimento.geocordenadas.latitude),
-    );
-    if (latitudeTexto == null) return;
-
-    const longitudeTexto = window.prompt(
-      'Informe a nova longitude:',
-      String(estabelecimento.geocordenadas.longitude),
-    );
-    if (longitudeTexto == null) return;
-
-    const latitude = Number.parseFloat(latitudeTexto.replace(',', '.'));
-    const longitude = Number.parseFloat(longitudeTexto.replace(',', '.'));
-
-    if (Number.isNaN(latitude) || Number.isNaN(longitude)) {
-      this.toastr.error('Latitude e longitude precisam ser números válidos.');
-      return;
-    }
-
-    this.estabelecimentoService
-      .atualizar(estabelecimento.id, { nome: novoNome, geocordenadas: { latitude, longitude } })
-      .subscribe({
-        next: () => {
-          this.showEditarEstabelecimentosModal = false;
-          this.showEditarEstabelecimentoModal = false;
-          this.estabelecimentoSelecionado = null;
-          this.toastr.success('Estabelecimento atualizado com sucesso!');
-        },
-        error: (erro) => {
-          console.error('Erro ao editar estabelecimento:', erro);
-          this.toastr.error('Não foi possível atualizar o estabelecimento. Tente novamente.');
-        },
-      });
+    this.showEditarEstabelecimentosModal = false;
+    this.showEditarEstabelecimentoModal = true;
   }
 
   closeEditarEstabelecimentoModal(): void {
     this.showEditarEstabelecimentoModal = false;
     this.estabelecimentoSelecionado = null;
+  }
+
+  onEdicaoSucesso(): void {
+    this.showEditarEstabelecimentoModal = false;
+    this.estabelecimentoSelecionado = null;
+    this.estabelecimentoService.cadastroRealizado$.next();
   }
 
   onDeletarEstabelecimento(id: number): void {

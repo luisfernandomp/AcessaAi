@@ -36,6 +36,16 @@
   scrollbar-color: #E2E8F0 transparent;
 }
 
+.modal-box::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, #0889A6 0%, #14B8A6 50%, #0F766E 100%);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
 .modal-box::-webkit-scrollbar { width: 4px; }
 .modal-box::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 4px; }
 
@@ -64,16 +74,17 @@
 }
 
 .modal-icon-badge {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 14px;
   background: linear-gradient(135deg, #0889A6, #0F766E);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 18px;
+  color: #fff;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(8, 137, 166, 0.3);
+  box-shadow: 0 4px 14px rgba(8, 137, 166, 0.35);
 }
 
 .modal-titulo {
@@ -158,7 +169,7 @@
   min-width: 24px;
 }
 
-.step-linha.ativo { background: #0889A6; }
+.step-linha.ativo { background: linear-gradient(90deg, #0889A6, #14B8A6); }
 
 /* ── Form ── */
 .modal-form { padding: 20px 28px 0; }

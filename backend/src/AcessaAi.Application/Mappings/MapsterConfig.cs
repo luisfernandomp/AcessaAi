@@ -64,8 +64,7 @@ namespace AcessaAi.Application.Mappings
 
             TypeAdapterConfig<EstabelecimentoFiltrarRequest, EstabelecimentoFiltrarConsulta>
                 .NewConfig()
-                .Map(dest => dest.EnderecoConsulta, src => src.EnderecoRequest)
-                .Map(dest => dest.GeocordenadasConsulta, src => src.GeocordenadasRequest);
+                .Map(dest => dest.EnderecoConsulta, src => src.EnderecoRequest);
 
             TypeAdapterConfig.GlobalSettings.Compile();
         }

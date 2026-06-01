@@ -61,7 +61,7 @@ export class EstabelecimentoFiltrarSidebarComponent implements OnInit, OnDestroy
     this.buscaSubject$.pipe(
       debounceTime(400),
       takeUntil(this.destroy$),
-    ).subscribe(() => this.executarBusca());
+    ).subscribe(() => this.processarBuscaPorTexto());
 
     this.estabelecimentoService.cadastroRealizado$.pipe(
       takeUntil(this.destroy$),
@@ -150,6 +150,67 @@ export class EstabelecimentoFiltrarSidebarComponent implements OnInit, OnDestroy
     this.executarBusca();
   }
 
+  private processarBuscaPorTexto(): void {
+    const texto = this.busca;
+
+    if (!texto || typeof google === 'undefined' || !google.maps?.places?.AutocompleteService) {
+      this.executarBusca();
+      return;
+    }
+
+    const tiposEndereco = new Set([
+      'route', 'street_address', 'geocode', 'sublocality', 'sublocality_level_1',
+      'locality', 'administrative_area_level_1', 'administrative_area_level_2',
+      'postal_code', 'neighborhood', 'premise',
+    ]);
+
+    const service = new google.maps.places.AutocompleteService();
+    service.getPlacePredictions(
+      { input: texto, componentRestrictions: { country: 'BR' } },
+      (predictions: any[], status: string) => {
+        this.ngZone.run(() => {
+          if (this.busca !== texto) return;
+
+          const primeira = predictions?.[0];
+          const ehEndereco = status === 'OK' && primeira &&
+            primeira.types.some((t: string) => tiposEndereco.has(t));
+
+          if (!ehEndereco) {
+            this.executarBusca();
+            return;
+          }
+
+          this.resolverGeometriaEBuscar(primeira.place_id, texto);
+        });
+      },
+    );
+  }
+
+  private resolverGeometriaEBuscar(placeId: string, textoOriginal: string): void {
+    const placesService = new google.maps.places.PlacesService(document.createElement('div'));
+    placesService.getDetails(
+      { placeId, fields: ['geometry', 'formatted_address'] },
+      (place: any, status: string) => {
+        this.ngZone.run(() => {
+          if (this.busca !== textoOriginal) return;
+
+          if (status === 'OK' && place?.geometry?.location) {
+            const lat = place.geometry.location.lat() as number;
+            const lng = place.geometry.location.lng() as number;
+            this.userLat = lat;
+            this.userLng = lng;
+            this.busca = '';
+            this.buscaLocalizada = true;
+            this.buscaLocalizadaNome = place.formatted_address ?? textoOriginal;
+            this.localizacaoObtida.emit({ lat, lng });
+          }
+
+          this.executarBusca();
+        });
+      },
+    );
+  }
+
   private executarBusca(): void {
     this.listaSubscription?.unsubscribe();
     this.carregandoLista = true;
@@ -160,11 +221,9 @@ export class EstabelecimentoFiltrarSidebarComponent implements OnInit, OnDestroy
       filtro.tipo = TIPO_MAP[this.categoriaSelecionada];
     }
     if (this.userLat != null && this.userLng != null) {
-      filtro['geocordenadasRequest.latitude'] = this.userLat;
-      filtro['geocordenadasRequest.longitude'] = this.userLng;
-      if (this.distanciaMaxima < 50) {
-        filtro.distanciaMaxima = this.distanciaMaxima;
-      }
+      filtro.latitude = this.userLat;
+      filtro.longitude = this.userLng;
+      filtro.distanciaMaxima = this.buscaLocalizada ? 0.5 : this.distanciaMaxima;
     }
 
     console.log('Executando busca com filtro:', filtro);
@@ -237,17 +296,11 @@ export class EstabelecimentoFiltrarSidebarComponent implements OnInit, OnDestroy
     if (end.bairro) partes.push(end.bairro);
     if (end.cidade) partes.push(`${end.cidade}${end.uf ? ' - ' + end.uf : ''}`);
 
-    let distancia = '';
-    let distanciaKm = 0;
-    if (this.userLat != null && this.userLng != null && e.geocordenadas) {
-      distanciaKm = this.haversineKm(
-        this.userLat, this.userLng,
-        e.geocordenadas.latitude, e.geocordenadas.longitude,
-      );
-      distancia = distanciaKm < 1
+    const distanciaKm = e.distanciaKm ?? 0;
+    const distancia = e.distanciaKm == null ? ''
+      : distanciaKm < 1
         ? `${Math.round(distanciaKm * 1000)} m`
         : `${distanciaKm.toFixed(1).replace('.', ',')} km`;
-    }
 
     const categoria = e.tipo != null
       ? TIPO_REVERSE_MAP[e.tipo] ?? 'todos'
@@ -278,16 +331,6 @@ export class EstabelecimentoFiltrarSidebarComponent implements OnInit, OnDestroy
       fotos: e.fotos || [],
       horario: '',
     };
-  }
-
-  private haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
 
   // ─── Filtros e ordenação ─────────────────────────────────────────────────
@@ -397,7 +440,12 @@ export class EstabelecimentoFiltrarSidebarComponent implements OnInit, OnDestroy
     this.autocomplete.addListener('place_changed', () => {
       this.ngZone.run(() => {
         const place = this.autocomplete.getPlace();
-        if (!place.geometry?.location) return;
+
+        if (!place.geometry?.location) {
+          // Enter pressionado sem selecionar sugestão — tenta geocodificar o texto digitado
+          if (this.busca) this.processarBuscaPorTexto();
+          return;
+        }
 
         const lat = place.geometry.location.lat();
         const lng = place.geometry.location.lng();

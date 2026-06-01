@@ -5,8 +5,8 @@
       <div class="modal-titulo-grupo">
         <div class="modal-icon-badge">🏢</div>
         <div>
-          <h2 class="modal-titulo">Cadastrar estabelecimento</h2>
-          <p class="modal-sub">Ajude outras pessoas a encontrar locais acessíveis</p>
+          <h2 class="modal-titulo">{{ modoEdicao ? 'Editar estabelecimento' : 'Cadastrar estabelecimento' }}</h2>
+          <p class="modal-sub">{{ modoEdicao ? 'Atualize as informações do seu estabelecimento' : 'Ajude outras pessoas a encontrar locais acessíveis' }}</p>
         </div>
       </div>
       <button class="btn-close-modal" (click)="fecharModal()">
@@ -32,11 +32,13 @@
         <div class="step-circulo">{{ etapa > 3 ? '✓' : '3' }}</div>
         <span>Endereço</span>
       </div>
-      <div class="step-linha" [class.ativo]="etapa >= 4"></div>
-      <div class="step" [class.ativo]="etapa >= 4">
-        <div class="step-circulo">4</div>
-        <span>Imagens</span>
-      </div>
+      @if (!modoEdicao) {
+        <div class="step-linha" [class.ativo]="etapa >= 4"></div>
+        <div class="step" [class.ativo]="etapa >= 4">
+          <div class="step-circulo">4</div>
+          <span>Imagens</span>
+        </div>
+      }
     </div>
 
     <form [formGroup]="form" (ngSubmit)="submit()" class="modal-form">
@@ -208,7 +210,13 @@
 
           <div class="modal-acoes">
             <button class="btn-acao secundario" type="button" (click)="voltarEtapa()">← Voltar</button>
-            <button class="btn-acao primario" type="button" (click)="proximaEtapa()">Próximo →</button>
+            @if (modoEdicao) {
+              <button class="btn-acao primario" type="submit" [disabled]="carregando">
+                @if (carregando) { Salvando... } @else { Salvar ✓ }
+              </button>
+            } @else {
+              <button class="btn-acao primario" type="button" (click)="proximaEtapa()">Próximo →</button>
+            }
           </div>
         </div>
       }

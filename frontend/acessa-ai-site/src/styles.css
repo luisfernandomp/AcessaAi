@@ -1,3 +1,65 @@
+/* ── Design Tokens ─────────────────────────────────────────── */
+:root {
+  /* Brand */
+  --clr-primary:        #0889A6;
+  --clr-primary-hover:  #077994;
+  --clr-secondary:      #0F766E;
+  --clr-secondary-hover:#0D6960;
+  --clr-accent:         #14B8A6;
+
+  /* Brand backgrounds */
+  --clr-primary-bg:     #F0FDFA;
+  --clr-primary-border: #99F6E4;
+  --clr-primary-soft:   #CCFBF1;
+
+  /* Text scale */
+  --clr-text-900: #0F172A;
+  --clr-text-700: #334155;
+  --clr-text-500: #475569;
+  --clr-text-400: #64748B;
+  --clr-text-300: #94A3B8;
+  --clr-text-200: #CBD5E1;
+
+  /* Neutral */
+  --clr-bg-0:   #ffffff;
+  --clr-bg-50:  #F8FAFC;
+  --clr-bg-100: #F1F5F9;
+  --clr-bg-200: #E2E8F0;
+
+  /* Semantic */
+  --clr-star:    #FBBF24;
+  --clr-error:   #EF4444;
+  --clr-success: #22C55E;
+
+  /* Gradients */
+  --grad-brand:      linear-gradient(135deg, #0889A6 0%, #0F766E 100%);
+  --grad-brand-h:    linear-gradient(90deg,  #0889A6 0%, #14B8A6 50%, #0F766E 100%);
+  --grad-teal:       linear-gradient(135deg, #0F766E 0%, #14B8A6 100%);
+  --grad-brand-soft: linear-gradient(135deg, #F0FDFA 0%, #E0F4F7 100%);
+
+  /* Shadows */
+  --shadow-xs:      0 1px 3px rgba(15,23,42,.05);
+  --shadow-sm:      0 2px 8px rgba(15,23,42,.07);
+  --shadow-md:      0 4px 16px rgba(15,23,42,.09);
+  --shadow-lg:      0 8px 32px rgba(15,23,42,.13);
+  --shadow-primary: 0 4px 16px rgba(8,137,166,.30);
+  --shadow-teal:    0 4px 16px rgba(15,118,110,.30);
+
+  /* Radii */
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-xl:   20px;
+  --r-2xl:  24px;
+  --r-pill: 9999px;
+
+  /* Transitions */
+  --ease-base:   0.2s ease;
+  --ease-spring: 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  --ease-smooth: 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── Reset ─────────────────────────────────────────────────── */
 * {
   margin: 0;
   padding: 0;
@@ -10,9 +72,17 @@ body {
   width: 100%;
   overflow: hidden;
   font-family: 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', sans-serif;
+  color: var(--clr-text-900);
 }
 
-/* TuiRoot renderiza um div.t-root-content — precisa ser flex para que o layout interno funcione */
+/* ── Accessibility: global focus ring ──────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── TuiRoot ────────────────────────────────────────────────── */
 .t-root-content {
   display: flex;
   flex-direction: column;

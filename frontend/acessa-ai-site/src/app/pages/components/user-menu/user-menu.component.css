@@ -60,18 +60,26 @@
   top: calc(100% + 8px);
   right: 0;
   background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.1);
-  min-width: 220px;
+  border-radius: 16px;
+  border: 1px solid #E8F0ED;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.16), 0 2px 8px rgba(15, 23, 42, 0.08);
+  min-width: 228px;
   overflow: hidden;
-  animation: dropdownIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: dropdownIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 200;
+}
+
+.user-dropdown::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, #0889A6 0%, #14B8A6 50%, #0F766E 100%);
 }
 
 @keyframes dropdownIn {
   from {
     opacity: 0;
-    transform: translateY(-8px) scale(0.96);
+    transform: translateY(-6px) scale(0.97);
   }
   to {
     opacity: 1;
@@ -82,10 +90,10 @@
 .dropdown-perfil {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 14px 16px;
-  background: linear-gradient(135deg, #e0f4f7, #e0f8f8);
-  border-bottom: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #F0FDFA 0%, #E8F4F8 100%);
+  border-bottom: 1px solid #E2EEF0;
 }
 
 .avatar-grande {
@@ -138,30 +146,42 @@
   color: #374151;
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
 }
 
 .dropdown-item i {
-  width: 15px;
+  width: 16px;
   text-align: center;
-  opacity: 0.6;
-  transition: opacity 0.15s;
+  color: #94A3B8;
+  transition: color 0.15s, transform 0.2s;
   font-size: 14px;
+  flex-shrink: 0;
 }
 
 .dropdown-item:hover {
-  background: #f8fafc;
-  color: #0f172a;
+  background: #F0FDFA;
+  color: #0F766E;
 }
 
 .dropdown-item:hover i {
-  opacity: 1;
+  color: #0F766E;
+  transform: scale(1.1);
 }
 
 .dropdown-item.sair {
   color: #dc2626;
 }
 
+.dropdown-item.sair i {
+  color: #FCA5A5;
+}
+
 .dropdown-item.sair:hover {
-  background: #fef2f2;
+  background: #FEF2F2;
+  color: #B91C1C;
+}
+
+.dropdown-item.sair:hover i {
+  color: #B91C1C;
 }

@@ -191,11 +191,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
       filtro.tipo = TIPO_MAP[this.categoriaSelecionada];
     }
     if (this.userLat != null && this.userLng != null) {
-      filtro['geocordenadasRequest.latitude'] = this.userLat;
-      filtro['geocordenadasRequest.longitude'] = this.userLng;
-      if (this.distanciaMaxima < 50) {
-        filtro.distanciaMaxima = this.distanciaMaxima;
-      }
+      filtro.latitude = this.userLat;
+      filtro.longitude = this.userLng;
+      filtro.distanciaMaxima = this.buscaLocalizada ? 0.5 : this.distanciaMaxima;
     }
 
     console.log('Executando busca com filtro:', filtro);
@@ -268,17 +266,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (end.bairro) partes.push(end.bairro);
     if (end.cidade) partes.push(`${end.cidade}${end.uf ? ' - ' + end.uf : ''}`);
 
-    let distancia = '';
-    let distanciaKm = 0;
-    if (this.userLat != null && this.userLng != null && e.geocordenadas) {
-      distanciaKm = this.haversineKm(
-        this.userLat, this.userLng,
-        e.geocordenadas.latitude, e.geocordenadas.longitude,
-      );
-      distancia = distanciaKm < 1
+    const distanciaKm = e.distanciaKm ?? 0;
+    const distancia = e.distanciaKm == null ? ''
+      : distanciaKm < 1
         ? `${Math.round(distanciaKm * 1000)} m`
         : `${distanciaKm.toFixed(1).replace('.', ',')} km`;
-    }
 
     const categoria = e.tipo != null
       ? TIPO_REVERSE_MAP[e.tipo] ?? 'todos'
@@ -309,16 +301,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
       fotos: e.fotos || [],
       horario: '',
     };
-  }
-
-  private haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
 
   // ─── Filtros e ordenação ─────────────────────────────────────────────────

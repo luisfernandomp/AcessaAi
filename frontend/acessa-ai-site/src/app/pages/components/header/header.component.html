@@ -81,6 +81,15 @@
   />
 }
 
+@if (showEditarEstabelecimentoModal && estabelecimentoSelecionado) {
+  <app-cadastrar-estabelecimento-modal
+    [modoEdicao]="true"
+    [estabelecimento]="estabelecimentoSelecionado"
+    (fechar)="closeEditarEstabelecimentoModal()"
+    (sucesso)="onEdicaoSucesso()"
+  />
+}
+
 @if (showPerfilModal) {
   <app-register-modal
     [modoEdicao]="true"

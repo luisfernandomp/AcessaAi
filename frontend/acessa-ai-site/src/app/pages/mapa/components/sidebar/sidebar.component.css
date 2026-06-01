@@ -15,7 +15,19 @@
   z-index: 10;
   overflow: visible;
   transition: width var(--transition), min-width var(--transition);
-  box-shadow: 2px 0 20px rgba(15, 23, 42, 0.06);
+  box-shadow: 2px 0 24px rgba(15, 23, 42, 0.07);
+}
+
+:host::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0889A6 0%, #14B8A6 50%, #0F766E 100%);
+  z-index: 1;
+  pointer-events: none;
 }
 
 :host.recolhido {
@@ -26,14 +38,14 @@
 /* ── Toggle recolher ── */
 .btn-recolher {
   position: absolute;
-  top: 18px;
-  right: -14px;
-  width: 28px;
-  height: 28px;
+  top: 20px;
+  right: -15px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: #fff;
   border: 1.5px solid #E2E8F0;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.12);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -46,10 +58,11 @@
 }
 
 .btn-recolher:hover {
-  background: #F0FDFA;
+  background: linear-gradient(135deg, #F0FDFA, #E8F4F8);
   border-color: #5EEAD4;
   color: #0F766E;
-  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.15);
+  box-shadow: 0 4px 16px rgba(15, 118, 110, 0.20);
+  transform: scale(1.08);
 }
 
 /* ── Search bar ── */

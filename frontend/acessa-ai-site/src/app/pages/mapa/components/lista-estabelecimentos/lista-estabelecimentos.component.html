@@ -27,6 +27,7 @@
           @if (lugar.acessivel) {
             <div class="card-badge-acessivel" title="Local acessível">
               <i class="fa-solid fa-wheelchair"></i>
+              <span>Acessível</span>
             </div>
           }
         </div>
@@ -55,22 +56,24 @@
 
           @if (lugar.recursosAcessibilidade.length > 0) {
             <div class="card-chips">
-              @for (r of lugar.recursosAcessibilidade.slice(0, 2); track r.id) {
+              @for (r of lugar.recursosAcessibilidade.slice(0, 1); track r.id) {
                 <span class="chip">
                   <i [class]="'fa-solid ' + r.icone + ' chip-icon'"></i>
                   {{ r.nome }}
                 </span>
               }
-              @if (lugar.recursosAcessibilidade.length > 2) {
-                <span class="chip chip-mais">+{{ lugar.recursosAcessibilidade.length - 2 }}</span>
+              @if (lugar.recursosAcessibilidade.length > 1) {
+                <span class="chip chip-mais">+{{ lugar.recursosAcessibilidade.length - 1 }}</span>
               }
             </div>
           }
 
+          <div class="card-spacer"></div>
+
           @if (lugar.distancia) {
             <div class="card-footer">
               <span class="card-distancia">
-                <i class="fa-solid fa-location-arrow"></i>
+                <i class="fa-solid fa-route"></i>
                 {{ lugar.distancia }}
               </span>
             </div>

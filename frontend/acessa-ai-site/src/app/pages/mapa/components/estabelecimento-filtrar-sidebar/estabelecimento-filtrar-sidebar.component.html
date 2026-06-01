@@ -34,12 +34,24 @@
     <button
       class="filtros-toggle"
       type="button"
+      [class.expandido]="filtrosExpandidos"
+      [class.tem-filtros]="filtrosAtivos > 0"
       (click)="onAccordionToggle(!filtrosExpandidos)">
-      <span class="filtros-header">
-        <i class="fa-solid fa-sliders"></i>
-        Filtros
+
+      <div class="filtros-toggle-esq">
+        <div class="filtros-icon-wrap" [class.ativo]="filtrosAtivos > 0 || filtrosExpandidos">
+          <i class="fa-solid fa-filter filtros-main-icon"></i>
+        </div>
+        <span class="filtros-toggle-label">
+          Filtros
+          @if (filtrosAtivos > 0) {
+            <span class="filtros-badge">{{ filtrosAtivos }}</span>
+          }
+        </span>
+      </div>
+
+      <div class="filtros-toggle-dir">
         @if (filtrosAtivos > 0) {
-          <span class="filtros-badge">{{ filtrosAtivos }}</span>
           <button
             type="button"
             class="btn-limpar"
@@ -47,8 +59,9 @@
             Limpar
           </button>
         }
-      </span>
-      <i class="fa-solid fa-chevron-down filtros-chevron" [class.aberto]="filtrosExpandidos"></i>
+        <i class="fa-solid fa-chevron-down filtros-chevron" [class.aberto]="filtrosExpandidos"></i>
+      </div>
+
     </button>
 
     @if (filtrosExpandidos) {
@@ -107,6 +120,7 @@
               max="50"
               step="1"
               [(ngModel)]="distanciaMaxima"
+              [style.--range-pct]="((distanciaMaxima - 1) / 49 * 100).toFixed(1) + '%'"
               (change)="filtrar()"
             />
             <span class="filtro-valor">{{ distanciaMaxima === 50 ? 'Qualquer distância' : distanciaMaxima + ' km' }}</span>

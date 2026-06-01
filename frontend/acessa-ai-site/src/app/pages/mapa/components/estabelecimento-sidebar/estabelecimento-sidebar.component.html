@@ -192,19 +192,47 @@
           </div>
         }
 
-        <!-- Accessibility chips -->
+        <!-- Accessibility chips — carrossel -->
         @if (recursosAcessibilidade.length > 0) {
           <div class="secao">
-            <h3 class="secao-titulo">
-              <i class="fa-solid fa-wheelchair"></i> Acessibilidade
-            </h3>
-            <div class="chips">
-              @for (r of recursosAcessibilidade; track r.nome) {
-                <div class="chip">
-                  <i [class]="'fa-solid ' + r.icone + ' chip-icon'"></i>
-                  <span>{{ r.nome }}</span>
-                </div>
-              }
+            <div class="secao-header">
+              <h3 class="secao-titulo">
+                <i class="fa-solid fa-wheelchair"></i> Acessibilidade
+              </h3>
+              <span class="chips-contagem">{{ recursosAcessibilidade.length }} recurso{{ recursosAcessibilidade.length !== 1 ? 's' : '' }}</span>
+            </div>
+
+            <div class="chips-carousel">
+
+              <button
+                class="carousel-nav prev"
+                type="button"
+                [class.visivel]="podeScrollEsq"
+                (click)="scrollChips(-1)"
+                aria-label="Anterior"
+              >
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+
+              <div class="chips-track" #chipsTrack (scroll)="onChipsScroll()">
+                @for (r of recursosAcessibilidade; track r.nome) {
+                  <div class="chip">
+                    <i [class]="'fa-solid ' + r.icone + ' chip-icon'"></i>
+                    <span>{{ r.nome }}</span>
+                  </div>
+                }
+              </div>
+
+              <button
+                class="carousel-nav next"
+                type="button"
+                [class.visivel]="podeScrollDir"
+                (click)="scrollChips(1)"
+                aria-label="Próximo"
+              >
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+
             </div>
           </div>
         }

@@ -40,13 +40,8 @@ export class EstabelecimentoService {
     if (filtro.tipo != null) params = params.set('tipo', filtro.tipo);
     if (filtro.distanciaMaxima != null)
       params = params.set('distanciaMaxima', filtro.distanciaMaxima);
-    if (filtro['geocordenadasRequest.latitude'] != null)
-      params = params.set('geocordenadasRequest.latitude', filtro['geocordenadasRequest.latitude']!);
-    if (filtro['geocordenadasRequest.longitude'] != null)
-      params = params.set(
-        'geocordenadasRequest.longitude',
-        filtro['geocordenadasRequest.longitude']!
-      );
+    if (filtro.latitude != null) params = params.set('latitude', filtro.latitude);
+    if (filtro.longitude != null) params = params.set('longitude', filtro.longitude);
     if (filtro['enderecoRequest.logradouro'])
       params = params.set('enderecoRequest.logradouro', filtro['enderecoRequest.logradouro']!);
     if (filtro['enderecoRequest.cidade'])

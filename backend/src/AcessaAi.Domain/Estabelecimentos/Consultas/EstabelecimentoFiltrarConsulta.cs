@@ -9,8 +9,7 @@ public class EstabelecimentoFiltrarConsulta
     public TipoEstabelecimento? Tipo { get; set; }
     public double? DistanciaMaxima { get; set; }
     public EnderecoConsulta? EnderecoConsulta { get; set; }
-    public GeocordenadasConsulta? GeocordenadasConsulta { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
     public IEnumerable<int>? RecursosAcessabilidadeIds { get; set; }
 }
-
-

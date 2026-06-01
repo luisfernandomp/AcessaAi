@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, inject, Input, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, inject, Input, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Lugar } from '../../mapa.models';
@@ -23,6 +23,11 @@ const CORES_AVATAR = ['#1a73e8', '#137333', '#e37400', '#c5221f', '#7b2d8b', '#0
 export class EstabelecimentoSidebarComponent implements OnDestroy {
     @Input() lugar: Lugar | null = null;
     @Output() fechar = new EventEmitter<void>();
+
+    @ViewChild('chipsTrack') chipsTrackRef?: ElementRef<HTMLDivElement>;
+
+    podeScrollEsq = false;
+    podeScrollDir = false;
 
     private readonly estabelecimentoService = inject(EstabelecimentoService);
     private readonly avaliacaoService = inject(AvaliacaoService);
@@ -58,6 +63,8 @@ export class EstabelecimentoSidebarComponent implements OnDestroy {
         this.mediaEstrelas = 0;
         this.expandido = false;
         this.fotoAtual = 0;
+        this.podeScrollEsq = false;
+        this.podeScrollDir = false;
         this.estabelecimentoService.getById(this.lugar.id).subscribe({
           next: (res) => {
             this.avaliacoes = res.avaliacaoResponses ?? [];
@@ -65,10 +72,29 @@ export class EstabelecimentoSidebarComponent implements OnDestroy {
             this.mediaEstrelas = this.avaliacoes.length
               ? this.avaliacoes.reduce((sum, a) => sum + a.estrelas, 0) / this.avaliacoes.length
               : 0;
+            setTimeout(() => this.atualizarScrollChips(), 50);
           },
           error: () => {},
         });
       }
+    }
+
+    private atualizarScrollChips(): void {
+      const el = this.chipsTrackRef?.nativeElement;
+      if (!el) return;
+      this.podeScrollEsq = el.scrollLeft > 4;
+      this.podeScrollDir = el.scrollLeft < el.scrollWidth - el.clientWidth - 4;
+    }
+
+    onChipsScroll(): void {
+      this.atualizarScrollChips();
+    }
+
+    scrollChips(dir: -1 | 1): void {
+      const el = this.chipsTrackRef?.nativeElement;
+      if (!el) return;
+      el.scrollBy({ left: dir * 160, behavior: 'smooth' });
+      setTimeout(() => this.atualizarScrollChips(), 320);
     }
   
     iniciais(nome: string): string {
