@@ -31,6 +31,35 @@
       @if (etapa === 1) {
         <div class="form-etapa">
 
+          @if (modoEdicao) {
+            <div class="foto-perfil-grupo">
+              <div class="foto-perfil-wrapper">
+                @if (fotoPerfilPreview) {
+                  <img class="foto-perfil-img" [src]="fotoPerfilPreview" alt="Foto de perfil" />
+                } @else {
+                  <div class="foto-perfil-placeholder">
+                    <i class="fa-solid fa-user"></i>
+                  </div>
+                }
+                <label class="foto-perfil-overlay" for="foto-perfil-input" [class.carregando]="uploadandoFoto">
+                  @if (uploadandoFoto) {
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                  } @else {
+                    <i class="fa-solid fa-camera"></i>
+                  }
+                </label>
+                <input
+                  id="foto-perfil-input"
+                  type="file"
+                  accept="image/*"
+                  class="input-oculto"
+                  [disabled]="uploadandoFoto"
+                  (change)="onFotoChange($event)" />
+              </div>
+              <span class="foto-perfil-label">Clique para alterar foto</span>
+            </div>
+          }
+
           <div class="input-group">
             <label class="input-label">Nome completo <span class="obrig">*</span></label>
             <input class="input-field" formControlName="nome" type="text" placeholder="Seu nome completo" autocomplete="name" />
@@ -132,7 +161,12 @@
             </div>
             <div class="input-group">
               <label class="input-label">UF <span class="obrig">*</span></label>
-              <input class="input-field" formControlName="uf" type="text" placeholder="SP" maxlength="2" />
+              <select class="input-field" formControlName="uf">
+                <option value="">UF</option>
+                @for (estado of estados; track estado.sigla) {
+                  <option [value]="estado.sigla">{{ estado.sigla }} — {{ estado.nome }}</option>
+                }
+              </select>
             </div>
             <div class="input-group">
               <label class="input-label">CEP <span class="obrig">*</span></label>

@@ -3,9 +3,13 @@
     class="user-avatar-btn"
     (click)="toggleDropdown()"
   >
-    <div class="avatar-circulo" [style.background]="avatarCor">
-      {{ usuarioIniciais }}
-    </div>
+    @if (urlFotoPerfil) {
+      <img class="avatar-circulo avatar-foto" [src]="urlFotoPerfil" [alt]="usuarioNome" />
+    } @else {
+      <div class="avatar-circulo" [style.background]="avatarCor">
+        {{ usuarioIniciais }}
+      </div>
+    }
     <span class="usuario-nome-header">{{ usuarioNome.split(' ')[0] }}</span>
     <i
       class="chevron fa-solid fa-chevron-down"
@@ -15,9 +19,13 @@
 
   <div class="user-dropdown" *ngIf="showDropdown">
     <div class="dropdown-perfil">
-      <div class="avatar-grande" [style.background]="avatarCor">
-        {{ usuarioIniciais }}
-      </div>
+      @if (urlFotoPerfil) {
+        <img class="avatar-grande avatar-foto" [src]="urlFotoPerfil" [alt]="usuarioNome" />
+      } @else {
+        <div class="avatar-grande" [style.background]="avatarCor">
+          {{ usuarioIniciais }}
+        </div>
+      }
       <div>
         <span class="dropdown-nome">{{ usuarioNome }}</span>
         <span class="dropdown-sub">Usuário verificado</span>

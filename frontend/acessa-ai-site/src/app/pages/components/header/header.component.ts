@@ -40,6 +40,7 @@ export class HeaderComponent implements OnInit {
   estabelecimentoSelecionado: EstabelecimentoResponse | null = null;
   dadosPerfil: UsuarioResponse | null = null;
   scrolled = false;
+  urlFotoPerfil: string | null = null;
 
   constructor(
     public authService: AuthService,
@@ -48,7 +49,20 @@ export class HeaderComponent implements OnInit {
     private usuarioService: UsuarioService,
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (this.isLoggedIn) {
+      this.carregarFotoPerfil();
+    }
+  }
+
+  private carregarFotoPerfil(): void {
+    const usuario = this.authService.getUsuarioLogado();
+    if (!usuario) return;
+    this.usuarioService.getById(usuario.id).subscribe({
+      next: (dados) => (this.urlFotoPerfil = dados.urlFotoPerfil ?? null),
+      error: () => {},
+    });
+  }
 
   get isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
@@ -170,5 +184,6 @@ export class HeaderComponent implements OnInit {
   closePerfilModal(): void {
     this.showPerfilModal = false;
     this.dadosPerfil = null;
+    if (this.isLoggedIn) this.carregarFotoPerfil();
   }
 }

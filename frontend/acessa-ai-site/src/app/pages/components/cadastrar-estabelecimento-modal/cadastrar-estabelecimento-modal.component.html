@@ -176,7 +176,12 @@
             </div>
             <div class="input-group">
               <label class="input-label">UF <span class="obrig">*</span></label>
-              <input class="input-field" formControlName="uf" type="text" placeholder="SP" maxlength="2" />
+              <select class="input-field" formControlName="uf">
+                <option value="">UF</option>
+                @for (estado of estados; track estado.sigla) {
+                  <option [value]="estado.sigla">{{ estado.sigla }} — {{ estado.nome }}</option>
+                }
+              </select>
             </div>
             <div class="input-group">
               <label class="input-label">CEP <span class="obrig">*</span></label>

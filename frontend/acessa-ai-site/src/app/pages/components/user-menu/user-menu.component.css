@@ -185,3 +185,8 @@
 .dropdown-item.sair:hover i {
   color: #B91C1C;
 }
+
+.avatar-foto {
+  object-fit: cover;
+  border: 2px solid #E2E8F0;
+}

@@ -4,6 +4,7 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Va
 import { Router } from '@angular/router';
 import { UsuarioService } from '../../core/services/usuario.service';
 import { CadastrarUsuarioRequest } from '../../core/models/usuario.model';
+import { ESTADOS_BRASILEIROS } from '../../core/constants/estados';
 
 function senhaValidator(control: AbstractControl): ValidationErrors | null {
   const v: string = control.value ?? '';
@@ -22,6 +23,7 @@ function senhaValidator(control: AbstractControl): ValidationErrors | null {
   styleUrls: ['./register.component.css'],
 })
 export class RegisterComponent {
+  readonly estados = ESTADOS_BRASILEIROS;
   errorMessage = '';
   successMessage = '';
 

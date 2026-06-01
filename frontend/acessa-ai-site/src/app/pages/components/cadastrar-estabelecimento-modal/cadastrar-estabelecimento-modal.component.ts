@@ -9,6 +9,7 @@ import { RecursoAcessibilidadeService } from '../../../core/services/recurso-ace
 import { RecursoAcessibilidade } from '../../../core/models/recurso-acessibilidade.model';
 import { EstabelecimentoResponse, TipoEstabelecimento } from '../../../core/models/estabelecimento.model';
 import { CATEGORIAS } from '../../mapa/mapa.models';
+import { ESTADOS_BRASILEIROS } from '../../../core/constants/estados';
 import { environment } from '../../../../environments/environment';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,6 +52,7 @@ export class CadastrarEstabelecimentoModalComponent implements OnInit {
   carregando = false;
   mapCarregando = false;
 
+  readonly estados = ESTADOS_BRASILEIROS;
   tiposEstabelecimento = CATEGORIAS.filter((c) => c.id !== 'todos');
 
   localizacaoSelecionada: { lat: number; lng: number } | null = null;

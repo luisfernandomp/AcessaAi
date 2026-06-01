@@ -20,4 +20,10 @@ export class UsuarioService {
   atualizar(id: number, request: AtualizarUsuarioRequest): Observable<UsuarioResponse> {
     return this.http.put<UsuarioResponse>(`${this.baseUrl}/${id}`, request);
   }
+
+  uploadFotoPerfil(id: number, arquivo: File): Observable<string> {
+    const fd = new FormData();
+    fd.append('foto', arquivo, arquivo.name);
+    return this.http.post(`${this.baseUrl}/${id}/foto-perfil`, fd, { responseType: 'text' });
+  }
 }

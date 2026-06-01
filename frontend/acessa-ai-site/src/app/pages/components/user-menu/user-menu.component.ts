@@ -14,6 +14,7 @@ export class UserMenuComponent {
   @Input() usuarioNome: string = '';
   @Input() avatarCor: string = '#2563eb';
   @Input() usuarioIniciais: string = '?';
+  @Input() urlFotoPerfil: string | null = null;
 
   @Output() openEstabelecimentoModal = new EventEmitter<void>();
   @Output() editEstabelecimentos = new EventEmitter<void>();

@@ -54,7 +54,12 @@
 
         <label>
           UF
-          <input type="text" formControlName="uf" placeholder="UF" />
+          <select formControlName="uf">
+            <option value="">UF</option>
+            @for (estado of estados; track estado.sigla) {
+              <option [value]="estado.sigla">{{ estado.sigla }}</option>
+            }
+          </select>
         </label>
 
         <label>

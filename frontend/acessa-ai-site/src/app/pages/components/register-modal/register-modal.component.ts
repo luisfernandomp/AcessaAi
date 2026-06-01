@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { ESTADOS_BRASILEIROS } from '../../../core/constants/estados';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
@@ -33,9 +34,12 @@ export class RegisterModalComponent implements OnInit {
   private readonly toastr = inject(ToastrService);
   private readonly authService = inject(AuthService);
 
+  readonly estados = ESTADOS_BRASILEIROS;
   etapa = 1;
   carregando = false;
   mostrarSenha = false;
+  fotoPerfilPreview: string | null = null;
+  uploadandoFoto = false;
 
   form = this.fb.group({
     nome: ['', Validators.required],
@@ -85,6 +89,7 @@ export class RegisterModalComponent implements OnInit {
             cep: d.endereco?.cep ?? '',
           },
         });
+        this.fotoPerfilPreview = d.urlFotoPerfil ?? null;
       }
     }
   }
@@ -168,6 +173,35 @@ export class RegisterModalComponent implements OnInit {
         this.toastr.error('Erro ao atualizar perfil. Tente novamente.');
       },
     });
+  }
+
+  onFotoChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const arquivo = input.files?.[0];
+    if (!arquivo) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => (this.fotoPerfilPreview = e.target!.result as string);
+    reader.readAsDataURL(arquivo);
+
+    const usuario = this.authService.getUsuarioLogado();
+    if (!usuario) return;
+
+    this.uploadandoFoto = true;
+    this.usuarioService.uploadFotoPerfil(usuario.id, arquivo).subscribe({
+      next: (url) => {
+        this.uploadandoFoto = false;
+        this.fotoPerfilPreview = url;
+        this.toastr.success('Foto de perfil atualizada!');
+      },
+      error: () => {
+        this.uploadandoFoto = false;
+        this.fotoPerfilPreview = this.dadosIniciais?.urlFotoPerfil ?? null;
+        this.toastr.error('Erro ao fazer upload da foto. Tente novamente.');
+      },
+    });
+
+    input.value = '';
   }
 
   fecharModal(): void {

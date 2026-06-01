@@ -13,6 +13,7 @@ export interface UsuarioResponse {
   dataNascimento: string;
   ativo: boolean;
   endereco: Endereco;
+  urlFotoPerfil?: string | null;
 }
 
 export interface AtualizarUsuarioRequest {
